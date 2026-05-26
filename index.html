@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beli Voucher</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+body { background: #f4f6f8; padding-bottom: 90px; }
+.header { background: #2a5298; color: #fff; padding: 20px; text-align: center; position: relative; }
+.menu-dot-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 5px 10px; line-height: 1; }
+.dropdown-menu { position: absolute; top: 50px; right: 15px; background: white; color: black; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 150px; z-index: 3000; overflow: hidden; text-align: left; }
+.dropdown-item { padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 14px; }
+.dropdown-item:last-child { border-bottom: none; }
+.dropdown-item:hover { background: #f5f5f5; }
+.card { background: #fff; margin: 15px; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.operator-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0; }
+.operator-card { min-width: 80px; padding: 10px; border: 2px solid #ddd; border-radius: 10px; text-align: center; cursor: pointer; }
+.operator-card.active { border-color: #2a5298; background: #eef6ff; }
+.operator-card img { width: 40px; height: 40px; object-fit: contain; }
+.produk-retro-grid { display: flex; flex-direction: column; gap: 15px; padding: 5px 0; }
+.produk-item-retro { position: relative; background: #fff; border: 3px solid #2d3748; border-radius: 4px; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 4px 4px 0px #2d3748; cursor: pointer; transition: all 0.15s ease; overflow: hidden; }
+.produk-item-retro:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #2d3748; }
+.produk-item-retro::before { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 100%; }
+.produk-item-retro.op-telkomsel::before { background: #e53e3e; }
+.produk-item-retro.op-telkomsel.active { background: #fff5f5; border-color: #e53e3e; box-shadow: 4px 4px 0px #e53e3e; }
+.produk-item-retro.op-telkomsel .produk-harga { color: #e53e3e; }
+.produk-item-retro.op-indosat::before { background: #dd6b20; }
+.produk-item-retro.op-indosat.active { background: #fffaf0; border-color: #dd6b20; box-shadow: 4px 4px 0px #dd6b20; }
+.produk-item-retro.op-indosat .produk-harga { color: #dd6b20; }
+.produk-item-retro.op-xl::before { background: #3182ce; }
+.produk-item-retro.op-xl.active { background: #ebf8ff; border-color: #3182ce; box-shadow: 4px 4px 0px #3182ce; }
+.produk-item-retro.op-xl .produk-harga { color: #3182ce; }
+.produk-item-retro.op-tri::before { background: #b83280; }
+.produk-item-retro.op-tri.active { background: #fff5f7; border-color: #b83280; box-shadow: 4px 4px 0px #b83280; }
+.produk-item-retro.op-tri .produk-harga { color: #b83280; }
+.produk-item-retro.op-axis::before { background: #805ad5; }
+.produk-item-retro.op-axis.active { background: #faf5ff; border-color: #805ad5; box-shadow: 4px 4px 0px #805ad5; }
+.produk-item-retro.op-axis .produk-harga { color: #805ad5; }
+.produk-item-retro.op-nitscell::before { background: #319795; }
+.produk-item-retro.op-nitscell.active { background: #e6fffa; border-color: #319795; box-shadow: 4px 4px 0px #319795; }
+.produk-item-retro.op-nitscell .produk-harga { color: #319795; }
+.produk-item-retro.disabled { background: #f7f7f7 !important; border-color: #cbd5e0 !important; box-shadow: 0px 0px 0px transparent !important; color: #a0aec0; cursor: not-allowed; transform: none !important; }
+.produk-item-retro.disabled::before { background: #cbd5e0 !important; }
+.produk-info { display: flex; flex-direction: column; gap: 6px; padding-left: 8px; }
+.produk-nama { font-weight: 800; color: #2d3748; font-size: 15px; letter-spacing: -0.3px; }
+.produk-item-retro.disabled .produk-nama { text-decoration: line-through; color: #a0aec0; }
+.produk-kanan { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.produk-harga { font-weight: 900; font-size: 16px; font-family: monospace; }
+.produk-item-retro.disabled .produk-harga { color: #a0aec0 !important; }
+.badge { font-size: 9px; padding: 2px 6px; border: 2px solid #2d3748; border-radius: 4px; font-weight: bold; text-transform: uppercase; display: inline-block; box-shadow: 1px 1px 0px #2d3748; }
+.badge-ready { background: #fff; color: #2d3748; }
+.badge-habis { background: #e53e3e; color: #fff; border-color: #2d3748; }
+.footer-buy { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 15px; border-top: 1px solid #eee; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); text-align: center; }
+.btn { width: 100%; padding: 15px; border: none; border-radius: 8px; background: #2a5298; color: #fff; font-weight: bold; cursor: pointer; }
+.btn:disabled { background: #ccc; }
+.footer-text { font-size: 80%; color: #718096; margin-top: 5px; }
+.hidden { display: none !important; }
+.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f4f6f8; z-index: 1000; padding: 0; overflow-y: auto; }
+.overlay-header { background: #2a5298; color: #fff; padding: 15px 20px; display: flex; align-items: center; gap: 15px; font-size: 18px; font-weight: bold; }
+.overlay-back { cursor: pointer; font-size: 24px; line-height: 1; }
+.kfc-receipt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: flex; justify-content: center; align-items: flex-start; padding: 20px; overflow-y: auto; }
+.kfc-receipt { background: #fff; width: 100%; max-width: 340px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-family: 'Courier New', Courier, monospace; color: #000; font-size: 13px; line-height: 1.4; position: relative; margin-bottom: 40px; }
+.kfc-receipt::before { content: ""; position: absolute; left: 0; bottom: -8px; width: 100%; height: 8px; background: linear-gradient(-45deg, transparent 4px, #fff 4px), linear-gradient(45deg, transparent 4px, #fff 4px); background-size: 8px 8px; }
+.kfc-header { text-align: center; text-transform: uppercase; margin-bottom: 15px; }
+.kfc-brand { font-size: 24px; font-weight: bold; letter-spacing: 2px; color: #d32f2f; margin-bottom: 2px; }
+.kfc-divider { border-top: 1px dashed #000; margin: 10px 0; }
+.kfc-row { display: flex; justify-content: space-between; }
+.kfc-bold { font-weight: bold; }
+.kfc-sn-box { border: 1px dashed #000; padding: 10px; margin: 15px 0; text-align: center; background: #fafafa; }
+.kfc-sn-title { font-size: 11px; text-transform: uppercase; margin-bottom: 3px; }
+.kfc-sn-value { font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+.kfc-footer { text-align: center; margin-top: 15px; font-size: 11px; text-transform: uppercase; }
+.kfc-btn-close { width: 100%; padding: 12px; border: none; background: #d32f2f; color: #fff; font-family: sans-serif; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 20px; text-transform: uppercase; }
+.input-group { margin-bottom: 15px; }
+.input-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #4a5568; }
+.input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s; }
+.input-group input:focus { border-color: #2a5298; }
+.riwayat-item { display: flex; flex-direction: column; padding: 15px; border-bottom: 1px solid #edf2f7; background: #fff; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.riwayat-item:last-child { margin-bottom: 0; }
+.riwayat-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.riwayat-nama { font-weight: bold; color: #2d3748; font-size: 15px; }
+.riwayat-tgl { font-size: 12px; color: #a0aec0; }
+.riwayat-sn-container { background: #f7fafc; border: 1px dashed #cbd5e0; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+.riwayat-sn-code { font-family: monospace; font-size: 14px; color: #2b6cb0; font-weight: bold; }
+.riwayat-btn-salin { font-size: 12px; color: #2a5298; font-weight: bold; background: none; border: none; cursor: pointer; }
+.custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+.custom-alert-box { background: #fff; border: 3px solid #2d3748; border-radius: 4px; box-shadow: 5px 5px 0px #2d3748; width: 100%; max-width: 320px; overflow: hidden; animation: alertTimbul 0.15s ease-out; }
+@keyframes alertTimbul { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.custom-alert-header { background: #2d3748; color: #fff; padding: 10px 15px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; }
+.custom-alert-body { padding: 20px 15px; color: #2d3748; font-size: 14px; font-weight: 700; line-height: 1.5; }
+.custom-alert-footer { padding: 10px 15px; display: flex; justify-content: flex-end; background: #f7fafc; border-top: 2px solid #2d3748; }
+.custom-alert-btn { padding: 8px 20px; background: #2a5298; color: #fff; border: 2px solid #2d3748; font-weight: bold; font-size: 13px; cursor: pointer; border-radius: 4px; box-shadow: 2px 2px 0px #2d3748; text-transform: uppercase; }
+.custom-alert-btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0px #2d3748; }
+.saldo-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+.saldo-alert-box { background: #fff; border: 3px solid #2d3748; border-radius: 4px; box-shadow: 5px 5px 0px #2d3748; width: 100%; max-width: 320px; overflow: hidden; animation: alertTimbul 0.15s ease-out; }
+.saldo-alert-header { background: #e53e3e; color: #fff; padding: 10px 15px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; }
+.saldo-alert-body { padding: 20px 15px; color: #2d3748; font-size: 14px; font-weight: 700; line-height: 1.5; }
+.saldo-alert-body p:first-child { color: #e53e3e; margin-bottom: 8px; font-size: 15px; font-weight: 800; }
+.saldo-alert-body p:last-child { color: #4a5568; font-size: 13px; font-weight: 600; }
+.saldo-alert-footer { padding: 10px 15px; display: flex; justify-content: space-between; background: #f7fafc; border-top: 2px solid #2d3748; }
+.saldo-alert-btn-tutup { padding: 8px 20px; background: #718096; color: #fff; border: 2px solid #2d3748; font-weight: bold; font-size: 13px; cursor: pointer; border-radius: 4px; box-shadow: 2px 2px 0px #2d3748; text-transform: uppercase; }
+.saldo-alert-btn-tutup:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0px #2d3748; }
+.btn-external { padding: 8px 15px; background: #25d366; color: #fff; border: 2px solid #2d3748; font-weight: bold; font-size: 13px; cursor: pointer; border-radius: 4px; box-shadow: 2px 2px 0px #2d3748; text-transform: uppercase; display: inline-block; text-decoration: none; text-align: center; }
+.btn-external:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0px #2d3748; }
+.container-frame { max-width: 600px; margin: 0 auto; border: 1px solid #dcdfe6; border-radius: 16px; background: transparent; padding: 8px; }
+.screenshot-container { display: flex; overflow-x: auto; gap: 12px; margin-bottom: 24px; padding: 8px 0; scrollbar-width: none; }
+.screenshot-container::-webkit-scrollbar { display: none; }
+.screenshot-item { flex: 0 0 140px; height: 250px; background-color: transparent; border-radius: 8px; overflow: hidden; display: block; text-decoration: none; transition: all 0.1s ease; }
+.screenshot-item:active { transform: scale(0.98); }
+.screenshot-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+.video-album-scroll { display: flex; overflow-x: auto; gap: 8px; padding: 15px; scrollbar-width: none; }
+.video-album-scroll::-webkit-scrollbar { display: none; }
+.video-card { flex: 0 0 84px; background: #000; border-radius: 4px; overflow: hidden; aspect-ratio: 9/16; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.video-card video { width: 100%; height: 100%; object-fit: cover; }
+.btn-play { position: absolute; color: white; font-size: 20px; z-index: 2; pointer-events: none; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div id="display-saldo">Login Dahulu</div>
+    <button class="menu-dot-btn" onclick="toggleDropdown(event)">&#8942;</button>
+    <div id="dropdown-menu" class="dropdown-menu hidden">
+        <div class="dropdown-item" onclick="window.AppInventor.setWebViewString('buka_profil')">Profil</div>
+        <div class="dropdown-item" onclick="window.AppInventor.setWebViewString('buka_riwayat')">Riwayat</div>
+    </div>
+</div>
+
+<div id="main-page">
+    <div class="card">
+        <div class="operator-scroll" id="operator-list">
+            <div class="operator-card" onclick="pilihOp('nitscell', this)">
+                <img src="nitscell.jpg">
+                <small>NitsCell</small>
+            </div>
+            <div class="operator-card" onclick="pilihOp('axis', this)">
+                <img src="axis.png">
+                <small>Axis</small>
+            </div>
+            <div class="operator-card" onclick="pilihOp('xl', this)">
+                <img src="xl.png">
+                <small>XL</small>
+            </div>
+            <div class="operator-card" onclick="pilihOp('indosat', this)">
+                <img src="indosat.png">
+                <small>Indosat</small>
+            </div>
+            <div class="operator-card" onclick="pilihOp('smartfren', this)">
+                <img src="smartfren.png">
+                <small>Smartfren</small>
+            </div>
+            <div class="operator-card" onclick="pilihOp('tri', this)">
+                <img src="tri.png">
+                <small>Tri</small>
+            </div>
+        </div>
+    </div>
+    <div id="container-produk" class="card"></div>
+</div>
+
+<div class="container-frame">
+    <div class="screenshot-container">
+        <div onclick="window.AppInventor.setWebViewString('buka_klaim')" class="screenshot-item"><img src="formulir.jpg"></div>
+        <div onclick="window.AppInventor.setWebViewString('buka_pasangacp')" class="screenshot-item"><img src="aplikator.jpg"></div>
+        <div onclick="window.AppInventor.setWebViewString('buka_video')" class="screenshot-item"><img src="galeri.jpg"></div>
+        <div onclick="window.AppInventor.setWebViewString('buka_qris')" class="screenshot-item"><img src="qris.jpg"></div>
+        <div onclick="window.AppInventor.setWebViewString('buka_slot')" class="screenshot-item"><img src="slot.jpg"></div>
+    </div>
+</div>
+
+<div id="container-video-album" class="video-album-scroll"></div>
+
+<div class="footer-buy">
+    <button id="btn-beli" class="btn" onclick="prosesBeli()" disabled>Beli Sekarang</button>
+    <div class="footer-text">Transaksi super cepat dari server nasuka wireless</div>
+</div>
+
+<div id="riwayat-page" class="overlay hidden">
+    <div class="overlay-header">
+        <span class="overlay-back" onclick="tutupOverlay('riwayat-page')">&#8592;</span>
+        <span>Riwayat Pembelian</span>
+    </div>
+    <div id="container-riwayat" style="padding: 15px 0;"></div>
+</div>
+
+<div id="auth-page" class="overlay hidden">
+    <div style="padding: 30px 20px;">
+        <h2>Login / Daftar</h2>
+        <div class="input-group" style="margin-top:20px;">
+            <label>Nomor HP</label>
+            <input type="text" id="auth-phone" placeholder="Contoh: 08123456789">
+        </div>
+        <div class="input-group">
+            <label>PIN 6 Digit</label>
+            <input type="password" id="auth-pin" placeholder="Masukkan PIN">
+        </div>
+        <button class="btn" onclick="authUser()" style="margin-bottom: 15px;">Masuk / Daftar</button>
+    </div>
+</div>
+
+<div id="receipt-overlay" class="kfc-receipt-overlay hidden">
+    <div class="kfc-receipt">
+        <div class="kfc-header">
+            <div class="kfc-brand">Struk Belanja</div>
+            <div>NASUKA WIRELESS STORE</div>
+        </div>
+        <div class="kfc-divider"></div>
+        <div class="kfc-row">
+            <div id="rc-tgl">TGL: 20/05/2026</div>
+            <div id="rc-jam">JAM: 11:20</div>
+        </div>
+        <div class="kfc-row">
+            <div id="rc-phone">CUST: 08123456789</div>
+        </div>
+        <div class="kfc-divider"></div>
+        <div class="kfc-bold">1  <span id="rc-nama">Telkomsel Flash 1GB</span></div>
+        <div class="kfc-row">
+            <div>&nbsp;&nbsp;&nbsp;HARGA SATUAN</div>
+            <div id="rc-harga-satuan">Rp 12.000</div>
+        </div>
+        <div class="kfc-divider"></div>
+        <div class="kfc-row kfc-bold" style="font-size:15px;">
+            <div>TOTAL</div>
+            <div id="rc-total">Rp 12.000</div>
+        </div>
+        <div class="kfc-divider"></div>
+        <div class="kfc-sn-box">
+            <div class="kfc-sn-title">SERIAL NUMBER (SN) / KODE VOUCHER</div>
+            <div id="rc-sn" class="kfc-sn-value">1234-5678-9012-3456</div>
+        </div>
+        <div class="kfc-divider"></div>
+        <div class="kfc-footer">
+            <p class="kfc-bold">TERIMA KASIH ATAS KUNJUNGAN ANDA</p>
+        </div>
+        <button class="kfc-btn-close" onclick="tutupStrukDanHome()">Selesai</button>
+    </div>
+</div>
+
+<div id="custom-alert" class="custom-alert-overlay hidden">
+    <div class="custom-alert-box">
+        <div class="custom-alert-header" id="custom-alert-title">NOTIFIKASI</div>
+        <div class="custom-alert-body" id="custom-alert-message">Pesan alert di sini.</div>
+        <div class="custom-alert-footer">
+            <button class="custom-alert-btn" onclick="tutupAlert()">OK</button>
+        </div>
+    </div>
+</div>
+
+<div id="saldo-alert" class="saldo-alert-overlay hidden">
+    <div class="saldo-alert-box">
+        <div class="saldo-alert-header">SALDO KURANG</div>
+        <div class="saldo-alert-body">
+            <p>Saldo anda tidak cukup untuk membeli paket data ini</p>
+            <p>Silahkan topup saldo anda atau hubungi admin</p>
+        </div>
+        <div class="saldo-alert-footer">
+            <button class="saldo-alert-btn-tutup" onclick="tutupSaldoAlert()">TUTUP</button>
+            <a href="https://wa.me/62859109819017" class="btn-external">WHATSAPP</a>
+        </div>
+    </div>
+</div>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyDXo3x2WA13dElu0jiRcDjzbm-2499Zaro",
+    authDomain: "nasukawireless-5808a.firebaseapp.com",
+    databaseURL: "https://nasukawireless-5808a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "nasukawireless-5808a"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const dataProduk = {
+    indosat: [{ id: 'i1', nama: 'Indosat 5GB 1hari', harga: 8250 }],
+    xl: [{ id: 'x1', nama: 'XL Flex 5GB 1hari', harga: 7750 }],
+    tri: [{ id: '31', nama: 'Tri 1.250GB 1Tahun', harga: 950000 }],
+    axis: [{ id: 'a1', nama: 'Axis Aigo 5GB 1hari', harga: 7250 }],
+    smartfren: [{ id: 's1', nama: 'Smartfren 1GB 3hari', harga: 7250 }],
+    nitscell: [{ id: 'n1', nama: 'NitsCell Unlimited 6jam', harga: 1750 }]
+};
+
+let user = JSON.parse(localStorage.getItem('user_data'));
+let cachedStok = JSON.parse(localStorage.getItem('cached_stok')) || {};
+let selectedProduk = null;
+let currentOp = '';
+
+function tampilAlert(pesan, judul = 'NOTIFIKASI') {
+    document.getElementById('custom-alert-title').innerText = judul;
+    document.getElementById('custom-alert-message').innerText = pesan;
+    document.getElementById('custom-alert').classList.remove('hidden');
+}
+
+function tutupAlert() {
+    document.getElementById('custom-alert').classList.add('hidden');
+}
+
+function tampilSaldoAlert() {
+    document.getElementById('saldo-alert').classList.remove('hidden');
+}
+
+function tutupSaldoAlert() {
+    document.getElementById('saldo-alert').classList.add('hidden');
+}
+
+window.onload = () => {
+    if(!user) {
+        document.getElementById('auth-page').classList.remove('hidden');
+    } else {
+        renderTampilanUser();
+        initApp();
+        loadVideoAlbum();
+    }
+    document.addEventListener('click', () => {
+        document.getElementById('dropdown-menu').classList.add('hidden');
+    });
+};
+
+function renderTampilanUser() {
+    if(!user) return;
+    document.getElementById('display-saldo').innerText = "Saldo: Rp " + parseInt(user.saldo).toLocaleString();
+}
+
+function initApp() {
+    if(!user) return;
+    db.ref('users/' + user.phone).on('value', snap => {
+        if(snap.exists()){
+            user = snap.val();
+            localStorage.setItem('user_data', JSON.stringify(user));
+            renderTampilanUser();
+        }
+    });
+    listenStokRealtime();
+    loadRiwayat();
+}
+
+function listenStokRealtime() {
+    Object.keys(dataProduk).forEach(op => {
+        dataProduk[op].forEach(p => {
+            db.ref('stok_sn/' + p.id).on('value', snap => {
+                const available = [];
+                snap.forEach(child => {
+                    if(!child.val().status) available.push(child.key);
+                });
+                cachedStok[p.id] = available.length > 0;
+                localStorage.setItem('cached_stok', JSON.stringify(cachedStok));
+                const itemEl = document.getElementById(`prod-item-${p.id}`);
+                if(itemEl) updateProdukDOMElement(itemEl, p, cachedStok[p.id]);
+            });
+        });
+    });
+}
+
+function toggleDropdown(event) {
+    event.stopPropagation();
+    document.getElementById('dropdown-menu').classList.toggle('hidden');
+}
+
+function pilihOp(op, el) {
+    currentOp = op;
+    document.querySelectorAll('.operator-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    renderProduk();
+}
+
+function renderProduk() {
+    const container = document.getElementById('container-produk');
+    container.innerHTML = '';
+    selectedProduk = null;
+    document.getElementById('btn-beli').disabled = true;
+    if(!currentOp) return;
+    const grid = document.createElement('div');
+    grid.className = 'produk-retro-grid';
+    container.appendChild(grid);
+    dataProduk[currentOp].forEach(p => {
+        const div = document.createElement('div');
+        div.id = `prod-item-${p.id}`;
+        const hasStok = cachedStok[p.id] !== undefined ? cachedStok[p.id] : true;
+        div.className = `produk-item-retro op-${currentOp} ` + (hasStok ? '' : 'disabled');
+        div.innerHTML = `
+            <div class="produk-info">
+                <span class="produk-nama">${p.nama}</span>
+                <div class="badge-container">${hasStok ? `<span class="badge badge-ready">Ready</span>` : `<span class="badge badge-habis">Habis</span>`}</div>
+            </div>
+            <div class="produk-kanan">
+                <span class="produk-harga">Rp ${p.harga.toLocaleString()}</span>
+            </div>
+        `;
+        if(hasStok) {
+            div.onclick = () => {
+                document.querySelectorAll('.produk-item-retro').forEach(item => item.classList.remove('active'));
+                div.classList.add('active');
+                selectedProduk = p;
+                document.getElementById('btn-beli').disabled = false;
+            };
+        }
+        grid.appendChild(div);
+    });
+}
+
+function loadVideoAlbum() {
+    if (!user || !user.phone) return;
+    db.ref('testimoni_video/' + user.phone).once('value', snap => {
+        const cont = document.getElementById('container-video-album');
+        cont.innerHTML = '';
+        if (snap.exists()) {
+            let videos = [];
+            snap.forEach(child => {
+                videos.push(child.val());
+            });
+            videos.reverse();
+            videos.forEach(v => {
+                const div = document.createElement('div');
+                div.className = 'video-card';
+                div.innerHTML = '<div class="btn-play">▶</div><video src="' + v.video_link + '" playsinline loop></video>';
+                div.onclick = function() {
+                    const vid = this.querySelector('video');
+                    const btn = this.querySelector('.btn-play');
+                    document.querySelectorAll('video').forEach(otherVid => {
+                        if (otherVid !== vid) {
+                            otherVid.pause();
+                            otherVid.currentTime = 0;
+                            otherVid.parentElement.querySelector('.btn-play').style.display = 'block';
+                        }
+                    });
+                    if (vid.paused) { vid.play(); btn.style.display = 'none'; } else { vid.pause(); btn.style.display = 'block'; }
+                };
+                cont.appendChild(div);
+            });
+        }
+    });
+}
+
+function updateProdukDOMElement(el, p, hasStok) {
+    el.className = `produk-item-retro op-${currentOp} ` + (hasStok ? '' : 'disabled');
+    el.querySelector('.badge-container').innerHTML = hasStok ? `<span class="badge badge-ready">Ready</span>` : `<span class="badge badge-habis">Habis</span>`;
+    el.onclick = hasStok ? () => {
+        document.querySelectorAll('.produk-item-retro').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+        selectedProduk = p;
+        document.getElementById('btn-beli').disabled = false;
+    } : null;
+}
+
+function prosesBeli() {
+    if(!selectedProduk) return;
+    if(parseInt(user.saldo) < selectedProduk.harga) {
+        tampilSaldoAlert();
+        return;
+    }
+    const stokRef = db.ref('stok_sn/' + selectedProduk.id);
+    stokRef.orderByChild('status').equalTo(null).limitToFirst(1).once('value', (snap) => {
+        if (!snap.exists()) {
+            tampilAlert("Stok Habis", "GAGAL");
+            return;
+        }
+        const snKey = Object.keys(snap.val())[0];
+        const snData = snap.val()[snKey];
+        const snTeks = snData.sn;
+        stokRef.child(snKey).update({ status: 'booked', booked_by: user.phone }, (error) => {
+            if (!error) {
+                db.ref('users/' + user.phone + '/saldo').transaction((saldo) => {
+                    return saldo >= selectedProduk.harga ? saldo - selectedProduk.harga : undefined;
+                }, (err, committed, snapshot) => {
+                    if (committed) {
+                        stokRef.child(snKey).remove();
+                        db.ref('riwayat_sn/' + user.phone).push({ nama: selectedProduk.nama, sn: snTeks, tgl: Date.now() });
+                        tampilkanStrukKFC(selectedProduk.nama, selectedProduk.harga, snTeks);
+                    } else {
+                        stokRef.child(snKey).update({ status: null, booked_by: null });
+                        tampilAlert("Saldo kurang atau terjadi kesalahan.", "GAGAL");
+                    }
+                });
+            }
+        });
+    });
+}
+
+function tampilkanStrukKFC(nama, harga, sn) {
+    const agora = new Date();
+    document.getElementById('rc-tgl').innerText = "TGL: " + agora.toLocaleDateString();
+    document.getElementById('rc-jam').innerText = "JAM: " + agora.toLocaleTimeString();
+    document.getElementById('rc-phone').innerText = "CUST: " + user.phone;
+    document.getElementById('rc-nama').innerText = nama;
+    document.getElementById('rc-harga-satuan').innerText = "Rp " + harga.toLocaleString();
+    document.getElementById('rc-total').innerText = "Rp " + harga.toLocaleString();
+    document.getElementById('rc-sn').innerText = sn;
+    document.getElementById('receipt-overlay').classList.remove('hidden');
+}
+
+function tutupStrukDanHome() {
+    document.getElementById('receipt-overlay').classList.add('hidden');
+    document.querySelectorAll('.produk-item-retro').forEach(item => item.classList.remove('active'));
+    document.getElementById('btn-beli').disabled = true;
+    selectedProduk = null;
+}
+
+function authUser() {
+    const phone = document.getElementById('auth-phone').value.trim();
+    const pin = document.getElementById('auth-pin').value.trim();
+    if(!phone || !pin) return;
+    db.ref('users/' + phone).once('value', snap => {
+        if(snap.exists()) {
+            if(snap.val().pin === pin) { 
+                user = snap.val(); 
+                localStorage.setItem('user_data', JSON.stringify(user)); 
+                document.getElementById('auth-page').classList.add('hidden');
+                initApp();
+                loadVideoAlbum();
+            } else tampilAlert("PIN Salah", "GAGAL");
+        } else {
+            db.ref('users/' + phone).set({ phone, pin, saldo: 0 }).then(() => {
+                user = { phone, pin, saldo: 0 };
+                localStorage.setItem('user_data', JSON.stringify(user));
+                document.getElementById('auth-page').classList.add('hidden');
+                initApp();
+            });
+        }
+    });
+}
+
+function loadRiwayat() {
+    db.ref('riwayat_sn/' + user.phone).on('value', snap => {
+        let items = [];
+        snap.forEach(child => items.push(child.val()));
+        items.reverse();
+        renderRiwayatDOM(items);
+    });
+}
+
+function renderRiwayatDOM(items) {
+    const cont = document.getElementById('container-riwayat');
+    cont.innerHTML = '';
+    items.forEach(r => {
+        const d = new Date(r.tgl);
+        const div = document.createElement('div');
+        div.className = 'riwayat-item';
+        div.innerHTML = `<div class="riwayat-top"><span class="riwayat-nama">${r.nama}</span><span>${d.toLocaleDateString()}</span></div>
+                         <div class="riwayat-sn-container"><span class="riwayat-sn-code">${r.sn}</span><button class="riwayat-btn-salin" onclick="salinTeks('${r.sn}')">Salin</button></div>`;
+        cont.appendChild(div);
+    });
+}
+
+function salinTeks(teks) {
+    navigator.clipboard.writeText(teks);
+    tampilAlert("SN disalin: " + teks, "BERHASIL");
+}
+
+function tutupOverlay(id) { document.getElementById(id).classList.add('hidden'); }
+</script>
+</body>
+</html>
