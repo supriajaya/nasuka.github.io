@@ -121,11 +121,11 @@ body { background: #f4f6f8; padding-bottom: 90px; }
 <body>
 
 <div class="header">
-    <div id="display-saldo">Login Dahulu</div>
+    <div id="display-saldo">Saldo: --</div>
     <button class="menu-dot-btn" onclick="toggleDropdown(event)">&#8942;</button>
     <div id="dropdown-menu" class="dropdown-menu hidden">
-        <div class="dropdown-item" onclick="window.AppInventor.setWebViewString('buka_profil')">Profil</div>
-        <div class="dropdown-item" onclick="window.AppInventor.setWebViewString('buka_riwayat')">Riwayat</div>
+        <div class="dropdown-item" onclick="checkAuth('buka_profil')">Profil</div>
+        <div class="dropdown-item" onclick="checkAuth('buka_riwayat')">Riwayat</div>
     </div>
 </div>
 
@@ -174,7 +174,7 @@ body { background: #f4f6f8; padding-bottom: 90px; }
 <div id="container-video-album" class="video-album-scroll"></div>
 
 <div class="footer-buy">
-    <button id="btn-beli" class="btn" onclick="prosesBeli()" disabled>Beli Sekarang</button>
+    <button id="btn-beli" class="btn" onclick="checkAuth('proses_beli')" disabled>Beli Sekarang</button>
     <div class="footer-text">Transaksi super cepat dari server nasuka wireless</div>
 </div>
 
@@ -198,6 +198,7 @@ body { background: #f4f6f8; padding-bottom: 90px; }
             <input type="password" id="auth-pin" placeholder="Masukkan PIN">
         </div>
         <button class="btn" onclick="authUser()" style="margin-bottom: 15px;">Masuk / Daftar</button>
+        <button class="btn" onclick="tutupOverlay('auth-page')" style="background:#718096;">Batal</button>
     </div>
 </div>
 
@@ -209,27 +210,27 @@ body { background: #f4f6f8; padding-bottom: 90px; }
         </div>
         <div class="kfc-divider"></div>
         <div class="kfc-row">
-            <div id="rc-tgl">TGL: 20/05/2026</div>
-            <div id="rc-jam">JAM: 11:20</div>
+            <div id="rc-tgl">TGL: --</div>
+            <div id="rc-jam">JAM: --</div>
         </div>
         <div class="kfc-row">
-            <div id="rc-phone">CUST: 08123456789</div>
+            <div id="rc-phone">CUST: --</div>
         </div>
         <div class="kfc-divider"></div>
-        <div class="kfc-bold">1  <span id="rc-nama">Telkomsel Flash 1GB</span></div>
+        <div class="kfc-bold">1  <span id="rc-nama">--</span></div>
         <div class="kfc-row">
             <div>&nbsp;&nbsp;&nbsp;HARGA SATUAN</div>
-            <div id="rc-harga-satuan">Rp 12.000</div>
+            <div id="rc-harga-satuan">--</div>
         </div>
         <div class="kfc-divider"></div>
         <div class="kfc-row kfc-bold" style="font-size:15px;">
             <div>TOTAL</div>
-            <div id="rc-total">Rp 12.000</div>
+            <div id="rc-total">--</div>
         </div>
         <div class="kfc-divider"></div>
         <div class="kfc-sn-box">
             <div class="kfc-sn-title">SERIAL NUMBER (SN) / KODE VOUCHER</div>
-            <div id="rc-sn" class="kfc-sn-value">1234-5678-9012-3456</div>
+            <div id="rc-sn" class="kfc-sn-value">--</div>
         </div>
         <div class="kfc-divider"></div>
         <div class="kfc-footer">
@@ -286,6 +287,7 @@ let user = JSON.parse(localStorage.getItem('user_data'));
 let cachedStok = JSON.parse(localStorage.getItem('cached_stok')) || {};
 let selectedProduk = null;
 let currentOp = '';
+let actionAfterAuth = '';
 
 function tampilAlert(pesan, judul = 'NOTIFIKASI') {
     document.getElementById('custom-alert-title').innerText = judul;
@@ -293,34 +295,24 @@ function tampilAlert(pesan, judul = 'NOTIFIKASI') {
     document.getElementById('custom-alert').classList.remove('hidden');
 }
 
-function tutupAlert() {
-    document.getElementById('custom-alert').classList.add('hidden');
-}
-
-function tampilSaldoAlert() {
-    document.getElementById('saldo-alert').classList.remove('hidden');
-}
-
-function tutupSaldoAlert() {
-    document.getElementById('saldo-alert').classList.add('hidden');
-}
+function tutupAlert() { document.getElementById('custom-alert').classList.add('hidden'); }
+function tampilSaldoAlert() { document.getElementById('saldo-alert').classList.remove('hidden'); }
+function tutupSaldoAlert() { document.getElementById('saldo-alert').classList.add('hidden'); }
 
 window.onload = () => {
-    if(!user) {
-        document.getElementById('auth-page').classList.remove('hidden');
-    } else {
-        renderTampilanUser();
-        initApp();
-        loadVideoAlbum();
-    }
-    document.addEventListener('click', () => {
-        document.getElementById('dropdown-menu').classList.add('hidden');
-    });
+    renderTampilanUser();
+    initApp();
+    loadVideoAlbum();
+    document.addEventListener('click', () => { document.getElementById('dropdown-menu').classList.add('hidden'); });
 };
 
 function renderTampilanUser() {
-    if(!user) return;
-    document.getElementById('display-saldo').innerText = "Saldo: Rp " + parseInt(user.saldo).toLocaleString();
+    const el = document.getElementById('display-saldo');
+    if(!user) {
+        el.innerText = "Login Dahulu";
+    } else {
+        el.innerText = "Saldo: Rp " + parseInt(user.saldo).toLocaleString();
+    }
 }
 
 function initApp() {
@@ -341,15 +333,55 @@ function listenStokRealtime() {
         dataProduk[op].forEach(p => {
             db.ref('stok_sn/' + p.id).on('value', snap => {
                 const available = [];
-                snap.forEach(child => {
-                    if(!child.val().status) available.push(child.key);
-                });
+                snap.forEach(child => { if(!child.val().status) available.push(child.key); });
                 cachedStok[p.id] = available.length > 0;
                 localStorage.setItem('cached_stok', JSON.stringify(cachedStok));
                 const itemEl = document.getElementById(`prod-item-${p.id}`);
                 if(itemEl) updateProdukDOMElement(itemEl, p, cachedStok[p.id]);
             });
         });
+    });
+}
+
+function checkAuth(action) {
+    if(!user) {
+        actionAfterAuth = action;
+        document.getElementById('auth-page').classList.remove('hidden');
+    } else {
+        if(action === 'buka_profil') window.AppInventor.setWebViewString('buka_profil');
+        else if(action === 'buka_riwayat') {
+            document.getElementById('riwayat-page').classList.remove('hidden');
+        } else if(action === 'proses_beli') {
+            prosesBeli();
+        }
+    }
+}
+
+function authUser() {
+    const phone = document.getElementById('auth-phone').value.trim();
+    const pin = document.getElementById('auth-pin').value.trim();
+    if(!phone || !pin) return;
+    db.ref('users/' + phone).once('value', snap => {
+        if(snap.exists()) {
+            if(snap.val().pin === pin) { 
+                user = snap.val(); 
+                localStorage.setItem('user_data', JSON.stringify(user)); 
+                document.getElementById('auth-page').classList.add('hidden');
+                renderTampilanUser();
+                initApp();
+                loadVideoAlbum();
+                if(actionAfterAuth) checkAuth(actionAfterAuth);
+            } else tampilAlert("PIN Salah", "GAGAL");
+        } else {
+            db.ref('users/' + phone).set({ phone, pin, saldo: 0 }).then(() => {
+                user = { phone, pin, saldo: 0 };
+                localStorage.setItem('user_data', JSON.stringify(user));
+                document.getElementById('auth-page').classList.add('hidden');
+                renderTampilanUser();
+                initApp();
+                if(actionAfterAuth) checkAuth(actionAfterAuth);
+            });
+        }
     });
 }
 
@@ -397,39 +429,6 @@ function renderProduk() {
             };
         }
         grid.appendChild(div);
-    });
-}
-
-function loadVideoAlbum() {
-    if (!user || !user.phone) return;
-    db.ref('testimoni_video/' + user.phone).once('value', snap => {
-        const cont = document.getElementById('container-video-album');
-        cont.innerHTML = '';
-        if (snap.exists()) {
-            let videos = [];
-            snap.forEach(child => {
-                videos.push(child.val());
-            });
-            videos.reverse();
-            videos.forEach(v => {
-                const div = document.createElement('div');
-                div.className = 'video-card';
-                div.innerHTML = '<div class="btn-play">▶</div><video src="' + v.video_link + '" playsinline loop></video>';
-                div.onclick = function() {
-                    const vid = this.querySelector('video');
-                    const btn = this.querySelector('.btn-play');
-                    document.querySelectorAll('video').forEach(otherVid => {
-                        if (otherVid !== vid) {
-                            otherVid.pause();
-                            otherVid.currentTime = 0;
-                            otherVid.parentElement.querySelector('.btn-play').style.display = 'block';
-                        }
-                    });
-                    if (vid.paused) { vid.play(); btn.style.display = 'none'; } else { vid.pause(); btn.style.display = 'block'; }
-                };
-                cont.appendChild(div);
-            });
-        }
     });
 }
 
@@ -497,25 +496,28 @@ function tutupStrukDanHome() {
     selectedProduk = null;
 }
 
-function authUser() {
-    const phone = document.getElementById('auth-phone').value.trim();
-    const pin = document.getElementById('auth-pin').value.trim();
-    if(!phone || !pin) return;
-    db.ref('users/' + phone).once('value', snap => {
-        if(snap.exists()) {
-            if(snap.val().pin === pin) { 
-                user = snap.val(); 
-                localStorage.setItem('user_data', JSON.stringify(user)); 
-                document.getElementById('auth-page').classList.add('hidden');
-                initApp();
-                loadVideoAlbum();
-            } else tampilAlert("PIN Salah", "GAGAL");
-        } else {
-            db.ref('users/' + phone).set({ phone, pin, saldo: 0 }).then(() => {
-                user = { phone, pin, saldo: 0 };
-                localStorage.setItem('user_data', JSON.stringify(user));
-                document.getElementById('auth-page').classList.add('hidden');
-                initApp();
+function loadVideoAlbum() {
+    if (!user || !user.phone) return;
+    db.ref('testimoni_video/' + user.phone).once('value', snap => {
+        const cont = document.getElementById('container-video-album');
+        cont.innerHTML = '';
+        if (snap.exists()) {
+            let videos = [];
+            snap.forEach(child => { videos.push(child.val()); });
+            videos.reverse();
+            videos.forEach(v => {
+                const div = document.createElement('div');
+                div.className = 'video-card';
+                div.innerHTML = '<div class="btn-play">▶</div><video src="' + v.video_link + '" playsinline loop></video>';
+                div.onclick = function() {
+                    const vid = this.querySelector('video');
+                    const btn = this.querySelector('.btn-play');
+                    document.querySelectorAll('video').forEach(otherVid => {
+                        if (otherVid !== vid) { otherVid.pause(); otherVid.currentTime = 0; otherVid.parentElement.querySelector('.btn-play').style.display = 'block'; }
+                    });
+                    if (vid.paused) { vid.play(); btn.style.display = 'none'; } else { vid.pause(); btn.style.display = 'block'; }
+                };
+                cont.appendChild(div);
             });
         }
     });
