@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Beli Voucher</title>
+<title>Nasuka</title>
 <style>
 body { margin: 0; padding: 20px 20px 140px 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; background-image: url('https://nasukafoods.site/image/ombak.gif'); background-repeat: no-repeat; background-size: cover; background-attachment: fixed; }
 header { width: 100%; max-width: 800px; display: flex; justify-content: center; align-items: center; padding: 15px; background: #f0f0f0; border: 4px outset #fff; margin-bottom: 20px; box-sizing: border-box; position: relative; }
@@ -21,79 +21,89 @@ header { width: 100%; max-width: 800px; display: flex; justify-content: center; 
 .control-row { display: flex; justify-content: center; width: 100%; }
 .btn-retro { cursor: pointer; background: #dcdcdc; border: 12px outset #fff; padding: 20px 33px; margin: 7px; font: bold 39px 'Courier New', monospace; outline: none; color: #000; display: block; text-align: center; flex: 1; }
 .btn-retro:active { border-style: inset; background: #c0c0c0; }
-.btn-external { display: block; padding: 15px; margin: 10px 0; background: #eee; border: 4px outset #ccc; text-decoration: none; color: #000; font-weight: bold; text-align: center; }
+.btn-external { display: block; padding: 25px; margin: 20px 0; background: #000; border: 4px outset #ccc; text-decoration: none; color: #fff; font-weight: bold; text-align: center; font-size: 40px; }
 input[type="radio"] { position: absolute; left: -9999px; }
 #partner:checked ~ .container .carousel { transform: translateZ(-702px); }
-#voucher:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-60deg); }
-#bikin:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-120deg); }
-#proyek:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-180deg); }
+#cilok:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-60deg); }
+#nasuka:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-120deg); }
+#paket:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-180deg); }
 #tentang:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-240deg); }
-#tambahan:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-300deg); }
+#kontak:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-300deg); }
 #partner:checked ~ .container .carousel a:nth-child(1) { transform: translateZ(702px) scale(1); opacity: 1; }
-#voucher:checked ~ .container .carousel a:nth-child(2) { transform: rotateY(60deg) translateZ(702px) scale(1); opacity: 1; }
-#bikin:checked ~ .container .carousel a:nth-child(3) { transform: rotateY(120deg) translateZ(702px) scale(1); opacity: 1; }
-#proyek:checked ~ .container .carousel a:nth-child(4) { transform: rotateY(180deg) translateZ(702px) scale(1); opacity: 1; }
+#cilok:checked ~ .container .carousel a:nth-child(2) { transform: rotateY(60deg) translateZ(702px) scale(1); opacity: 1; }
+#nasuka:checked ~ .container .carousel a:nth-child(3) { transform: rotateY(120deg) translateZ(702px) scale(1); opacity: 1; }
+#paket:checked ~ .container .carousel a:nth-child(4) { transform: rotateY(180deg) translateZ(702px) scale(1); opacity: 1; }
 #tentang:checked ~ .container .carousel a:nth-child(5) { transform: rotateY(240deg) translateZ(702px) scale(1); opacity: 1; }
-#tambahan:checked ~ .container .carousel a:nth-child(6) { transform: rotateY(300deg) translateZ(702px) scale(1); opacity: 1; }
-#artikel-wrapper { width: 100%; max-width: 900px; margin-top: 20px; border: 4px solid #000; min-height: 300px; font-size: 45.6px; line-height: 1.6; background: rgba(255, 255, 255, 0.8); }
+#kontak:checked ~ .container .carousel a:nth-child(6) { transform: rotateY(300deg) translateZ(702px) scale(1); opacity: 1; }
+#artikel-wrapper { width: 100%; max-width: 900px; margin-top: 20px; border: 4px solid #000; min-height: 300px; font-size: 32px; line-height: 1.6; background: rgba(255, 255, 255, 0.9); text-align: center; }
 .konten-artikel { padding: 20px; }
+.galeri-foto { display: flex; justify-content: space-between; gap: 10px; margin: 20px 0; }
+.galeri-foto img { width: 32%; height: auto; border: 4px solid #000; }
 </style>
 </head>
 <body>
 <header>
-<div id="display-saldo">Nasuka Foods</div>
+<div id="display-saldo">Nasuka Wireless</div>
 </header>
 
 <input checked id="partner" name="multiples" type="radio">
-<input id="voucher" name="multiples" type="radio">
-<input id="bikin" name="multiples" type="radio">
-<input id="proyek" name="multiples" type="radio">
+<input id="cilok" name="multiples" type="radio">
+<input id="nasuka" name="multiples" type="radio">
+<input id="paket" name="multiples" type="radio">
 <input id="tentang" name="multiples" type="radio">
-<input id="tambahan" name="multiples" type="radio">
+<input id="kontak" name="multiples" type="radio">
 
 <div class="container">
 <div class="carousel">
-<a href="partner.html"><img src="partner.jpg"></a>
-<a href="voucher.html"><img src="voucher.png"></a>
-<a href="bikin.html"><img src="bikin.png"></a>
-<a href="proyek.html"><img src="proyek.jpg"></a>
-<a href="tentang.html"><img src="tentang.png"></a>
-<a href="tambahan.html"><img src="tambahan.png"></a>
+<a onclick="window.AppInventor.setWebViewString('partner.html')"><img src="partner.jpg"></a>
+<a onclick="window.AppInventor.setWebViewString('cilok.html')"><img src="voucher.png"></a>
+<a onclick="window.AppInventor.setWebViewString('nasuka.html')"><img src="bikin.png"></a>
+<a onclick="window.AppInventor.setWebViewString('paket.html')"><img src="proyek.jpg"></a>
+<a onclick="window.AppInventor.setWebViewString('tentang.html')"><img src="tentang.png"></a>
+<a onclick="window.AppInventor.setWebViewString('kontak.html')"><img src="tambahan.png"></a>
 </div>
 </div>
 
-<div id="info-produk" style="text-align:center; font-size:39px; font-weight:bold; margin: 20px;">Partner Cilok</div>
+<div id="info-produk" style="text-align:center; font-size:39px; font-weight:bold; margin: 20px;">Partner</div>
 
 <div class="controls-wrapper">
 <div class="control-row">
-<label class="btn-retro" for="partner" onclick="updateInfo('Partner Cilok', 'partner')">Partner</label>
-<label class="btn-retro" for="voucher" onclick="updateInfo('VoucherData', 'voucher')">VoucherData</label>
-<label class="btn-retro" for="bikin" onclick="updateInfo('BikinApk', 'bikin')">BikinApk</label>
+<label class="btn-retro" for="partner" onclick="updateInfo('Partner', 'partner')">Partner</label>
+<label class="btn-retro" for="cilok" onclick="updateInfo('Cilok', 'cilok')">Cilok</label>
+<label class="btn-retro" for="paket" onclick="updateInfo('PaketData', 'paket')">PaketData</label>
+
+
+
+
 </div>
+
 <div class="control-row">
-<label class="btn-retro" for="proyek" onclick="updateInfo('ProyekAcp', 'proyek')">ProyekAcp</label>
-<label class="btn-retro" for="tentang" onclick="updateInfo('TentangKami', 'tentang')">TentangKami</label>
-<label class="btn-retro" for="tambahan" onclick="updateInfo('Lainnya', 'tambahan')">Lainnya</label>
+    
+    
+
+
+<label class="btn-retro" for="nasuka" onclick="updateInfo('Nasuka.apk', 'nasuka')">Nasuka.apk</label>
+
+
+<label class="btn-retro" for="tentang" onclick="updateInfo('Tentang', 'tentang')">Tentang</label>
+<label class="btn-retro" for="kontak" onclick="updateInfo('Kontak', 'kontak')">Kontak</label>
 </div>
 
 <div id="artikel-wrapper">
     <div id="konten-artikel" class="konten-artikel">
-        <a href="https://gofood.link" class="btn-external">GoFood</a>
-        <a href="https://r.grab.com" class="btn-external">GrabFood</a>
-        <a href="https://app.shopeepay.co.id" class="btn-external">ShopeeFood</a>
-        <a href="https://vt.tiktok.com" class="btn-external">TikTok Shop</a>
+        Informasi mengenai Partner.
     </div>
 </div>
 </div>
 
 <script>
 const dataProduk = {
-    partner: '<a href="https://gofood.link" class="btn-external">GoFood</a><a href="https://r.grab.com" class="btn-external">GrabFood</a><a href="https://app.shopeepay.co.id" class="btn-external">ShopeeFood</a><a href="https://vt.tiktok.com" class="btn-external">TikTok Shop</a>',
-    voucher: '<p>VoucherData tersedia untuk berbagai provider.</p><p>Harga terjangkau dan proses cepat.</p>',
-    bikin: '<p>Jasa pembuatan aplikasi Android profesional.</p><p>Menggunakan Kodular dan AppInventor.</p>',
-    proyek: '<p>Detail mengenai proyek ACP.</p><p>Proyek yang sedang berjalan saat ini.</p>',
-    tentang: '<p>Nasuka Foods.</p><p>Berdedikasi memberikan kualitas terbaik bagi pelanggan.</p>',
-    tambahan: '<p>Berbagai layanan tambahan lainnya.</p><p>Hubungi kami untuk kebutuhan Anda.</p>'
+    partner: 'Informasi mengenai Partner.',
+    cilok: 'Informasi mengenai Cilok.',
+    nasuka: '<br><br><div class="galeri-foto"><img src="https://nasukafoods.site/image/ssdata4.jpg"><img src="https://via.placeholder.com/300x200"><img src="https://via.placeholder.com/300x200"></div><p>Ukuran: 8MB<br>OS: Android 5.0+</p><a href="https://nasuka.pro/nasuka.apk" class="btn-external">DOWNLOAD APK</a>',
+    paket: 'Informasi mengenai PaketData.',
+    tentang: 'Informasi mengenai Tentang.',
+    kontak: 'Informasi mengenai Kontak.'
 };
 
 function updateInfo(nama, key) {
