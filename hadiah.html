@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hadiah</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #202124;
+            padding: 20px;
+        }
+
+        .page {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #f1f3f4;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .app-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .app-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-left: 16px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .service-card {
+            background: #ffffff;
+            border: 2px solid #202124;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 4px 4px 0px #202124;
+            pointer-events: none;
+        }
+
+        .service-card h4 {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            color: #01875f;
+        }
+
+        .service-img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #202124;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <div class="header">
+        <div class="app-icon"><img src="https://nasuka.pro/gambar/ikonhadiah.png" alt="Icon"></div>
+        <div class="app-title">Hadiah</div>
+    </div>
+    
+    <div class="services-grid">
+        <div class="service-card">
+            <h4>Payung</h4>
+            <span style="font-size: 12px;">Payung cantik kekinian</span>
+            <img src="https://nasukafoods.site/image/nasukafoods.jpg" class="service-img" alt="Payung">
+        </div>
+    
+        <div class="service-card">
+            <h4>Jas Hujan</h4>
+            <span style="font-size: 12px;">Perlindungan badan dari cuaca </span>
+            <img src="https://nasukafoods.site/image/nasukafoods.jpg" class="service-img" alt="Jas Hujan">
+        </div>
+
+        <div class="service-card">
+            <h4>Voucher Kouta</h4>
+            <span style="font-size: 12px;">Voucher kuota 28hari all operator</span>
+            <img src="https://nasukafoods.site/image/nasukafoods.jpg" class="service-img" alt="Voucher Kouta">
+        </div>
+
+        <div class="service-card">
+            <h4>Saldo Nasuka</h4>
+            <span style="font-size: 12px;">Free saldo nasuka Rp 20.000</span>
+            <img src="https://nasukafoods.site/image/nasukafoods.jpg" class="service-img" alt="Saldo Nasuka">
+        </div>
+    </div>
+
+    <div class="service-card">
+        <h4>Ketentuan pemenang</h4>
+        <span style="font-size: 12px;">Pemenang akan diumumkan 17 agustus 2026</span>
+    </div>
+</div>
+
+</body>
+</html>
