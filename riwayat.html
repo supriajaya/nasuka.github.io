@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riwayat Pembelian</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+body { background: #f4f6f8; }
+.overlay-header { background: #2a5298; color: #fff; padding: 15px 20px; display: flex; align-items: center; gap: 15px; font-size: 18px; font-weight: bold; position: sticky; top: 0; z-index: 1000; }
+.riwayat-item { display: flex; flex-direction: column; padding: 15px; border-bottom: 1px solid #edf2f7; background: #fff; border-radius: 8px; margin: 12px 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.riwayat-top { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.riwayat-nama { font-weight: bold; color: #2d3748; font-size: 15px; }
+.riwayat-tgl { font-size: 12px; color: #a0aec0; }
+.riwayat-sn-container { background: #f7fafc; border: 1px dashed #cbd5e0; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+.riwayat-sn-code { font-family: monospace; font-size: 14px; color: #2b6cb0; font-weight: bold; }
+.riwayat-btn-salin { font-size: 12px; color: #2a5298; font-weight: bold; background: none; border: none; cursor: pointer; }
+.custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+.custom-alert-box { background: #fff; border: 3px solid #2d3748; border-radius: 4px; box-shadow: 5px 5px 0px #2d3748; width: 100%; max-width: 320px; overflow: hidden; }
+.custom-alert-header { background: #2d3748; color: #fff; padding: 10px 15px; font-weight: bold; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; }
+.custom-alert-body { padding: 20px 15px; color: #2d3748; font-size: 14px; font-weight: 700; line-height: 1.5; }
+.custom-alert-footer { padding: 10px 15px; display: flex; justify-content: flex-end; background: #f7fafc; border-top: 2px solid #2d3748; }
+.custom-alert-btn { padding: 8px 20px; background: #2a5298; color: #fff; border: 2px solid #2d3748; font-weight: bold; font-size: 13px; cursor: pointer; border-radius: 4px; box-shadow: 2px 2px 0px #2d3748; text-transform: uppercase; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="overlay-header">
+    <span>Riwayat Pembelian</span>
+</div>
+
+<div id="container-riwayat" style="padding: 15px 0;"></div>
+
+<div id="custom-alert" class="custom-alert-overlay hidden">
+    <div class="custom-alert-box">
+        <div class="custom-alert-header" id="custom-alert-title">NOTIFIKASI</div>
+        <div class="custom-alert-body" id="custom-alert-message">Pesan alert di sini.</div>
+        <div class="custom-alert-footer">
+            <button class="custom-alert-btn" onclick="tutupAlert()">OK</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyDXo3x2WA13dElu0jiRcDjzbm-2499Zaro",
+    authDomain: "nasukawireless-5808a.firebaseapp.com",
+    databaseURL: "https://nasukawireless-5808a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "nasukawireless-5808a"
+};
+
+let user = JSON.parse(localStorage.getItem('user_data'));
+const storageKey = 'cache_riwayat_' + (user ? user.phone : 'guest');
+
+function initFirebase() {
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        return firebase.database();
+    } catch (e) {
+        return null;
+    }
+}
+
+function renderRiwayatDOM(items) {
+    const cont = document.getElementById('container-riwayat');
+    cont.innerHTML = '';
+    if(!items || items.length === 0) {
+        cont.innerHTML = '<div style="text-align:center; padding:30px; color:#a0aec0;">Belum ada riwayat pembelian.</div>';
+        return;
+    }
+    items.forEach(r => {
+        const d = new Date(r.tgl);
+        const tglStr = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+        
+        const div = document.createElement('div');
+        div.className = 'riwayat-item';
+        div.innerHTML = `
+            <div class="riwayat-top">
+                <span class="riwayat-nama">${r.nama}</span>
+                <span class="riwayat-tgl">${tglStr}</span>
+            </div>
+            <div class="riwayat-sn-container">
+                <span class="riwayat-sn-code">${r.sn}</span>
+                <button class="riwayat-btn-salin" onclick="salinTeks('${r.sn}')">Salin</button>
+            </div>
+        `;
+        cont.appendChild(div);
+    });
+}
+
+function loadData() {
+    const cachedData = localStorage.getItem(storageKey);
+    if (cachedData) {
+        renderRiwayatDOM(JSON.parse(cachedData));
+    }
+
+    const db = initFirebase();
+    if(navigator.onLine && user && db) {
+        db.ref('riwayat_sn/' + user.phone).once('value').then(snap => {
+            if(snap.exists()) {
+                let items = [];
+                snap.forEach(child => { items.push(child.val()); });
+                items.reverse();
+                localStorage.setItem(storageKey, JSON.stringify(items));
+                renderRiwayatDOM(items);
+            }
+        });
+    }
+}
+
+window.onload = loadData;
+
+function salinTeks(teks) {
+    const el = document.createElement('textarea');
+    el.value = teks;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    tampilAlert("SN berhasil disalin: " + teks, "BERHASIL");
+}
+
+function tampilAlert(pesan, judul = 'NOTIFIKASI') {
+    document.getElementById('custom-alert-title').innerText = judul;
+    document.getElementById('custom-alert-message').innerText = pesan;
+    document.getElementById('custom-alert').classList.remove('hidden');
+}
+
+function tutupAlert() {
+    document.getElementById('custom-alert').classList.add('hidden');
+}
+</script>
+</body>
+</html>
