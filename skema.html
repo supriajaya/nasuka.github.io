@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ketentuan Layanan</title>
+    <style>
+        :root {
+            --gold: #c5a059;
+            --dark: #1a1a1a;
+            --bg: #fdfdfd;
+            --text: #4a4a4a;
+        }
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: var(--text);
+        }
+        .wrapper {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .main-card {
+            background: var(--bg);
+            padding: 40px 30px;
+            border: 1px solid #e0e0e0;
+            position: relative;
+        }
+        .main-card::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid var(--gold);
+            pointer-events: none;
+        }
+        h1 {
+            color: var(--dark);
+            text-align: center;
+            font-size: 22px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+        }
+        .card-inner {
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: var(--gold);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--gold);
+            display: inline-block;
+        }
+        p, li {
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li::before {
+            content: "◆";
+            color: var(--gold);
+            margin-right: 10px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="main-card">
+        <h1>Ketentuan & Privasi</h1>
+        
+        <div class="card-inner">
+            <h2>Aturan Testimoni</h2>
+            <ul>
+                <li>Produk Nasuka Foods harus asli dan terlihat jelas.</li>
+                <li>Durasi video maksimal 60 detik.</li>
+                <li>Testimoni berkaitan dengan produk Nasuka Foods CILOK ISIAN GAJIH.</li>
+                <li>Peserta boleh mengirim video lebih dari satu untuk berkesempatan memenangkan hadiah</li>
+                <li>Dilarang mengandung SARA, kekerasan, atau pelanggaran hak cipta.</li>
+                <li>Pengelola berhak menolak video yang tidak relevan.</li>
+            </ul>
+        </div>
+
+        <div class="card-inner">
+            <h2>Kebijakan Privasi</h2>
+            <p>Data Anda kami kelola dengan standar keamanan tinggi, terbatas hanya untuk verifikasi hadiah dan promosi resmi Nasuka Foods.</p>
+            <p>Privasi Anda adalah komitmen kami. Tidak ada data yang dibagikan kepada pihak ketiga tanpa izin eksplisit.</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
