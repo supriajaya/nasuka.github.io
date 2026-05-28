@@ -5,8 +5,7 @@
 <title>Nasuka</title>
 <style>
 body { margin: 0; padding: 20px 20px 140px 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; background-image: url('https://nasukafoods.site/image/ombak.gif'); background-repeat: no-repeat; background-size: cover; background-attachment: fixed; }
-header { width: 100%; max-width: 800px; display: flex; justify-content: center; align-items: center; padding: 15px; background: #f0f0f0; border: 4px outset #fff; margin-bottom: 20px; box-sizing: border-box; position: relative; }
-#display-saldo { font-weight: bold; padding: 10px; font-size: 47.88px; font-family: 'Courier New', monospace; color: #000; }
+header { width: 100%; max-width: 800px; display: flex; justify-content: center; align-items: center; padding: 15px; background: #f0f0f0; border: 4px outset #fff; margin-bottom: 20px; box-sizing: border-box; }
 .container { width: 650px; height: 390px; perspective: 1300px; perspective-origin: 50% -25%; margin: 50px auto; }
 .carousel { transform-style: preserve-3d; transform: translateZ(-702px); position: relative; width: 650px; height: 390px; transition: 1s; }
 .carousel a { position: absolute; border: 15px solid #222; opacity: .5; transition: 1s; width: 650px; height: 390px; background:#ccc; cursor: pointer; display: block; }
@@ -17,7 +16,7 @@ header { width: 100%; max-width: 800px; display: flex; justify-content: center; 
 .carousel a:nth-child(4) { transform: rotateY(180deg) translateZ(702px) scale(.8); }
 .carousel a:nth-child(5) { transform: rotateY(240deg) translateZ(702px) scale(.8); }
 .carousel a:nth-child(6) { transform: rotateY(300deg) translateZ(702px) scale(.8); }
-.controls-wrapper { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 900px; align-items: center; }
+.controls-wrapper { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 900px; align-items: center; margin-bottom: 20px; }
 .control-row { display: flex; justify-content: center; width: 100%; }
 .btn-retro { cursor: pointer; background: #dcdcdc; border: 12px outset #fff; padding: 20px 33px; margin: 7px; font: bold 42.9px 'Courier New', monospace; outline: none; color: #000; display: block; text-align: center; flex: 1; }
 .btn-retro:active { border-style: inset; background: #c0c0c0; }
@@ -35,67 +34,52 @@ input[type="radio"] { position: absolute; left: -9999px; }
 #paket:checked ~ .container .carousel a:nth-child(4) { transform: rotateY(180deg) translateZ(702px) scale(1); opacity: 1; }
 #tentang:checked ~ .container .carousel a:nth-child(5) { transform: rotateY(240deg) translateZ(702px) scale(1); opacity: 1; }
 #kontak:checked ~ .container .carousel a:nth-child(6) { transform: rotateY(300deg) translateZ(702px) scale(1); opacity: 1; }
-#artikel-wrapper { width: 100%; max-width: 900px; margin-top: 20px; border: 4px solid #000; min-height: 300px; font-size: 48px; line-height: 1.6; background: rgba(255, 255, 255, 0.9); text-align: center; }
+#artikel-wrapper { width: 100%; max-width: 900px; border: 4px solid #000; min-height: 300px; font-size: 48px; line-height: 1.6; background: rgba(255, 255, 255, 0.9); text-align: center; }
 .konten-artikel { padding: 20px; }
 .galeri-foto { display: flex; justify-content: space-between; gap: 10px; margin: 20px 0; }
 .galeri-foto img { width: 32%; height: auto; border: 4px solid #000; }
 </style>
 </head>
 <body>
-<header>
-</header>
-<input checked id="partner" name="multiples" type="radio">
+<header></header>
+<input checked id="nasuka" name="multiples" type="radio">
 <input id="cilok" name="multiples" type="radio">
-<input id="nasuka" name="multiples" type="radio">
 <input id="paket" name="multiples" type="radio">
+<input id="partner" name="multiples" type="radio">
 <input id="tentang" name="multiples" type="radio">
 <input id="kontak" name="multiples" type="radio">
 <div class="container">
 <div class="carousel">
-<a onclick="window.AppInventor.setWebViewString('partner.html')"><img src="https://nasuka.pro/gambar/partner.jpg"></a>
-<a onclick="window.AppInventor.setWebViewString('cilok.html')"><img src="https://nasuka.pro/gambar/pelanggancilok.jpg"></a>
+<a href="partner.html"><img src="https://nasuka.pro/gambar/partner.jpg"></a>
+<a href="cilok.html"><img src="https://nasuka.pro/gambar/pelanggancilok.jpg"></a>
 <a><img src="https://nasuka.pro/gambar/android.jpg"></a>
 <a><img src="https://nasuka.pro/gambar/paketdata.jpg"></a>
-<a onclick="window.AppInventor.setWebViewString('tentang.html')"><img src="https://nasuka.pro/gambar/naskia.jpg"></a>
-<a onclick="window.AppInventor.setWebViewString('kontak.html')"><img src="https://nasuka.pro/gambar/whatsapp.jpg"></a>
+<a href="tentang.html"><img src="https://nasuka.pro/gambar/tentangkami.jpg"></a>
+<a href="kontak.html"><img src="https://nasuka.pro/gambar/whatsapp.jpg"></a>
 </div>
 </div>
-<div id="info-produk" style="text-align:center; font-size:39px; font-weight:bold; margin: 20px;"></div>
 <div class="controls-wrapper">
 <div class="control-row">
-<label class="btn-retro" for="partner" onclick="updateInfo('', 'partner')">Partner</label>
+<label class="btn-retro" for="nasuka" onclick="updateInfo('', 'nasuka')">Nasuka.apk</label>
 <label class="btn-retro" for="cilok" onclick="updateInfo('', 'cilok')">Cilok</label>
 <label class="btn-retro" for="paket" onclick="updateInfo('', 'paket')">PaketData</label>
 </div>
 <div class="control-row">
-<label class="btn-retro" for="nasuka" onclick="updateInfo('', 'nasuka')">Nasuka.apk</label>
+<label class="btn-retro" for="partner" onclick="updateInfo('', 'partner')">Partner</label>
 <label class="btn-retro" for="tentang" onclick="updateInfo('', 'tentang')">Tentang</label>
 <label class="btn-retro" for="kontak" onclick="updateInfo('', 'kontak')">Kontak</label>
 </div>
-<div id="artikel-wrapper">
-<div id="konten-artikel" class="konten-artikel">
-<a class="btn-external">AMPYANG LEGEND</a>
-<a class="btn-external">MAY BAKERY</a>
-<a class="btn-external">GOJEK</a>
-<a class="btn-external">GRAB</a>
-<a class="btn-external">SHOPEE</a>
-<a class="btn-external">TIKTOKSHOP</a>
-<a class="btn-external">CONDONG NET</a>
-<a class="btn-external">NITS CELL</a>
-<a class="btn-external">SINAR KARYA FACADE</a>
-<a class="btn-external">ARYA KAWASAKI LABS</a>
-<a class="btn-external">RAYA STORE</a>
 </div>
-</div>
-</div>
+<div id="info-produk" style="text-align:center; font-size:39px; font-weight:bold; margin: 0 0 20px 0;"></div>
+<div id="artikel-wrapper"><div id="konten-artikel" class="konten-artikel"></div></div>
 <script>
 const dataProduk = {
-partner: '<a class="btn-external">AMPYANG LEGEND</a><a class="btn-external">MAY BAKERY</a><a class="btn-external">GOJEK</a><a class="btn-external">GRAB</a><a class="btn-external">SHOPEE</a><a class="btn-external">TIKTOKSHOP</a><a class="btn-external">CONDONG NET</a><a class="btn-external">NITS CELL</a><a class="btn-external">SINAR KARYA FACADE</a><a class="btn-external">ARYA KAWASAKI LABS</a><a class="btn-external">RAYA STORE</a>',
 cilok: 'Cilok isian gajih khas NasukaFoods. Kami biasa mangkal di seberang TVRI Bandung dan Masjid Nahjusallam Ciparay Tengah, serta melayani orderan online yang Bisa dipesan di jam tertentu via:<a href="https://gofood.link/" class="btn-external">GOFOOD</a><a href="https://r.grab.com/" class="btn-external">GRABFOOD</a><a href="https://app.shopeepay.co.id/" class="btn-external">SHOPEEFOOD</a><a href="https://vt.tiktok.com/" class="btn-external">TIKTOK SHOP</a>',
 nasuka: '<div class="galeri-foto"><img src="https://nasuka.pro/gambar/apk1.jpg"><img src="https://nasuka.pro/gambar/apk2.jpg"><img src="https://nasuka.pro/gambar/apk3.jpg"></div><a href="https://nasuka.pro/nasuka.apk" class="btn-external">DOWNLOAD APK</a>',
 paket: 'Dedikasi NasukaFoods untuk pelanggan: Kami menyajikan pilihan kuota harian termurah dan terpercaya agar Anda tetap terhubung dengan hemat.',
 tentang: 'Nasuka Foods lahir pada 17 Agustus 2020 dengan produk andalan cilok isian gajih. Bagi kami, kualitas adalah janji. Hal menarik: Inovasi rasa, konsistensi, dan dukungan teknologi digital untuk pelanggan.',
-kontak: 'Hubungi kami melalui WhatsApp.<a href="https://wa.me/62859109819017" class="btn-external">CHAT WHATSAPP</a>'
+kontak: 'Hubungi kami melalui WhatsApp.<a href="https://wa.me/62859109819017" class="btn-external">CHAT WHATSAPP</a>',
+partner: 'Informasi Kemitraan Nasuka Foods.'
 };
 function updateInfo(nama, key) {
 document.getElementById('info-produk').innerHTML = nama;
