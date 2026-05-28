@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+body { background: #f4f6f8; padding: 20px; }
+.card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; }
+.avatar { width: 100px; height: 100px; border-radius: 50%; background: #e2e8f0; margin: 0 auto 15px; background-size: cover; background-position: center; border: 4px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.nama { font-size: 20px; font-weight: bold; color: #2d3748; margin-bottom: 5px; }
+.phone { color: #718096; margin-bottom: 20px; }
+.info-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+.info-box { background: #f7fafc; padding: 15px; border-radius: 8px; text-align: left; }
+.info-label { font-size: 12px; color: #a0aec0; text-transform: uppercase; margin-bottom: 5px; }
+.info-value { font-size: 16px; font-weight: bold; color: #2a5298; }
+</style>
+</head>
+<body>
+
+<div class="card">
+    <div class="avatar" id="prof-avatar"></div>
+    <div class="nama" id="prof-nama">-</div>
+    <div class="phone" id="prof-phone">-</div>
+    
+    <div class="info-grid">
+        <div class="info-box">
+            <div class="info-label">Saldo</div>
+            <div class="info-value" id="prof-saldo">Rp 0</div>
+        </div>
+        <div class="info-box">
+            <div class="info-label">Alamat</div>
+            <div class="info-value" id="prof-alamat">-</div>
+        </div>
+    </div>
+</div>
+
+<script>
+window.onload = () => {
+    const userData = JSON.parse(localStorage.getItem('user_data'));
+    if(userData) {
+        document.getElementById('prof-nama').innerText = userData.nama || '-';
+        document.getElementById('prof-phone').innerText = userData.phone || '-';
+        document.getElementById('prof-saldo').innerText = "Rp " + parseInt(userData.saldo || 0).toLocaleString();
+        document.getElementById('prof-alamat').innerText = userData.alamat || '-';
+        if(userData.foto) {
+            document.getElementById('prof-avatar').style.backgroundImage = 'url("' + userData.foto + '")';
+        }
+    }
+};
+</script>
+</body>
+</html>
