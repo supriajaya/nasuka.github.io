@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klaim Hadiah - Nasuka Foods</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f4f6f9; color: #333333; min-height: 100vh; display: flex; flex-direction: column; }
+        .page { padding: 24px; max-width: 600px; margin: 20px auto; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); flex: 1; width: 95%; }
+        .header { display: flex; align-items: center; margin-bottom: 24px; background: #fafafa; padding: 16px; border-bottom: 1px solid #eeeeee; border-radius: 6px; }
+        .app-developer { color: #01875f; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group { margin-bottom: 20px; position: relative; }
+        .form-group label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #444444; }
+        .form-control { width: 100%; padding: 12px; font-size: 14px; font-weight: 500; border: 1px solid #cccccc; border-radius: 6px; background-color: #ffffff; color: #333333; outline: none; transition: border-color 0.2s ease; }
+        .form-control:focus { border-color: #01875f; box-shadow: 0 0 0 3px rgba(1, 135, 95, 0.1); }
+        .custom-file-upload { display: flex; align-items: center; justify-content: space-between; border: 2px dashed #cccccc; padding: 14px; border-radius: 6px; cursor: pointer; background-color: #fafafa; }
+        .custom-file-upload span { font-size: 14px; font-weight: 500; color: #666666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+        .custom-file-upload .btn-browse { background-color: #01875f; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .btn-submit { background-color: #01875f; color: white; border: none; width: 100%; padding: 14px; border-radius: 6px; font-size: 16px; font-weight: 700; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
+        .sticky-footer { background: #ffffff; padding: 16px; border-top: 1px solid #e0e0e0; position: sticky; bottom: 0; width: 100%; z-index: 100; }
+        .grid-hadiah { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 600px; margin: 0 auto; }
+        .item-hadiah { background: #f4f6f9; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px; text-align: center; cursor: pointer; text-decoration: none; color: #01875f; }
+        .item-hadiah h3 { font-size: 14px; font-weight: 700; text-transform: uppercase; }
+        .custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .custom-alert-box { background: #fff; border-radius: 8px; width: 100%; max-width: 340px; overflow: hidden; }
+        .custom-alert-header { padding: 16px 20px 10px 20px; font-weight: 700; font-size: 15px; text-transform: uppercase; }
+        .custom-alert-body { padding: 0 20px 20px 20px; font-size: 14px; }
+        .custom-alert-footer { padding: 12px 20px; display: flex; justify-content: flex-end; }
+        .custom-alert-btn { padding: 8px 20px; background: #01875f; color: #fff; border: none; font-weight: 700; cursor: pointer; border-radius: 4px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <div class="header">
+        <div class="app-info">
+            <p class="app-developer">Event Testimoni Video</p>
+        </div>
+    </div>
+
+    <form id="formKlaim" onsubmit="prosesKlaim(event)">
+        <div class="form-group">
+            <label for="testimoni">Testimoni</label>
+            <input type="text" id="testimoni" class="form-control" required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label>Upload Video</label>
+            <input type="file" id="video_file" class="hidden" accept="video/*" required onchange="updateFileName(this)">
+            <div class="custom-file-upload" onclick="document.getElementById('video_file').click()">
+                <span id="file-name-text">Pilih file video...</span>
+                <div class="btn-browse">Pilih</div>
+            </div>
+        </div>
+
+        <button type="submit" id="btn-submit" class="btn-submit">Kirim Video</button>
+    </form>
+</div>
+
+<div class="sticky-footer">
+    <div class="grid-hadiah">
+        <a href="video.html" class="item-hadiah"><h3>Album</h3></a>
+        <a href="hadiah.html" class="item-hadiah"><h3>Hadiah</h3></a>
+    </div>
+</div>
+
+<div id="custom-alert" class="custom-alert-overlay hidden">
+    <div class="custom-alert-box">
+        <div class="custom-alert-header" id="custom-alert-title">NOTIFIKASI</div>
+        <div class="custom-alert-body" id="custom-alert-message">Pesan alert di sini.</div>
+        <div class="custom-alert-footer">
+            <button class="custom-alert-btn" onclick="tutupAlert()">OK</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyDXo3x2WA13dElu0jiRcDjzbm-2499Zaro",
+    authDomain: "nasukawireless-5808a.firebaseapp.com",
+    databaseURL: "https://nasukawireless-5808a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "nasukawireless-5808a"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const cloudinaryCloudName = "dwnoxm8eu";
+const cloudinaryUploadPreset = "Dokumentasi_Users";
+let user = JSON.parse(localStorage.getItem('user_data'));
+
+function updateFileName(input) {
+    const textSpan = document.getElementById('file-name-text');
+    if (input.files && input.files.length > 0) {
+        textSpan.innerText = input.files[0].name;
+    }
+}
+
+function resetCustomFormComponents() {
+    document.getElementById('file-name-text').innerText = "Pilih file video...";
+}
+
+function tampilAlert(pesan, judul = 'NOTIFIKASI') {
+    document.getElementById('custom-alert-title').innerText = judul;
+    document.getElementById('custom-alert-message').innerText = pesan;
+    document.getElementById('custom-alert').classList.remove('hidden');
+}
+
+function tutupAlert() {
+    document.getElementById('custom-alert').classList.add('hidden');
+}
+
+function prosesKlaim(event) {
+    event.preventDefault();
+    if(!user || !user.phone) {
+        tampilAlert("Silakan login terlebih dahulu.", "LOGIN DAHULU");
+        return;
+    }
+    const btnSubmit = document.getElementById('btn-submit');
+    const file = document.getElementById('video_file').files[0];
+    if (!file) return;
+    btnSubmit.disabled = true;
+    tampilAlert("Sedang mengupload, mohon tunggu...", "UPLOADING");
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', cloudinaryUploadPreset);
+    fetch('https://api.cloudinary.com/v1_1/' + cloudinaryCloudName + '/auto/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(d => {
+        var postData = { phone: user.phone, nama: user.nama || '-', testimoni: document.getElementById('testimoni').value, video_link: d.secure_url, tgl: new Date().toLocaleString() };
+        return db.ref('testimoni_video/' + user.phone).push(postData);
+    })
+    .then(() => {
+        tutupAlert();
+        tampilAlert("Berhasil!", "SUKSES");
+        document.getElementById('formKlaim').reset();
+        resetCustomFormComponents();
+        btnSubmit.disabled = false;
+    })
+    .catch(e => {
+        tutupAlert();
+        tampilAlert("Gagal: " + e.message, "ERROR");
+        btnSubmit.disabled = false;
+    });
+}
+</script>
+</body>
+</html>
