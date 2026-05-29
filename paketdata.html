@@ -88,10 +88,10 @@ input.auth-input { width: 100%; padding: 28px; margin: 19px 0; font-size: 34px; 
 
 <div id="nav-overlay" onclick="toggleNav(false)"></div>
 <div id="nav-menu">
-    <div class="nav-item" onclick="navigate('profil')">Profil</div>
-    <div class="nav-item" onclick="navigate('riwayat')">Riwayat</div>
-    <div class="nav-item" onclick="navigate('setting')">Setting</div>
-    <div class="nav-item" onclick="navigate('admin')">Info</div>
+    <div class="nav-item" onclick="checkAuthAndNavigate('profil')">Profil</div>
+    <div class="nav-item" onclick="checkAuthAndNavigate('riwayat')">Riwayat</div>
+    <div class="nav-item" onclick="checkAuthAndNavigate('setting')">Setting</div>
+    <div class="nav-item" onclick="navigate('info')">Info</div>
 </div>
 
 <input checked id="axis" name="multiples" type="radio">
@@ -139,7 +139,7 @@ input.auth-input { width: 100%; padding: 28px; margin: 19px 0; font-size: 34px; 
 </div>
 
 <footer>
-    <button id="btn-beli" onclick="prosesBeli()" disabled>BELI SEKARANG</button>
+    <button id="btn-beli" onclick="prosesBeli()">BELI SEKARANG</button>
 </footer>
 
 <div id="custom-alert-overlay" class="hidden">
@@ -165,9 +165,14 @@ function navigate(page) {
         'profil': 'profil.html',
         'riwayat': 'riwayat.html',
         'setting': 'setting.html',
-        'admin': 'admin.html'
+        'info': 'info.html'
     };
     window.location.href = urls[page] || '#';
+}
+
+function checkAuthAndNavigate(page) {
+    if(!user) { document.getElementById('login-overlay').style.display = 'flex'; }
+    else { navigate(page); }
 }
 
 const firebaseConfig = {
@@ -258,7 +263,7 @@ function updateTombol() {
 
 function pilihProduk(op) {
     selectedProduk = dataProduk[op];
-    document.getElementById('info-produk').innerHTML = "";
+    document.getElementById('info-produk').innerText = selectedProduk.nama;
     document.getElementById(op).checked = true;
     updateTombol();
 }
@@ -294,8 +299,7 @@ function prosesBeli() {
 }
 
 function initApp() {
-    if(!user) { renderTampilanUser(); }
-    else {
+    if(user) {
         db.ref('users/' + user.phone).on('value', snap => {
             if(snap.exists()){
                 user = snap.val();
@@ -303,6 +307,8 @@ function initApp() {
                 renderTampilanUser();
             }
         });
+    } else {
+        renderTampilanUser();
     }
     listenStokRealtime();
 }
