@@ -40,7 +40,7 @@ input[type="radio"] { position: absolute; left: -9999px; }
 .galeri-foto img { width: 32%; height: auto; border: 4px solid #000; }
 </style>
 </head>
-<body>
+<body onload="initDefault()">
 <header></header>
 <input checked id="nasuka" name="multiples" type="radio">
 <input id="cilok" name="multiples" type="radio">
@@ -50,23 +50,12 @@ input[type="radio"] { position: absolute; left: -9999px; }
 <input id="kontak" name="multiples" type="radio">
 <div class="container">
 <div class="carousel">
-    
 <a href="partner.html"><img src="https://nasuka.pro/gambar/partner.jpg"></a>
-
 <a href="cilok.html"><img src="https://nasuka.pro/gambar/pelanggancilok.jpg"></a>
-
-<a href="paketdata.html"><img src="https://nasuka.pro/gambar/android.jpg"></a>
-
-<a href="paketdata2.html"><img src="https://nasuka.pro/gambar/paketdata.jpg"></a>
-
-
-
+<a href="paketdata2.html"><img src="https://nasuka.pro/gambar/android.jpg"></a>
+<a href="paketdata.html"><img src="https://nasuka.pro/gambar/paketdata.jpg"></a>
 <a href="tentangkami.html"><img src="https://nasuka.pro/gambar/tentangkami.jpg"></a>
-
-
-
 <a href="kontak.html"><img src="https://nasuka.pro/gambar/whatsapp.jpg"></a>
-
 </div>
 </div>
 <div class="controls-wrapper">
@@ -85,16 +74,22 @@ input[type="radio"] { position: absolute; left: -9999px; }
 <div id="artikel-wrapper"><div id="konten-artikel" class="konten-artikel"></div></div>
 <script>
 const dataProduk = {
-cilok: 'Cilok isian gajih khas NasukaFoods. Kami biasa mangkal di seberang TVRI Bandung dan Masjid Nahjusallam Ciparay Tengah, serta melayani orderan online yang Bisa dipesan di jam tertentu via:<a href="https://gofood.link/" class="btn-external">GOFOOD</a><a href="https://r.grab.com/" class="btn-external">GRABFOOD</a><a href="https://app.shopeepay.co.id/" class="btn-external">SHOPEEFOOD</a><a href="https://vt.tiktok.com/" class="btn-external">TIKTOK SHOP</a>',
+cilok: 'Cilok isian gajih khas NasukaFoods. Kami biasa mangkal di seberang TVRI Bandung dan Masjid Nahjusallam Ciparay Tengah, serta melayani orderan online yang Bisa dipesan di jam tertentu via:<a href="https://gofood.link/" class="btn-external">GOFOOD</a><a href="https://r.grab.com/" class="btn-external">GRABFOOD</a><a href="https://app.shopeepay.co.id/" class="btn-external">SHOPEEFOOD</a><a href="https://vt.tokopedia.com/" class="btn-external">TOKOPEDIA</a><a href="https://vt.tiktok.com/" class="btn-external">TIKTOK SHOP</a>',
 nasuka: '<div class="galeri-foto"><img src="https://nasuka.pro/gambar/apk1.jpg"><img src="https://nasuka.pro/gambar/apk2.jpg"><img src="https://nasuka.pro/gambar/apk3.jpg"></div><a href="https://nasuka.pro/nasuka.apk" class="btn-external">DOWNLOAD APK</a>',
+
+
 paket: 'Dedikasi NasukaFoods untuk pelanggan: Kami menyajikan pilihan kuota harian termurah dan terpercaya agar Anda tetap terhubung dengan hemat.',
 tentang: 'Nasuka Foods lahir pada 17 Agustus 2020 dengan produk andalan cilok isian gajih. Bagi kami, kualitas adalah janji. Hal menarik: Inovasi rasa, konsistensi, dan dukungan teknologi digital untuk pelanggan.',
-kontak: 'Hubungi kami melalui WhatsApp.<a href="https://wa.me/62859109819017" class="btn-external">CHAT WHATSAPP</a>',
+kontak:'<div class="galeri-foto"><img src="https://nasuka.pro/gambar/kontak1.jpg"><img src="https://nasuka.pro/gambar/kontak2.jpg"><img src="https://nasuka.pro/gambar/kontak3.jpg"></div><a href="https://wa.me/62859109819017?text=hallo%20nasuka%20admin" class="btn-external">CHAT Admin Sekarang</a>',
+
 partner: 'Informasi Kemitraan Nasuka Foods.'
 };
 function updateInfo(nama, key) {
 document.getElementById('info-produk').innerHTML = nama;
 document.getElementById('konten-artikel').innerHTML = dataProduk[key];
+}
+function initDefault() {
+updateInfo('', 'nasuka');
 }
 </script>
 </body>
