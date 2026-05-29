@@ -6,8 +6,8 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <style>
-body { margin: 0; padding: 20px 20px 140px 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; }
-header { width: 100%; max-width: 800px; display: flex; justify-content: center; align-items: center; padding: 15px; background: #f0f0f0; border: 4px outset #fff; margin-bottom: 20px; box-sizing: border-box; position: relative; }
+body { margin: 0; padding: 20px 20px 140px 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; background-image: url('https://nasuka.pro/gambar/ombak.gif'); background-size: cover; background-position: center; background-attachment: fixed; }
+header { width: 100%; max-width: 800px; display: flex; justify-content: center; align-items: center; padding: 15px; background: rgba(240, 240, 240, 0.9); border: 4px outset #fff; margin-bottom: 20px; box-sizing: border-box; position: relative; }
 #display-saldo { font-weight: bold; padding: 10px; font-size: 47.88px; font-family: 'Courier New', monospace; color: #000; }
 .menu-btn { position: absolute; left: 15px; font-size: 50px; cursor: pointer; color: #000; font-weight: bold; }
 #nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: none; }
@@ -28,7 +28,7 @@ header { width: 100%; max-width: 800px; display: flex; justify-content: center; 
 .carousel img:nth-child(9) { transform: rotateY(320deg) translateZ(702px) scale(.8); }
 .controls-wrapper { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 900px; align-items: center; }
 .control-row { display: flex; justify-content: center; width: 100%; }
-.btn-retro { cursor: pointer; background: #dcdcdc; border: 12px outset #fff; padding: 20px 33px; margin: 7px; font: bold 39px 'Courier New', monospace; outline: none; color: #000; display: block; text-align: center; flex: 1; }
+.btn-retro { cursor: pointer; background: rgba(220, 220, 220, 0.9); border: 12px outset #fff; padding: 20px 33px; margin: 7px; font: bold 39px 'Courier New', monospace; outline: none; color: #000; display: block; text-align: center; flex: 1; }
 .btn-retro:active { border-style: inset; background: #c0c0c0; }
 input[type="radio"] { position: absolute; left: -9999px; }
 #axis:checked ~ .container .carousel { transform: translateZ(-702px); }
