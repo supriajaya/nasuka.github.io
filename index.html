@@ -2,327 +2,95 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Beli Voucher</title>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<title>Nasuka</title>
 <style>
-body { margin: 0; padding: 20px 20px 140px 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; }
-header { width: 100%; max-width: 800px; display: flex; justify-content: center; align-items: center; padding: 15px; background: #f0f0f0; border: 4px outset #fff; margin-bottom: 20px; box-sizing: border-box; position: relative; }
-#display-saldo { font-weight: bold; padding: 10px; font-size: 47.88px; font-family: 'Courier New', monospace; color: #000; }
-.menu-btn { position: absolute; left: 15px; font-size: 50px; cursor: pointer; color: #000; font-weight: bold; }
-#nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: none; }
-#nav-menu { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: #fff; z-index: 10000; box-shadow: 2px 0 10px rgba(0,0,0,0.5); transition: 0.3s; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
-#nav-menu.show { left: 0; }
-.nav-item { padding: 20px; background: #eee; font-size: 30px; text-align: center; cursor: pointer; border: 2px solid #000; }
+body { margin: 0; padding: 20px 20px 140px 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; background-image: url('https://nasukafoods.site/image/ombak.gif'); background-repeat: no-repeat; background-size: cover; background-attachment: fixed; }
+header { width: 100%; max-width: 800px; display: flex; justify-content: center; align-items: center; padding: 15px; background: #f0f0f0; border: 4px outset #fff; margin-bottom: 20px; box-sizing: border-box; }
 .container { width: 650px; height: 390px; perspective: 1300px; perspective-origin: 50% -25%; margin: 50px auto; }
 .carousel { transform-style: preserve-3d; transform: translateZ(-702px); position: relative; width: 650px; height: 390px; transition: 1s; }
-.carousel img { position: absolute; border: 15px solid #222; opacity: .5; transition: 1s; width: 650px; height: 390px; background:#ccc; cursor: pointer; }
-.carousel img:nth-child(1) { transform: translateZ(702px) scale(.8); }
-.carousel img:nth-child(2) { transform: rotateY(40deg) translateZ(702px) scale(.8); }
-.carousel img:nth-child(3) { transform: rotateY(80deg) translateZ(702px) scale(.8); }
-.carousel img:nth-child(4) { transform: rotateY(120deg) translateZ(702px) scale(.8); }
-.carousel img:nth-child(5) { transform: rotateY(160deg) translateZ(702px) scale(.8); }
-.carousel img:nth-child(6) { transform: rotateY(200deg) translateZ(702px) scale(.8); }
-.carousel img:nth-child(7) { transform: rotateY(240deg) translateZ(702px) scale(.8); }
-.carousel img:nth-child(8) { transform: rotateY(280deg) translateZ(702px) scale(.8); }
-.carousel img:nth-child(9) { transform: rotateY(320deg) translateZ(702px) scale(.8); }
-.controls-wrapper { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 900px; align-items: center; }
+.carousel a { position: absolute; border: 15px solid #222; opacity: .5; transition: 1s; width: 650px; height: 390px; background: transparent; cursor: pointer; display: block; }
+.carousel a img { width: 100%; height: 100%; object-fit: cover; }
+.carousel a:nth-child(1) { transform: translateZ(702px) scale(.8); }
+.carousel a:nth-child(2) { transform: rotateY(60deg) translateZ(702px) scale(.8); }
+.carousel a:nth-child(3) { transform: rotateY(120deg) translateZ(702px) scale(.8); }
+.carousel a:nth-child(4) { transform: rotateY(180deg) translateZ(702px) scale(.8); }
+.carousel a:nth-child(5) { transform: rotateY(240deg) translateZ(702px) scale(.8); }
+.carousel a:nth-child(6) { transform: rotateY(300deg) translateZ(702px) scale(.8); }
+.controls-wrapper { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 900px; align-items: center; margin-bottom: 20px; }
 .control-row { display: flex; justify-content: center; width: 100%; }
-.btn-retro { cursor: pointer; background: #dcdcdc; border: 12px outset #fff; padding: 20px 33px; margin: 7px; font: bold 39px 'Courier New', monospace; outline: none; color: #000; display: block; text-align: center; flex: 1; }
+.btn-retro { cursor: pointer; background: #dcdcdc; border: 12px outset #fff; padding: 20px 33px; margin: 7px; font: bold 42.9px 'Courier New', monospace; outline: none; color: #000; display: block; text-align: center; flex: 1; }
 .btn-retro:active { border-style: inset; background: #c0c0c0; }
+.btn-external { display: block; padding: 25px; margin: 20px 0; background: #000; border: 4px outset #ccc; text-decoration: none; color: #fff; font-weight: bold; text-align: center; font-size: 48px; }
 input[type="radio"] { position: absolute; left: -9999px; }
-#axis:checked ~ .container .carousel { transform: translateZ(-702px); }
-#xl:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-40deg); }
-#telkomsel:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-80deg); }
-#indosat:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-120deg); }
-#smartfren:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-160deg); }
-#tri:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-200deg); }
-#nitscell:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-240deg); }
-#condongnet:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-280deg); }
-#wifiid:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-320deg); }
-#axis:checked ~ .container .carousel img:nth-child(1) { transform: translateZ(702px) scale(1); opacity: 1; }
-#xl:checked ~ .container .carousel img:nth-child(2) { transform: rotateY(40deg) translateZ(702px) scale(1); opacity: 1; }
-#telkomsel:checked ~ .container .carousel img:nth-child(3) { transform: rotateY(80deg) translateZ(702px) scale(1); opacity: 1; }
-#indosat:checked ~ .container .carousel img:nth-child(4) { transform: rotateY(120deg) translateZ(702px) scale(1); opacity: 1; }
-#smartfren:checked ~ .container .carousel img:nth-child(5) { transform: rotateY(160deg) translateZ(702px) scale(1); opacity: 1; }
-#tri:checked ~ .container .carousel img:nth-child(6) { transform: rotateY(200deg) translateZ(702px) scale(1); opacity: 1; }
-#nitscell:checked ~ .container .carousel img:nth-child(7) { transform: rotateY(240deg) translateZ(702px) scale(1); opacity: 1; }
-#condongnet:checked ~ .container .carousel img:nth-child(8) { transform: rotateY(280deg) translateZ(702px) scale(1); opacity: 1; }
-#wifiid:checked ~ .container .carousel img:nth-child(9) { transform: rotateY(320deg) translateZ(702px) scale(1); opacity: 1; }
-.hidden { display: none !important; }
-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 20px; display: flex; justify-content: center; box-sizing: border-box; border-top: 5px solid #ccc; }
-#btn-beli { padding: 20px 40px; font-size: 30px; font-weight: bold; width: 100%; max-width: 800px; cursor: pointer; border: 4px outset #fff; }
-#btn-beli:disabled { background: #808080; color: #ccc; cursor: not-allowed; }
-#btn-beli:not(:disabled) { background: #28a745; color: #fff; }
-#custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-.alert-container-retro { background: #e0e0e0; border: 12px outset #fff; padding: 40px; width: 80%; max-width: 700px; font-family: 'Courier New', monospace; box-sizing: border-box; }
-#alert-msg { font-size: 40px; margin-bottom: 40px; color: #000; text-align: center; font-weight: bold; }
-.btn-close { width: 100%; padding: 30px; font-size: 40px; font-weight: bold; background: #dcdcdc; border: 12px outset #fff; cursor: pointer; color: #000; }
-#struk-box { background: #e0e0e0; border: 12px outset #fff; padding: 40px; width: 80%; max-width: 700px; font-family: 'Courier New', monospace; color: #000; }
-.struk-header { font-size: 50px; font-weight: bold; text-align: center; margin-bottom: 30px; border-bottom: 5px double #000; padding-bottom: 20px; }
-.struk-body { font-size: 35px; line-height: 1.5; }
-.struk-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-#login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:20000; display:none; flex-direction:column; align-items:center; justify-content:center; }
-.login-box { width: 760px; padding: 76px; text-align: center; font-family: sans-serif; }
-.login-box h2 { font-size: 60px; color: #003087; margin-bottom: 57px; font-weight: bold; }
-input.auth-input { width: 100%; padding: 28px; margin: 19px 0; font-size: 34px; border: 4px solid #ccc; border-radius: 9px; box-sizing: border-box; }
-#btn-login { width: 100%; padding: 28px; font-size: 34px; background: #0070ba; color: #fff; border: none; border-radius: 47px; cursor: pointer; margin-top: 19px; font-weight: bold; }
-#btn-batal { width: 100%; padding: 28px; font-size: 34px; background: transparent; color: #0070ba; border: none; cursor: pointer; margin-top: 19px; text-decoration: underline; }
+#partner:checked ~ .container .carousel { transform: translateZ(-702px); }
+#cilok:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-60deg); }
+#nasuka:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-120deg); }
+#paket:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-180deg); }
+#tentang:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-240deg); }
+#kontak:checked ~ .container .carousel { transform: translateZ(-702px) rotateY(-300deg); }
+#partner:checked ~ .container .carousel a:nth-child(1) { transform: translateZ(702px) scale(1); opacity: 1; }
+#cilok:checked ~ .container .carousel a:nth-child(2) { transform: rotateY(60deg) translateZ(702px) scale(1); opacity: 1; }
+#nasuka:checked ~ .container .carousel a:nth-child(3) { transform: rotateY(120deg) translateZ(702px) scale(1); opacity: 1; }
+#paket:checked ~ .container .carousel a:nth-child(4) { transform: rotateY(180deg) translateZ(702px) scale(1); opacity: 1; }
+#tentang:checked ~ .container .carousel a:nth-child(5) { transform: rotateY(240deg) translateZ(702px) scale(1); opacity: 1; }
+#kontak:checked ~ .container .carousel a:nth-child(6) { transform: rotateY(300deg) translateZ(702px) scale(1); opacity: 1; }
+#artikel-wrapper { width: 100%; max-width: 900px; border: 4px solid #000; min-height: 300px; font-size: 48px; line-height: 1.6; background: rgba(255, 255, 255, 0.9); text-align: center; }
+.konten-artikel { padding: 20px; }
+.galeri-foto { display: flex; justify-content: space-between; gap: 10px; margin: 20px 0; }
+.galeri-foto img { width: 32%; height: auto; border: 4px solid #000; }
 </style>
 </head>
-<body>
-<div id="login-overlay">
-    <div class="login-box">
-        <h2>Log in</h2>
-        <input type="tel" id="in-phone" class="auth-input" placeholder="Nomor HP">
-        <input type="password" id="in-pin" class="auth-input" placeholder="PIN">
-        <button id="btn-login" onclick="authApp()">Log In</button>
-        <button id="btn-batal" onclick="document.getElementById('login-overlay').style.display='none'">Tidak, nanti saja</button>
-    </div>
-</div>
-
-<header>
-<div class="menu-btn" onclick="toggleNav(true)">⋮</div>
-<div id="display-saldo">Saldo: --</div>
-</header>
-
-<div id="nav-overlay" onclick="toggleNav(false)"></div>
-<div id="nav-menu">
-    <div class="nav-item" onclick="navigate('profil')">Profil</div>
-    <div class="nav-item" onclick="navigate('riwayat')">Riwayat</div>
-    <div class="nav-item" onclick="navigate('setting')">Setting</div>
-    <div class="nav-item" onclick="navigate('admin')">Info</div>
-</div>
-
-<input checked id="axis" name="multiples" type="radio">
-<input id="xl" name="multiples" type="radio">
-<input id="telkomsel" name="multiples" type="radio">
-<input id="indosat" name="multiples" type="radio">
-<input id="smartfren" name="multiples" type="radio">
-<input id="tri" name="multiples" type="radio">
-<input id="nitscell" name="multiples" type="radio">
-<input id="condongnet" name="multiples" type="radio">
-<input id="wifiid" name="multiples" type="radio">
-
+<body onload="initDefault()">
+<header></header>
+<input checked id="nasuka" name="multiples" type="radio">
+<input id="cilok" name="multiples" type="radio">
+<input id="paket" name="multiples" type="radio">
+<input id="partner" name="multiples" type="radio">
+<input id="tentang" name="multiples" type="radio">
+<input id="kontak" name="multiples" type="radio">
 <div class="container">
 <div class="carousel">
-<img src="https://nasuka.pro/gambar/axis.jpg" onclick="pilihProduk('axis')">
-<img src="https://nasuka.pro/gambar/xl.jpg" onclick="pilihProduk('xl')">
-<img src="https://nasuka.pro/gambar/telkomsel.jpg" onclick="pilihProduk('telkomsel')">
-<img src="https://nasuka.pro/gambar/indosat.jpg" onclick="pilihProduk('indosat')">
-<img src="https://nasuka.pro/gambar/smartfren.jpg" onclick="pilihProduk('smartfren')">
-<img src="https://nasuka.pro/gambar/tri.jpg" onclick="pilihProduk('tri')">
-<img src="https://nasuka.pro/gambar/nitscell.jpg" onclick="pilihProduk('nitscell')">
-<img src="https://nasuka.pro/gambar/condongnet.jpg" onclick="pilihProduk('condongnet')">
-<img src="https://nasuka.pro/gambar/wifiid.jpg" onclick="pilihProduk('wifiid')">
+<a href="partner.html"><img src="https://nasuka.pro/gambar/partner.jpg"></a>
+<a href="cilok.html"><img src="https://nasuka.pro/gambar/pelanggancilok.jpg"></a>
+<a href="paketdata2.html"><img src="https://nasuka.pro/gambar/android.jpg"></a>
+<a href="paketdata.html"><img src="https://nasuka.pro/gambar/paketdata.jpg"></a>
+<a href="tentangkami.html"><img src="https://nasuka.pro/gambar/tentangkami.jpg"></a>
+<a href="kontak.html"><img src="https://nasuka.pro/gambar/whatsapp.jpg"></a>
 </div>
 </div>
-
-<div id="info-produk" style="text-align:center; font-size:39px; font-weight:bold; margin: 20px; height: 50px;"></div>
-
 <div class="controls-wrapper">
 <div class="control-row">
-<label class="btn-retro" for="axis" onclick="pilihProduk('axis')">Axis</label>
-<label class="btn-retro" for="xl" onclick="pilihProduk('xl')">Xl</label>
-<label class="btn-retro" for="telkomsel" onclick="pilihProduk('telkomsel')">Telkomsel</label>
+<label class="btn-retro" for="nasuka" onclick="updateInfo('', 'nasuka')">Nasuka.apk</label>
+<label class="btn-retro" for="cilok" onclick="updateInfo('', 'cilok')">Cilok</label>
+<label class="btn-retro" for="paket" onclick="updateInfo('', 'paket')">PaketData</label>
 </div>
 <div class="control-row">
-<label class="btn-retro" for="indosat" onclick="pilihProduk('indosat')">Indosat</label>
-<label class="btn-retro" for="smartfren" onclick="pilihProduk('smartfren')">Smartfren</label>
-<label class="btn-retro" for="tri" onclick="pilihProduk('tri')">Tri</label>
-</div>
-<div class="control-row">
-<label class="btn-retro" for="nitscell" onclick="pilihProduk('nitscell')">Nitscell</label>
-<label class="btn-retro" for="condongnet" onclick="pilihProduk('condongnet')">CondongNet</label>
-<label class="btn-retro" for="wifiid" onclick="pilihProduk('wifiid')">Wifi.id</label>
+<label class="btn-retro" for="partner" onclick="updateInfo('', 'partner')">Partner</label>
+<label class="btn-retro" for="tentang" onclick="updateInfo('', 'tentang')">Tentang</label>
+<label class="btn-retro" for="kontak" onclick="updateInfo('', 'kontak')">Kontak</label>
 </div>
 </div>
-
-<footer>
-    <button id="btn-beli" onclick="prosesBeli()" disabled>BELI SEKARANG</button>
-</footer>
-
-<div id="custom-alert-overlay" class="hidden">
-    <div id="alert-box-retro" class="alert-container-retro hidden">
-        <div id="alert-msg"></div>
-        <button class="btn-close" onclick="closeAlert()">OK</button>
-    </div>
-    <div id="struk-box" class="hidden">
-        <div class="struk-header">STRUK PEMBAYARAN</div>
-        <div id="isi-struk" class="struk-body"></div>
-        <button class="btn-close" style="margin-top:20px" onclick="closeAlert()">TUTUP</button>
-    </div>
-</div>
-
+<div id="info-produk" style="text-align:center; font-size:39px; font-weight:bold; margin: 0 0 20px 0;"></div>
+<div id="artikel-wrapper"><div id="konten-artikel" class="konten-artikel"></div></div>
 <script>
-function toggleNav(show) {
-    document.getElementById('nav-menu').classList.toggle('show', show);
-    document.getElementById('nav-overlay').style.display = show ? 'block' : 'none';
-}
-
-function navigate(page) {
-    const urls = {
-        'profil': 'profil.html',
-        'riwayat': 'riwayat.html',
-        'setting': 'setting.html',
-        'admin': 'admin.html'
-    };
-    window.location.href = urls[page] || '#';
-}
-
-const firebaseConfig = {
-    apiKey: "AIzaSyDXo3x2WA13dElu0jiRcDjzbm-2499Zaro",
-    authDomain: "nasukawireless-5808a.firebaseapp.com",
-    databaseURL: "https://nasukawireless-5808a-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "nasukawireless-5808a"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
 const dataProduk = {
-    axis: { id: 'a1', nama: 'Axis Aigo 5GB 1hari', harga: 7250 },
-    xl: { id: 'x1', nama: 'XL Flex 5GB 1hari', harga: 7750 },
-    telkomsel: { id: 't1', nama: 'Telkomsel 1GB 1hari', harga: 8500 },
-    indosat: { id: 'i1', nama: 'Indosat 5GB 1hari', harga: 8250 },
-    smartfren: { id: 's1', nama: 'Smartfren 1GB 3hari', harga: 7250 },
-    tri: { id: '31', nama: 'Tri 1.250GB 1Tahun', harga: 950000 },
-    nitscell: { id: 'n1', nama: 'NitsCell Unlimited 6jam', harga: 1750 },
-    condongnet: { id: 'c1', nama: 'CondongNet 1GB 1hari', harga: 5000 },
-    wifiid: { id: 'w1', nama: 'Wifi.id 6jam', harga: 5000 }
+cilok: 'Cilok isian gajih khas NasukaFoods. Kami biasa mangkal di seberang TVRI Bandung dan Masjid Nahjusallam Ciparay Tengah, serta melayani orderan online yang Bisa dipesan di jam tertentu via:<a href="https://gofood.link/" class="btn-external">GOFOOD</a><a href="https://r.grab.com/" class="btn-external">GRABFOOD</a><a href="https://app.shopeepay.co.id/" class="btn-external">SHOPEEFOOD</a><a href="https://vt.tokopedia.com/" class="btn-external">TOKOPEDIA</a><a href="https://vt.tiktok.com/" class="btn-external">TIKTOK SHOP</a>',
+nasuka: '<div class="galeri-foto"><img src="https://nasuka.pro/gambar/apk1.jpg"><img src="https://nasuka.pro/gambar/apk2.jpg"><img src="https://nasuka.pro/gambar/apk3.jpg"></div><a href="https://nasuka.pro/nasuka.apk" class="btn-external">DOWNLOAD APK</a>',
+
+
+paket: 'Dedikasi NasukaFoods untuk pelanggan: Kami menyajikan pilihan kuota harian termurah dan terpercaya agar Anda tetap terhubung dengan hemat.',
+tentang: 'Nasuka Foods lahir pada 17 Agustus 2020 dengan produk andalan cilok isian gajih. Bagi kami, kualitas adalah janji. Hal menarik: Inovasi rasa, konsistensi, dan dukungan teknologi digital untuk pelanggan.',
+kontak:'<div class="galeri-foto"><img src="https://nasuka.pro/gambar/kontak1.jpg"><img src="https://nasuka.pro/gambar/kontak2.jpg"><img src="https://nasuka.pro/gambar/kontak3.jpg"></div><a href="https://wa.me/62859109819017?text=hallo%20nasuka%20admin" class="btn-external">CHAT Admin Sekarang</a>',
+
+partner: 'Informasi Kemitraan Nasuka Foods.'
 };
-
-let user = JSON.parse(localStorage.getItem('user_data'));
-let cachedStok = JSON.parse(localStorage.getItem('cached_stok')) || {};
-let selectedProduk = null;
-
-function showAlert(msg) {
-    document.getElementById('alert-msg').innerText = msg;
-    document.getElementById('custom-alert-overlay').classList.remove('hidden');
-    document.getElementById('alert-box-retro').classList.remove('hidden');
+function updateInfo(nama, key) {
+document.getElementById('info-produk').innerHTML = nama;
+document.getElementById('konten-artikel').innerHTML = dataProduk[key];
 }
-
-function closeAlert() {
-    document.getElementById('custom-alert-overlay').classList.add('hidden');
-    document.getElementById('alert-box-retro').classList.add('hidden');
-    document.getElementById('struk-box').classList.add('hidden');
+function initDefault() {
+updateInfo('', 'nasuka');
 }
-
-function authApp() {
-    const phone = document.getElementById('in-phone').value;
-    const pin = document.getElementById('in-pin').value;
-    if(!phone || !pin) return;
-    db.ref('users/' + phone).once('value', snap => {
-        if(snap.exists()){
-            if(snap.val().pin == pin){
-                user = snap.val();
-                localStorage.setItem('user_data', JSON.stringify(user));
-                document.getElementById('login-overlay').style.display = 'none';
-                initApp();
-            } else { showAlert("PIN Salah"); }
-        } else {
-            user = { phone: phone, pin: pin, saldo: 0 };
-            db.ref('users/' + phone).set(user);
-            localStorage.setItem('user_data', JSON.stringify(user));
-            document.getElementById('login-overlay').style.display = 'none';
-            initApp();
-        }
-    });
-}
-
-function tampilkanStruk(sn) {
-    const now = new Date();
-    document.getElementById('isi-struk').innerHTML = `
-        <div class="struk-row"><span>Tgl:</span> <span>${now.toLocaleDateString('id-ID')}</span></div>
-        <div class="struk-row"><span>Jam:</span> <span>${now.toLocaleTimeString('id-ID')}</span></div>
-        <div class="struk-row"><span>HP:</span> <span>${user.phone}</span></div>
-        <div style="margin:20px 0; border-top:4px dashed #000;"></div>
-        <div class="struk-row"> <span>${selectedProduk.nama}</span></div>
-        <div class="struk-row"><span>Harga:</span> <span>Rp ${selectedProduk.harga.toLocaleString()}</span></div>
-        <div style="margin:20px 0; border-top:4px dashed #000;"></div>
-        <div style="text-align:center; font-weight:bold;">SERIAL NUMBER:</div>
-        <div style="text-align:center; font-weight:bold; font-size:40px; margin:20px 0; word-break:break-all;">${sn}</div>
-    `;
-    document.getElementById('custom-alert-overlay').classList.remove('hidden');
-    document.getElementById('struk-box').classList.remove('hidden');
-}
-
-function renderTampilanUser() {
-    const el = document.getElementById('display-saldo');
-    if(!user) { el.innerText = "Saldo: --"; } else { el.innerText = "Saldo: Rp " + parseInt(user.saldo).toLocaleString(); }
-}
-
-function updateTombol() {
-    const btn = document.getElementById('btn-beli');
-    btn.disabled = !(selectedProduk && cachedStok[selectedProduk.id]);
-}
-
-function pilihProduk(op) {
-    selectedProduk = dataProduk[op];
-    document.getElementById('info-produk').innerHTML = "";
-    document.getElementById(op).checked = true;
-    updateTombol();
-}
-
-function prosesBeli() {
-    if(!selectedProduk) return;
-    if(!user) { document.getElementById('login-overlay').style.display = 'flex'; return; }
-    if(parseInt(user.saldo) < selectedProduk.harga) { showAlert("Saldo tidak cukup"); return; }
-    
-    const stokRef = db.ref('stok_sn/' + selectedProduk.id);
-    stokRef.orderByChild('status').equalTo(null).limitToFirst(1).once('value', (snap) => {
-        if (!snap.exists()) { showAlert("Stok Habis"); return; }
-        const snKey = Object.keys(snap.val())[0];
-        const snTeks = snap.val()[snKey].sn;
-        
-        stokRef.child(snKey).update({ status: 'booked', booked_by: user.phone }, (error) => {
-            if (!error) {
-                db.ref('users/' + user.phone + '/saldo').transaction((saldo) => {
-                    return saldo >= selectedProduk.harga ? saldo - selectedProduk.harga : undefined;
-                }, (err, committed) => {
-                    if (committed) {
-                        stokRef.child(snKey).remove();
-                        db.ref('riwayat_sn/' + user.phone).push({ nama: selectedProduk.nama, sn: snTeks, tgl: Date.now() });
-                        tampilkanStruk(snTeks);
-                    } else {
-                        stokRef.child(snKey).update({ status: null, booked_by: null });
-                        showAlert("Gagal memproses saldo.");
-                    }
-                });
-            }
-        });
-    });
-}
-
-function initApp() {
-    if(!user) { renderTampilanUser(); }
-    else {
-        db.ref('users/' + user.phone).on('value', snap => {
-            if(snap.exists()){
-                user = snap.val();
-                localStorage.setItem('user_data', JSON.stringify(user));
-                renderTampilanUser();
-            }
-        });
-    }
-    listenStokRealtime();
-}
-
-function listenStokRealtime() {
-    Object.keys(dataProduk).forEach(op => {
-        let p = dataProduk[op];
-        db.ref('stok_sn/' + p.id).on('value', snap => {
-            const available = [];
-            snap.forEach(child => { if(!child.val().status) available.push(child.key); });
-            cachedStok[p.id] = available.length > 0;
-            localStorage.setItem('cached_stok', JSON.stringify(cachedStok));
-            updateTombol();
-        });
-    });
-}
-
-window.onload = () => {
-    initApp();
-};
 </script>
 </body>
 </html>
