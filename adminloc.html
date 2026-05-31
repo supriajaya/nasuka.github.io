@@ -3,14 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Location</title>
+<title>Admin Location Map</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <style>
-    body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
-    .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    .user-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-    button { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    body { font-family: sans-serif; padding: 10px; background: #f4f4f9; }
+    #map { height: 300px; border-radius: 15px; margin-bottom: 20px; }
+    .card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; }
+    .user-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; }
+    button { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
     .btn-izinkan { background: #28a745; color: white; }
     .btn-tolak { background: #dc3545; color: white; }
 </style>
@@ -18,13 +21,13 @@
 <body>
 
 <div class="card">
-    <h3>Data Lokasi Admin (Realtime)</h3>
-    <div id="loc-data" style="font-size: 1.2em; font-weight: bold; color: #007bff;">Memuat...</div>
+    <h3>Peta Lokasi Admin</h3>
+    <div id="map"></div>
 </div>
 
 <div class="card">
-    <h3>Kelola Akses User</h3>
-    <div id="user-list">Memuat daftar user...</div>
+    <h3>Kelola Akses</h3>
+    <div id="user-list">Memuat...</div>
 </div>
 
 <script>
@@ -37,12 +40,16 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+var map = L.map('map').setView([-6.2000, 106.8166], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+var marker = L.marker([-6.2000, 106.8166]).addTo(map);
+
 db.ref('lokasi_admin').on('value', snap => {
     const loc = snap.val();
     if (loc) {
-        document.getElementById('loc-data').innerHTML = `Lat: ${loc.lat}<br>Lng: ${loc.lng}`;
-    } else {
-        document.getElementById('loc-data').innerHTML = "Menunggu data koordinat...";
+        const newLatLng = [loc.lat, loc.lng];
+        marker.setLatLng(newLatLng);
+        map.setView(newLatLng, 15);
     }
 });
 
@@ -53,7 +60,6 @@ db.ref('users').on('value', snap => {
         const user = child.val();
         const phone = child.key;
         const isAuth = user.is_authorized === true;
-        
         list.innerHTML += `
             <div class="user-item">
                 <span>${phone} (${isAuth ? "Aktif" : "Tidak Aktif"})</span>
