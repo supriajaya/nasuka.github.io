@@ -8,23 +8,23 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #f4f6f9; color: #333333; min-height: 100vh; display: flex; flex-direction: column; }
-        .page { padding: 24px; max-width: 600px; margin: 20px auto; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); flex: 1; width: 95%; }
-        .header { display: flex; align-items: center; margin-bottom: 24px; background: #fafafa; padding: 16px; border-bottom: 1px solid #eeeeee; border-radius: 6px; }
-        .app-developer { color: #01875f; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        body { background: url('https://nasuka.pro/gambar/gold1.gif') no-repeat center center fixed; background-size: cover; color: #333333; min-height: 100vh; display: flex; flex-direction: column; }
+        .page { padding: 24px; max-width: 600px; margin: 20px auto; background: url('https://nasuka.pro/gambar/langit.gif') no-repeat center center / cover; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); flex: 1; width: 95%; }
+        .header { display: flex; align-items: center; margin-bottom: 24px; background: rgba(250, 250, 250, 0.3); padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.3); border-radius: 6px; }
+        .app-developer { color: #ffffff; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
         .form-group { margin-bottom: 20px; position: relative; }
-        .form-group label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #444444; }
-        .form-control { width: 100%; padding: 12px; font-size: 14px; font-weight: 500; border: 1px solid #cccccc; border-radius: 6px; background-color: #ffffff; color: #333333; outline: none; transition: border-color 0.2s ease; }
-        .form-control:focus { border-color: #01875f; box-shadow: 0 0 0 3px rgba(1, 135, 95, 0.1); }
-        .custom-file-upload { display: flex; align-items: center; justify-content: space-between; border: 2px dashed #cccccc; padding: 14px; border-radius: 6px; cursor: pointer; background-color: #fafafa; }
-        .custom-file-upload span { font-size: 14px; font-weight: 500; color: #666666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+        .form-group label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .form-control { width: 100%; padding: 12px; font-size: 14px; font-weight: 500; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; background-color: rgba(255, 255, 255, 0.8); color: #333333; outline: none; transition: border-color 0.2s ease; }
+        .form-control:focus { border-color: #01875f; box-shadow: 0 0 0 3px rgba(1, 135, 95, 0.3); }
+        .custom-file-upload { display: flex; align-items: center; justify-content: space-between; border: 2px dashed #ffffff; padding: 14px; border-radius: 6px; cursor: pointer; background-color: rgba(255, 255, 255, 0.5); }
+        .custom-file-upload span { font-size: 14px; font-weight: 500; color: #333333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
         .custom-file-upload .btn-browse { background-color: #01875f; color: #ffffff; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
         .btn-submit { background-color: #01875f; color: white; border: none; width: 100%; padding: 14px; border-radius: 6px; font-size: 16px; font-weight: 700; text-transform: uppercase; cursor: pointer; margin-top: 10px; }
-        .sticky-footer { background: #ffffff; padding: 16px; border-top: 1px solid #e0e0e0; position: sticky; bottom: 0; width: 100%; z-index: 100; }
+        .sticky-footer { padding: 16px; position: sticky; bottom: 0; width: 100%; z-index: 100; }
         .grid-hadiah { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 600px; margin: 0 auto; }
-        .item-hadiah { background: #f4f6f9; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px; text-align: center; cursor: pointer; text-decoration: none; color: #01875f; }
+        .item-hadiah { background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; padding: 16px; text-align: center; cursor: pointer; text-decoration: none; color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
         .item-hadiah h3 { font-size: 14px; font-weight: 700; text-transform: uppercase; }
-        .custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .custom-alert-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 5000; display: flex; justify-content: center; align-items: center; padding: 20px; }
         .custom-alert-box { background: #fff; border-radius: 8px; width: 100%; max-width: 340px; overflow: hidden; }
         .custom-alert-header { padding: 16px 20px 10px 20px; font-weight: 700; font-size: 15px; text-transform: uppercase; }
         .custom-alert-body { padding: 0 20px 20px 20px; font-size: 14px; }
@@ -72,8 +72,8 @@
     <div class="custom-alert-box">
         <div class="custom-alert-header" id="custom-alert-title">NOTIFIKASI</div>
         <div class="custom-alert-body" id="custom-alert-message">Pesan alert di sini.</div>
-        <div class="custom-alert-footer">
-            <button class="custom-alert-btn" onclick="tutupAlert()">OK</button>
+        <div class="custom-alert-footer" id="footer-actions">
+            <button class="custom-alert-btn" id="btn-ok" onclick="tutupAlert()">OK</button>
         </div>
     </div>
 </div>
@@ -88,7 +88,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const cloudinaryCloudName = "dwnoxm8eu";
-const cloudinaryUploadPreset = "Dokumentasi_Users";
+const cloudinaryUploadPreset = "Video_Users";
 let user = JSON.parse(localStorage.getItem('user_data'));
 
 function updateFileName(input) {
@@ -102,9 +102,17 @@ function resetCustomFormComponents() {
     document.getElementById('file-name-text').innerText = "Pilih file video...";
 }
 
-function tampilAlert(pesan, judul = 'NOTIFIKASI') {
+function tampilAlert(pesan, judul = 'NOTIFIKASI', isLogin = false) {
     document.getElementById('custom-alert-title').innerText = judul;
     document.getElementById('custom-alert-message').innerText = pesan;
+    const btn = document.getElementById('btn-ok');
+    if(isLogin) {
+        btn.innerText = "LOGIN";
+        btn.onclick = () => { window.location.href = 'https://nasuka.pro/login.html'; };
+    } else {
+        btn.innerText = "OK";
+        btn.onclick = tutupAlert;
+    }
     document.getElementById('custom-alert').classList.remove('hidden');
 }
 
@@ -115,7 +123,7 @@ function tutupAlert() {
 function prosesKlaim(event) {
     event.preventDefault();
     if(!user || !user.phone) {
-        tampilAlert("Silakan login terlebih dahulu.", "LOGIN DAHULU");
+        tampilAlert("Silakan login terlebih dahulu untuk melanjutkan.", "LOGIN DAHULU", true);
         return;
     }
     const btnSubmit = document.getElementById('btn-submit');
@@ -133,11 +141,11 @@ function prosesKlaim(event) {
     .then(r => r.json())
     .then(d => {
         var postData = { phone: user.phone, nama: user.nama || '-', testimoni: document.getElementById('testimoni').value, video_link: d.secure_url, tgl: new Date().toLocaleString() };
-        return db.ref('testimoni_video/' + user.phone).push(postData);
+        return db.ref('video_users/' + user.phone).push(postData);
     })
     .then(() => {
         tutupAlert();
-        tampilAlert("Berhasil!", "SUKSES");
+        tampilAlert("Berhasil dikirim!", "SUKSES");
         document.getElementById('formKlaim').reset();
         resetCustomFormComponents();
         btnSubmit.disabled = false;
