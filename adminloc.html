@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Realtime Map</title>
+<title>Admin Realtime Location</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <style>
-    body, html { height: 100%; margin: 0; }
+    body, html { height: 100%; margin: 0; padding: 0; }
     #map { height: 100vh; width: 100%; }
 </style>
 </head>
@@ -27,18 +27,25 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const map = L.map('map').setView([-6.2000, 106.8166], 15);
+const map = L.map('map').setView([-6.9740, 107.5900], 15);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-const marker = L.marker([-6.2000, 106.8166]).addTo(map);
+let marker = L.marker([0, 0]).addTo(map);
 
-db.ref('lokasi_admin').on('value', (snapshot) => {
-    const data = snapshot.val();
-    if (data && data.lat && data.lng) {
-        const newLatLng = [data.lat, data.lng];
-        marker.setLatLng(newLatLng);
-        map.panTo(newLatLng);
-    }
+navigator.geolocation.watchPosition((position) => {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    
+    marker.setLatLng([lat, lng]);
+    map.panTo([lat, lng]);
+    
+    db.ref('lokasi_admin').set({ lat: lat, lng: lng });
+}, (err) => {
+    alert("Izin lokasi ditolak atau GPS mati. Buka pengaturan browser, cari 'Site Settings' > 'Location', dan izinkan situs ini.");
+}, { 
+    enableHighAccuracy: true, 
+    timeout: 5000, 
+    maximumAge: 0 
 });
 </script>
 </body>
