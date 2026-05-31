@@ -74,8 +74,8 @@ input.auth-input { width: 100%; padding: 28px; margin: 19px 0; font-size: 34px; 
 <div id="login-overlay">
     <div class="login-box">
         <h2>Log in</h2>
-        <input type="tel" id="in-phone" class="auth-input" placeholder="Nomor HP">
-        <input type="password" id="in-pin" class="auth-input" placeholder="PIN">
+        <input type="number" inputmode="numeric" id="in-phone" class="auth-input" placeholder="Nomor HP" oninput="if(this.value.length>13)this.value=this.value.slice(0,13)">
+        <input type="number" inputmode="numeric" id="in-pin" class="auth-input" placeholder="PIN" oninput="if(this.value.length>4)this.value=this.value.slice(0,4)">
         <button id="btn-login" onclick="authApp()">Log In</button>
         <button id="btn-batal" onclick="document.getElementById('login-overlay').style.display='none'">Tidak, nanti saja</button>
     </div>
