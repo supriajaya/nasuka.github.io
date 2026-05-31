@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User View</title>
+<title>User View - Pantau Lokasi</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -30,20 +30,14 @@ const db = firebase.database();
 const map = L.map('map').setView([-6.9740, 107.5900], 15);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-let marker = null;
+const marker = L.marker([0, 0]).addTo(map);
 
 db.ref('lokasi_admin').on('value', (snapshot) => {
     const data = snapshot.val();
     if (data && data.lat !== undefined && data.lng !== undefined) {
-        const latLng = [data.lat, data.lng];
-        
-        if (!marker) {
-            marker = L.marker(latLng).addTo(map);
-        } else {
-            marker.setLatLng(latLng);
-        }
-        
-        map.panTo(latLng);
+        const newPos = [data.lat, data.lng];
+        marker.setLatLng(newPos);
+        map.panTo(newPos);
     }
 });
 </script>
