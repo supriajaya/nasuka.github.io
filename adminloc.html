@@ -18,8 +18,8 @@
 <body>
 
 <div class="card">
-    <h3>Data Lokasi Admin</h3>
-    <div id="loc-data">Memuat...</div>
+    <h3>Data Lokasi Admin (Realtime)</h3>
+    <div id="loc-data" style="font-size: 1.2em; font-weight: bold; color: #007bff;">Memuat...</div>
 </div>
 
 <div class="card">
@@ -39,7 +39,11 @@ const db = firebase.database();
 
 db.ref('lokasi_admin').on('value', snap => {
     const loc = snap.val();
-    document.getElementById('loc-data').innerHTML = loc ? `Lat: ${loc.lat}<br>Lng: ${loc.lng}` : "Data kosong";
+    if (loc) {
+        document.getElementById('loc-data').innerHTML = `Lat: ${loc.lat}<br>Lng: ${loc.lng}`;
+    } else {
+        document.getElementById('loc-data').innerHTML = "Menunggu data koordinat...";
+    }
 });
 
 db.ref('users').on('value', snap => {
@@ -48,14 +52,12 @@ db.ref('users').on('value', snap => {
     snap.forEach(child => {
         const user = child.val();
         const phone = child.key;
-        const status = user.is_authorized ? "Aktif" : "Tidak Aktif";
-        const btnClass = user.is_authorized ? "btn-tolak" : "btn-izinkan";
-        const btnText = user.is_authorized ? "Tolak" : "Izinkan";
+        const isAuth = user.is_authorized === true;
         
         list.innerHTML += `
             <div class="user-item">
-                <span>${phone} (${status})</span>
-                <button class="${btnClass}" onclick="updateAkses('${phone}', ${!user.is_authorized})">${btnText}</button>
+                <span>${phone} (${isAuth ? "Aktif" : "Tidak Aktif"})</span>
+                <button class="${isAuth ? 'btn-tolak' : 'btn-izinkan'}" onclick="updateAkses('${phone}', ${!isAuth})">${isAuth ? 'Tolak' : 'Izinkan'}</button>
             </div>
         `;
     });
