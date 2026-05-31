@@ -36,7 +36,10 @@ navigator.geolocation.watchPosition((pos) => {
     map.panTo([lat, lng]);
 
     if (now - lastUpdate > 60000) {
-        db.ref('lokasi_admin').set({ lat: lat, lng: lng });
+        db.ref('lokasi_admin').set({
+            lat: parseFloat(lat),
+            lng: parseFloat(lng)
+        });
         lastUpdate = now;
     }
 }, null, { enableHighAccuracy: true });
