@@ -25,24 +25,18 @@ const map = L.map('map').setView([-6.9740, 107.5900], 15);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 const marker = L.marker([0, 0]).addTo(map);
 
-let lastUpdate = 0;
-
-navigator.geolocation.watchPosition((pos) => {
-    const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
-    const now = Date.now();
-
-    marker.setLatLng([lat, lng]);
-    map.panTo([lat, lng]);
-
-    if (now - lastUpdate > 60000) {
-        db.ref('lokasi_admin').set({
-            lat: parseFloat(lat),
-            lng: parseFloat(lng)
+setInterval(() => {
+    navigator.geolocation.getCurrentPosition((pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        marker.setLatLng([lat, lng]);
+        map.panTo([lat, lng]);
+        db.ref('lokasi_admin').update({
+            lat: lat,
+            lng: lng
         });
-        lastUpdate = now;
-    }
-}, null, { enableHighAccuracy: true });
+    }, null, { enableHighAccuracy: true });
+}, 60000);
 </script>
 </body>
 </html>
