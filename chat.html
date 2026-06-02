@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Chat SPA</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            background-color: #008080; 
+            font-family: "Courier New", Courier, monospace; 
+            margin: 0; 
+            overflow: hidden; 
+            height: 100vh;
+        }
+        .window {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .title-bar {
+            background: #000080;
+            color: white;
+            padding: 2px 10px;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 40px;
+            position: relative;
+        }
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0 10px;
+            line-height: 40px;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 5px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            z-index: 100;
+            min-width: 180px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        .dropdown-menu button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px;
+            border: none;
+            background: none;
+            font-family: "Courier New", Courier, monospace;
+            cursor: pointer;
+        }
+        .dropdown-menu button:hover {
+            background: #000080;
+            color: white;
+        }
+        .dropdown-menu button.danger {
+            color: #a00000;
+        }
+        .dropdown-menu button.danger:hover {
+            background: #a00000;
+            color: white;
+        }
+        .content {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+        .view { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+        .view.active { display: flex; }
+
+        #auth-view { justify-content: center; align-items: center; gap: 10px; }
+        
+        #chat-container {
+            flex: 1;
+            background: #ffffff;
+            border: 3px inset #808080;
+            margin-bottom: 10px;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .message {
+            padding: 8px 12px;
+            font-size: 14px;
+            max-width: 70%;
+            border: 1px solid #000;
+            word-wrap: break-word;
+            position: relative;
+        }
+        .sent { align-self: flex-end; background-color: #dcf8c6; }
+        .received { align-self: flex-start; background-color: #e0e0e0; }
+        .timestamp { font-size: 10px; display: block; margin-top: 5px; color: #555; }
+        
+        .tick {
+            font-size: 12px;
+            margin-left: 5px;
+            color: #888;
+        }
+        .read-blue {
+            color: #34b7f1;
+            font-weight: bold;
+        }
+
+        .input-area { display: flex; gap: 10px; height: 50px; }
+        input, select {
+            background: #ffffff;
+            border: 3px inset #808080;
+            padding: 10px;
+            font-family: "Courier New", Courier, monospace;
+        }
+        button {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 5px 10px;
+        }
+        button:active { border-color: #808080 #ffffff #ffffff #808080; }
+        button:disabled { color: #808080; cursor: not-allowed; }
+
+        .list-container {
+            flex: 1;
+            background: #fff;
+            border: 2px inset #808080;
+            overflow-y: auto;
+            margin-top: 5px;
+        }
+        .contact-item {
+            padding: 10px;
+            border-bottom: 1px solid #808080;
+            cursor: pointer;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 10px;
+        }
+        .contact-item:hover { background: #000080; color: #fff; }
+        .unread-badge {
+            background: #ff0000;
+            color: white;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #fff;
+            margin-left: auto;
+        }
+        .profile-card, .settings-card {
+            background: #fff;
+            border: 3px inset #808080;
+            padding: 20px;
+        }
+        .avatar-frame {
+            width: 80px;
+            height: 80px;
+            background: #808080;
+            margin: 0 auto 10px;
+            border: 2px solid #000;
+            overflow: hidden;
+            position: relative;
+        }
+        .avatar-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .list-avatar {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #000;
+            object-fit: cover;
+        }
+
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-box {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            width: 300px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+        .modal-header {
+            background: #000080;
+            color: white;
+            padding: 4px 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .modal-body {
+            padding: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .modal-footer {
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header" id="modal-title">Sistem</div>
+        <div class="modal-body">
+            <div id="modal-message"></div>
+            <input type="text" id="modal-prompt-input" style="width:100%; margin-top:10px; display:none;">
+        </div>
+        <div class="modal-footer">
+            <button id="modal-ok-btn">OK</button>
+            <button id="modal-cancel-btn" style="display:none;">BATAL</button>
+        </div>
+    </div>
+</div>
+
+<div class="window">
+    <div class="title-bar">
+        <span id="header-title">Retro Messenger</span>
+        <div id="main-menu-container" style="display:none;">
+            <button class="menu-btn" id="menu-trigger">⋮</button>
+            <div class="dropdown-menu" id="dropdown-menu">
+                <div id="lobby-menu-items">
+                    <button onclick="switchView('profile')">Profil Saya</button>
+                    <button onclick="switchView('search')">Cari Lawan</button>
+                    <button onclick="switchView('settings')">Pengaturan</button>
+                    <button id="filtered-btn" onclick="toggleFilteredView()">Lihat Terfilter</button>
+                    <button id="logout-action">Keluar</button>
+                </div>
+                <div id="chat-menu-items" style="display:none;">
+                    <button onclick="editContactName()">Ubah Nama Kontak</button>
+                    <button class="danger" onclick="deleteContact()">Hapus Kontak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div id="auth-view" class="view active">
+            <b style="font-size: 20px;">MASUK / DAFTAR</b>
+            <input type="number" id="phoneInput" placeholder="Nomor HP (08...)">
+            <input type="password" id="pinInput" placeholder="PIN 4 Digit" maxlength="4">
+            <button id="authBtn" style="height:40px; width: 100%;">MASUK KE PLATFORM</button>
+        </div>
+
+        <div id="lobby-view" class="view">
+            <div id="contact-list" class="list-container"></div>
+        </div>
+
+        <div id="search-view" class="view">
+            <div style="border: 2px inset #808080; padding: 20px; background: #eee;">
+                <p style="margin: 0 0 10px 0; font-weight: bold;">Cari Lawan Chat:</p>
+                <input type="number" id="targetPhoneInput" style="width: 100%; margin-bottom: 10px;" placeholder="No HP Lawan">
+                <button id="startChatBtn" style="width: 100%;">MULAI CHAT</button>
+            </div>
+            <button onclick="switchView('lobby')" style="margin-top: 10px;">BATAL</button>
+        </div>
+
+        <div id="profile-view" class="view">
+            <div class="profile-card">
+                <div class="avatar-frame" onclick="document.getElementById('avatarInput').click()" style="cursor: pointer;">
+                    <img id="profile-avatar-img" src="">
+                </div>
+                <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleProfilePhoto(event)">
+                <h2 id="profile-display-name" style="margin: 5px 0; text-align: center;"></h2>
+                <p id="profile-phone" style="color: #666; margin: 0; text-align: center;"></p>
+                <div id="my-profile-edit" style="margin-top:15px; display:flex; flex-direction:column; gap:10px;">
+                    <input type="text" id="editNameInput" placeholder="Nama Baru">
+                    <button id="saveProfileBtn">SIMPAN</button>
+                </div>
+            </div>
+            <button onclick="switchView('lobby')" style="margin-top: 10px;">KEMBALI</button>
+        </div>
+
+        <div id="settings-view" class="view">
+            <div class="settings-card">
+                <p><b>Siapa yang boleh chat saya?</b></p>
+                <select id="privacy-select" style="width: 100%;">
+                    <option value="all">Semua Orang</option>
+                    <option value="contacts">Hanya Kontak</option>
+                </select>
+                <p style="font-size: 11px; color: #555;">Jika "Hanya Kontak" dipilih, pesan dari orang asing akan masuk ke folder "Terfilter".</p>
+                <button id="saveSettingsBtn" style="width: 100%; margin-top: 10px;">SIMPAN PENGATURAN</button>
+            </div>
+            <button onclick="switchView('lobby')" style="margin-top: 10px;">KEMBALI</button>
+        </div>
+
+        <div id="chat-view" class="view">
+            <div id="chat-container"></div>
+            <div class="input-area">
+                <input type="text" id="messageInput" style="flex:1" placeholder="Ketik pesan...">
+                <button id="sendBtn">KIRIM</button>
+            </div>
+            <button id="backToLobbyBtn" style="margin-top: 5px;">KEMBALI KE LOBBY</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDXo3x2WA13dElu0jiRcDjzbm-2499Zaro",
+        authDomain: "nasukawireless-5808a.firebaseapp.com",
+        databaseURL: "https://nasukawireless-5808a-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "nasukawireless-5808a"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dwnoxm8eu/image/upload";
+    const UPLOAD_PRESET = "Fhoto_Users";
+
+    let myPhone = localStorage.getItem('userPhone') || "";
+    let opponentPhone = "";
+    let currentChatRef = null;
+    let lobbyRef = null;
+    let activeTab = 'main';
+
+    const defaultAvatar = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23555' d='M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,5c1.66,0,3,1.34,3,3s-1.34,3-3,3s-1.34-3-3-3 S10.34,5,12,5z M12,19.2c-2.5,0-4.71-1.28-6-3.22c0.03-1.99,4-3.08,6-3.08c1.99,0,5.97,1.09,6,3.08C16.71,17.92,14.5,19.2,12,19.2z'/%3E%3C/svg%3E";
+
+    const retroDialog = {
+        show: function(msg, type = 'alert', callback = null, defaultValue = '') {
+            const overlay = document.getElementById('modal-overlay');
+            const okBtn = document.getElementById('modal-ok-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            const inputEl = document.getElementById('modal-prompt-input');
+            document.getElementById('modal-message').innerText = msg;
+            overlay.style.display = 'flex';
+            inputEl.style.display = type === 'prompt' ? 'block' : 'none';
+            if(type === 'prompt') inputEl.value = defaultValue;
+            cancelBtn.style.display = (type === 'confirm' || type === 'prompt') ? 'block' : 'none';
+            okBtn.onclick = () => { overlay.style.display = 'none'; if(callback) callback(type === 'prompt' ? inputEl.value : true); };
+            cancelBtn.onclick = () => { overlay.style.display = 'none'; if(callback) callback(null); };
+        },
+        alert: function(msg) { this.show(msg, 'alert'); },
+        confirm: function(msg, cb) { this.show(msg, 'confirm', cb); },
+        prompt: function(msg, def, cb) { this.show(msg, 'prompt', cb, def); }
+    };
+
+    function switchView(viewId) {
+        if(currentChatRef) { currentChatRef.off(); currentChatRef = null; }
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(viewId + '-view').classList.add('active');
+        document.getElementById('main-menu-container').style.display = (viewId === 'auth') ? 'none' : 'block';
+        document.getElementById('lobby-menu-items').style.display = (viewId === 'chat') ? 'none' : 'block';
+        document.getElementById('chat-menu-items').style.display = (viewId === 'chat') ? 'block' : 'none';
+        
+        if(viewId === 'lobby') {
+            activeTab = 'main';
+            document.getElementById('filtered-btn').innerText = 'Lihat Terfilter';
+            document.getElementById('header-title').innerText = 'Retro Messenger';
+            loadLobby();
+        }
+        if(viewId === 'settings') loadSettings();
+        if(viewId === 'profile') loadMyProfile();
+        document.getElementById('dropdown-menu').style.display = 'none';
+    }
+
+    function toggleFilteredView() {
+        const btn = document.getElementById('filtered-btn');
+        if (activeTab === 'main') {
+            activeTab = 'filtered';
+            btn.innerText = 'Lihat Pesan Utama';
+            document.getElementById('header-title').innerText = 'Pesan Terfilter';
+        } else {
+            activeTab = 'main';
+            btn.innerText = 'Lihat Terfilter';
+            document.getElementById('header-title').innerText = 'Retro Messenger';
+        }
+        document.getElementById('dropdown-menu').style.display = 'none';
+        loadLobby();
+    }
+
+    document.getElementById('menu-trigger').onclick = (e) => {
+        e.stopPropagation();
+        const m = document.getElementById('dropdown-menu');
+        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    };
+    window.onclick = () => document.getElementById('dropdown-menu').style.display = 'none';
+
+    document.getElementById('authBtn').onclick = async () => {
+        const phone = document.getElementById('phoneInput').value.trim();
+        const pin = document.getElementById('pinInput').value.trim();
+        if (phone.length < 10 || pin.length !== 4) return retroDialog.alert("Input tidak valid!");
+        const snap = await db.ref(`users/${phone}`).once("value");
+        if (snap.exists()) {
+            if (snap.val().pin === pin) loginSuccess(phone);
+            else retroDialog.alert("PIN Salah!");
+        } else {
+            await db.ref(`users/${phone}`).set({ phone, pin, name: "User" + phone.slice(-4), avatar: "", privacy: "all" });
+            loginSuccess(phone);
+        }
+    };
+
+    function loginSuccess(phone) { myPhone = phone; localStorage.setItem('userPhone', phone); switchView('lobby'); }
+
+    async function loadLobby() {
+        if (!myPhone) return;
+        const listDiv = document.getElementById('contact-list');
+        if (lobbyRef) { lobbyRef.off(); lobbyRef = null; }
+        
+        const privacySnap = await db.ref(`users/${myPhone}/privacy`).once("value");
+        const myPrivacy = privacySnap.val() || "all";
+
+        lobbyRef = db.ref(`users/${myPhone}/chats`);
+        lobbyRef.on('value', async (snap) => {
+            const chats = snap.val();
+            listDiv.innerHTML = "";
+            if (!chats) {
+                if(activeTab === 'filtered') listDiv.innerHTML = "<p style='text-align:center; padding:20px;'>Tidak ada pesan terfilter.</p>";
+                return;
+            }
+
+            const myContactsSnap = await db.ref(`users/${myPhone}/contacts`).once("value");
+            const myContacts = myContactsSnap.val() || {};
+
+            let foundItems = 0;
+            for (let targetPhone in chats) {
+                const isContact = myContacts.hasOwnProperty(targetPhone);
+                
+                if (myPrivacy === "contacts") {
+                    if (activeTab === 'main' && !isContact) continue;
+                    if (activeTab === 'filtered' && isContact) continue;
+                } else {
+                    if (activeTab === 'filtered') continue;
+                }
+
+                const targetSnap = await db.ref(`users/${targetPhone}`).once("value");
+                if(!targetSnap.exists()) continue;
+                
+                foundItems++;
+                const displayName = myContacts[targetPhone] || targetSnap.val().name || targetPhone;
+                const displayAvatar = targetSnap.val().avatar || defaultAvatar;
+                const chatId = chats[targetPhone];
+
+                const lastMsgSnap = await db.ref(`chats/${chatId}`).orderByChild('timestamp').limitToLast(1).once("value");
+                let lastMsg = "...";
+                lastMsgSnap.forEach(m => lastMsg = m.val().text || "...");
+
+                let unread = 0;
+                const msgsSnap = await db.ref(`chats/${chatId}`).once("value");
+                msgsSnap.forEach(m => { if(m.val().sender !== myPhone && !m.val().read) unread++; });
+
+                const item = document.createElement('div');
+                item.className = 'contact-item';
+                item.innerHTML = `
+                    <img src="${displayAvatar}" class="list-avatar">
+                    <div style="flex:1">
+                        <div style="font-weight:bold;">${displayName}</div>
+                        <div style="font-size:12px; opacity:0.7;">${lastMsg.substring(0,25)}</div>
+                    </div>
+                    ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ''}
+                `;
+                item.onclick = () => openChat(targetPhone, displayName);
+                listDiv.appendChild(item);
+            }
+            if(foundItems === 0 && activeTab === 'filtered') {
+                listDiv.innerHTML = "<p style='text-align:center; padding:20px;'>Folder terfilter kosong.</p>";
+            }
+        });
+    }
+
+    document.getElementById('startChatBtn').onclick = async () => {
+        const target = document.getElementById('targetPhoneInput').value.trim();
+        if (target === myPhone) return;
+        const targetSnap = await db.ref(`users/${target}`).once("value");
+        if (!targetSnap.exists()) return retroDialog.alert("Tidak ditemukan!");
+        
+        let chatId;
+        const myChatSnap = await db.ref(`users/${myPhone}/chats/${target}`).once("value");
+        if (myChatSnap.exists()) chatId = myChatSnap.val();
+        else {
+            chatId = db.ref('chats').push().key;
+            await db.ref(`users/${myPhone}/chats/${target}`).set(chatId);
+            await db.ref(`users/${target}/chats/${myPhone}`).set(chatId);
+        }
+        
+        const contactCheck = await db.ref(`users/${myPhone}/contacts/${target}`).once("value");
+        if(!contactCheck.exists()) {
+            await db.ref(`users/${myPhone}/contacts/${target}`).set(targetSnap.val().name || target);
+        }
+
+        openChat(target, targetSnap.val().name);
+    };
+
+    function openChat(target, name) {
+        opponentPhone = target;
+        document.getElementById('header-title').innerText = name;
+        switchView('chat');
+        loadMessages();
+    }
+
+    async function loadMessages() {
+        const chatIdSnap = await db.ref(`users/${myPhone}/chats/${opponentPhone}`).once("value");
+        const chatId = chatIdSnap.val();
+        
+        if (currentChatRef) { currentChatRef.off(); currentChatRef = null; }
+        
+        currentChatRef = db.ref(`chats/${chatId}`);
+        currentChatRef.on('value', (snap) => {
+            const container = document.getElementById('chat-container');
+            let html = "";
+            snap.forEach(m => {
+                const d = m.val();
+                if (d.sender === opponentPhone && !d.read) {
+                    db.ref(`chats/${chatId}/${m.key}/read`).set(true);
+                }
+                const msgClass = d.sender === myPhone ? 'sent' : 'received';
+                const ticks = d.sender === myPhone ? `<span class="tick ${d.read ? 'read-blue' : ''}">✓✓</span>` : "";
+                html += `<div class="message ${msgClass}"><div>${d.text}</div><span class="timestamp">${d.time} ${ticks}</span></div>`;
+            });
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
+        });
+    }
+
+    async function loadSettings() {
+        const snap = await db.ref(`users/${myPhone}/privacy`).once("value");
+        if (snap.exists()) document.getElementById('privacy-select').value = snap.val();
+    }
+
+    document.getElementById('saveSettingsBtn').onclick = async () => {
+        const val = document.getElementById('privacy-select').value;
+        await db.ref(`users/${myPhone}/privacy`).set(val);
+        retroDialog.alert("Pengaturan disimpan!");
+    };
+
+    async function loadMyProfile() {
+        const snap = await db.ref(`users/${myPhone}`).once("value");
+        const d = snap.val();
+        document.getElementById('profile-display-name').innerText = d.name;
+        document.getElementById('profile-phone').innerText = d.phone;
+        document.getElementById('editNameInput').value = d.name;
+        document.getElementById('profile-avatar-img').src = d.avatar || defaultAvatar;
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        if (!text || !opponentPhone) return;
+
+        const chatIdSnap = await db.ref(`users/${myPhone}/chats/${opponentPhone}`).once("value");
+        const chatId = chatIdSnap.val();
+        if(!chatId) return;
+
+        const now = new Date();
+        const time = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+        
+        await db.ref(`chats/${chatId}`).push({
+            sender: myPhone,
+            text: text,
+            time: time,
+            read: false,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+        input.value = "";
+    }
+
+    document.getElementById('sendBtn').onclick = sendMessage;
+    document.getElementById('messageInput').onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
+    document.getElementById('backToLobbyBtn').onclick = () => { switchView('lobby'); };
+    document.getElementById('saveProfileBtn').onclick = async () => {
+        const n = document.getElementById('editNameInput').value.trim();
+        if(n) { await db.ref(`users/${myPhone}/name`).set(n); loadMyProfile(); retroDialog.alert("Berhasil!"); }
+    };
+    document.getElementById('logout-action').onclick = () => { localStorage.clear(); location.reload(); };
+
+    async function handleProfilePhoto(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+
+        retroDialog.alert("Sedang mengunggah...");
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", UPLOAD_PRESET);
+
+        try {
+            const response = await fetch(CLOUDINARY_URL, {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+            const imageUrl = data.secure_url;
+            document.getElementById('profile-avatar-img').src = imageUrl;
+            await db.ref(`users/${myPhone}/avatar`).set(imageUrl);
+            retroDialog.alert("Foto profil berhasil diperbarui!");
+        } catch (err) {
+            retroDialog.alert("Gagal mengunggah foto.");
+        }
+    }
+
+    function editContactName() {
+        retroDialog.prompt("Nama Kontak:", document.getElementById('header-title').innerText, async (val) => {
+            if(val) { 
+                await db.ref(`users/${myPhone}/contacts/${opponentPhone}`).set(val.trim()); 
+                document.getElementById('header-title').innerText = val.trim();
+            }
+        });
+    }
+
+    function deleteContact() {
+        retroDialog.confirm("Hapus dari kontak? Pesan akan terfilter jika privasi aktif.", async (ok) => {
+            if(ok) {
+                await db.ref(`users/${myPhone}/contacts/${opponentPhone}`).remove();
+                retroDialog.alert("Kontak dihapus.");
+                switchView('lobby');
+            }
+        });
+    }
+
+    if (myPhone) switchView('lobby');
+</script>
+</body>
+</html>
