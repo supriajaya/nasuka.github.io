@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Tentang kami</title>
+<style>
+body { margin: 0; padding: 20px 20px 20px 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; background-image: url('https://nasukafoods.site/image/ombak.gif'); background-repeat: no-repeat; background-size: cover; background-attachment: fixed; }
+header { width: 100%; max-width: 800px; display: flex; justify-content: center; align-items: center; padding: 15px; background: rgba(240, 240, 240, 0.8); border: 4px outset #fff; margin-bottom: 20px; box-sizing: border-box; }
+#kami { font-weight: bold; padding: 10px; font-size: 47.88px; font-family: 'Courier New', monospace; color: #000; }
+.controls-wrapper { width: 100%; max-width: 900px; padding: 10px 0; display: flex; flex-direction: column; gap: 10px; align-items: center; margin-bottom: 20px; }
+.control-row { display: flex; justify-content: center; width: 100%; }
+.btn-retro { cursor: pointer; background: rgba(220, 220, 220, 0.9); border: 6px outset #fff; padding: 15px 10px; margin: 4px; font: bold 37.5px 'Courier New', monospace; outline: none; color: #000; text-align: center; flex: 1; }
+.btn-retro:active { border-style: inset; background: #c0c0c0; }
+input[type="radio"] { position: absolute; left: -9999px; }
+#artikel-wrapper { width: 100%; max-width: 900px; border: 4px solid #000; min-height: 300px; font-size: 45.6px; line-height: 1.6; }
+.konten-artikel { padding: 20px; color: #fff; text-shadow: 2px 2px 4px #000; }
+</style>
+</head>
+<body>
+<header>
+<div id="kami">Tentang Kami</div>
+</header>
+
+<input checked id="developer" name="multiples" type="radio">
+<input id="pertanyaan" name="multiples" type="radio">
+<input id="privacy" name="multiples" type="radio">
+<input id="refund" name="multiples" type="radio">
+<input id="term" name="multiples" type="radio">
+<input id="disclaimer" name="multiples" type="radio">
+
+<div class="controls-wrapper">
+<div class="control-row">
+<label class="btn-retro" for="developer" onclick="updateInfo('Developer', 'developer')">Developer</label>
+<label class="btn-retro" for="pertanyaan" onclick="updateInfo('Pertanyaan Umum', 'pertanyaan')">FAQ</label>
+<label class="btn-retro" for="privacy" onclick="updateInfo('Privacy Policy', 'privacy')">Privacy</label>
+</div>
+<div class="control-row">
+<label class="btn-retro" for="refund" onclick="updateInfo('Refund Policy', 'refund')">Refund</label>
+<label class="btn-retro" for="term" onclick="updateInfo('Term & Condition', 'term')">T&C</label>
+<label class="btn-retro" for="disclaimer" onclick="updateInfo('Disclaimer', 'disclaimer')">Disclaimer</label>
+</div>
+</div>
+
+<div id="info-produk" style="text-align:center; font-size:39px; font-weight:bold; margin: 20px; color: #fff; text-shadow: 2px 2px 4px #000;">Developer</div>
+
+<div id="artikel-wrapper">
+    <div id="konten-artikel" class="konten-artikel">
+        <p>Silahkan pilih tombol di atas.</p>
+    </div>
+</div>
+
+<script>
+const dataProduk = {
+    developer: '<p><strong>Nasuka Wireless</strong>, </p>',
+    pertanyaan: '<p>Jawaban untuk pertanyaan umum pelanggan.</p>',
+    privacy: '<p>Kebijakan privasi layanan kami.</p>',
+    refund: '<p>Syarat dan ketentuan pengembalian dana.</p>',
+    term: '<p>Aturan dan ketentuan penggunaan layanan.</p>',
+    disclaimer: '<p>Pernyataan sangkalan atau disclaimer layanan.</p>'
+};
+
+function updateInfo(nama, key) {
+    document.getElementById('info-produk').innerHTML = nama;
+    document.getElementById('konten-artikel').innerHTML = dataProduk[key];
+}
+</script>
+</body>
+</html>
