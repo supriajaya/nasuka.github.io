@@ -22,12 +22,10 @@ header { width: 100%; max-width: 800px; display: flex; justify-content: center; 
 .btn-retro:active { border-style: inset; background: #c0c0c0; }
 .btn-external { display: block; padding: 25px; margin: 20px 0; background: #000; border: 4px outset #ccc; text-decoration: none; color: #fff; font-weight: bold; text-align: center; font-size: 48px; }
 input[type="radio"] { position: absolute; left: -9999px; }
-#cilok:checked ~ .container .carousel { transform: translateZ(-563px); }
 #paket:checked ~ .container .carousel { transform: translateZ(-563px) rotateY(-72deg); }
 #event:checked ~ .container .carousel { transform: translateZ(-563px) rotateY(-144deg); }
 #tentang:checked ~ .container .carousel { transform: translateZ(-563px) rotateY(-216deg); }
 #kontak:checked ~ .container .carousel { transform: translateZ(-563px) rotateY(-288deg); }
-#cilok:checked ~ .container .carousel a:nth-child(1) { transform: translateZ(563px) scale(1); opacity: 1; }
 #paket:checked ~ .container .carousel a:nth-child(2) { transform: rotateY(72deg) translateZ(563px) scale(1); opacity: 1; }
 #event:checked ~ .container .carousel a:nth-child(3) { transform: rotateY(144deg) translateZ(563px) scale(1); opacity: 1; }
 #tentang:checked ~ .container .carousel a:nth-child(4) { transform: rotateY(216deg) translateZ(563px) scale(1); opacity: 1; }
@@ -40,14 +38,13 @@ input[type="radio"] { position: absolute; left: -9999px; }
 </head>
 <body onload="initDefault()">
 <header></header>
-<input checked id="cilok" name="multiples" type="radio">
 <input id="paket" name="multiples" type="radio">
 <input id="event" name="multiples" type="radio">
 <input id="tentang" name="multiples" type="radio">
 <input id="kontak" name="multiples" type="radio">
 <div class="container">
 <div class="carousel">
-<a href="https://nasuka.pro/cilok.html"><img src="https://nasuka.pro/gambar/pelanggancilok.jpg"></a>
+<a href="javascript:void(0)"></a>
 <a href="https://nasuka.pro/paketdata.html"><img src="https://nasuka.pro/gambar/paketdata.jpg"></a>
 <a href="https://nasuka.pro/event.html"><img src="https://nasuka.pro/gambar/event.jpg"></a>
 <a href="https://nasuka.pro/tentang.html"><img src="https://nasuka.pro/gambar/tentangkami.jpg"></a>
@@ -56,7 +53,6 @@ input[type="radio"] { position: absolute; left: -9999px; }
 </div>
 <div class="controls-wrapper">
 <div class="control-row">
-<label class="btn-retro" for="cilok" onclick="updateInfo('Cilok', 'cilok')">Cilok Gajih</label>
 <label class="btn-retro" for="paket" onclick="updateInfo('PaketData', 'paket')">Paket Data</label>
 </div>
 <div class="control-row">
@@ -69,7 +65,6 @@ input[type="radio"] { position: absolute; left: -9999px; }
 <div id="artikel-wrapper"><div id="konten-artikel" class="konten-artikel"></div></div>
 <script>
 const dataProduk = {
-cilok: '<div class="galeri-foto"><img src="https://nasuka.pro/gambar/cilok1.jpg"><img src="https://nasuka.pro/gambar/cilok2.jpg"><img src="https://nasuka.pro/gambar/cilok3.jpg"></div>',
 paket:'<div class="galeri-foto"><img src="https://nasuka.pro/gambar/kontak1.jpg"><img src="https://nasuka.pro/gambar/kontak2.jpg"><img src="https://nasuka.pro/gambar/kontak3.jpg"></div><a href="https://nasuka.pro/nasuka.apk" class="btn-external">Download Nasuka.apk</a>',
 event: 'Kirim Video Testimoni jujur tentang Cilok Isian Gajih Nasuka Foods, Dapatkan Hadiah Paket Data Gratis.',
 tentang: 'Nasuka Foods lahir pada 17 Agustus 2020.',
@@ -80,7 +75,7 @@ document.getElementById('info-produk').innerHTML = nama;
 document.getElementById('konten-artikel').innerHTML = dataProduk[key];
 }
 function initDefault() {
-updateInfo('Cilok', 'cilok');
+updateInfo('PaketData', 'paket');
 }
 </script>
 </body>
