@@ -29,7 +29,8 @@ header { width: 98%; max-width: 800px; display: flex; justify-content: center; a
 .carousel img:nth-child(9) { transform: rotateY(320deg) translateZ(561px) scale(.8); }
 .controls-wrapper { display: flex; flex-direction: column; gap: 12px; width: 98%; font-weight: bold; }
 .control-row { display: flex; justify-content: space-between; width: 100%; gap: 12px; }
-.btn-retro { cursor: pointer; background: #fff; border: 4px solid #000; padding: 35px 5px; font-size: 46px; border-radius: 28px; outline: none; color: #333; transition: 0.2s; flex: 1; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: bold; }
+.btn-retro { cursor: pointer; background: #fff; border: 4px solid #000; padding: 25px 5px; font-size: 32px; border-radius: 28px; outline: none; color: #333; transition: 0.2s; flex: 1; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-weight: bold; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+.btn-retro span { font-size: 24px; color: #666; }
 .btn-retro:active { transform: scale(0.95); background: #f0f0f0; }
 input[type="radio"] { position: absolute; left: -9999px; }
 #axis:checked ~ .container .carousel { transform: translateZ(-561px); }
@@ -124,19 +125,19 @@ input.auth-input { width: 100%; padding: 15px; margin: 10px 0; font-size: 20px; 
 
 <div class="controls-wrapper">
 <div class="control-row">
-<label class="btn-retro" for="axis" onclick="pilihProduk('axis')">Axis</label>
-<label class="btn-retro" for="xl" onclick="pilihProduk('xl')">Xl</label>
-<label class="btn-retro" for="telkomsel" onclick="pilihProduk('telkomsel')">Telkomsel</label>
+<label class="btn-retro" for="axis" onclick="pilihProduk('axis')">Axis<span>7.000</span></label>
+<label class="btn-retro" for="xl" onclick="pilihProduk('xl')">Xl<span>8.000</span></label>
+<label class="btn-retro" for="telkomsel" onclick="pilihProduk('telkomsel')">Telkomsel<span>9.000</span></label>
 </div>
 <div class="control-row">
-<label class="btn-retro" for="indosat" onclick="pilihProduk('indosat')">Indosat</label>
-<label class="btn-retro" for="smartfren" onclick="pilihProduk('smartfren')">Smartfren</label>
-<label class="btn-retro" for="tri" onclick="pilihProduk('tri')">Tri</label>
+<label class="btn-retro" for="indosat" onclick="pilihProduk('indosat')">Indosat<span>8.500</span></label>
+<label class="btn-retro" for="smartfren" onclick="pilihProduk('smartfren')">Smartfren<span>7.000</span></label>
+<label class="btn-retro" for="tri" onclick="pilihProduk('tri')">Tri<span>950rb</span></label>
 </div>
 <div class="control-row">
-<label class="btn-retro" for="nitscell" onclick="pilihProduk('nitscell')">Nitscell</label>
-<label class="btn-retro" for="condongnet" onclick="pilihProduk('condongnet')">CondongNet</label>
-<label class="btn-retro" for="wifiid" onclick="pilihProduk('wifiid')">Aplikasi</label>
+<label class="btn-retro" for="nitscell" onclick="pilihProduk('nitscell')">Nitscell<span>5.000</span></label>
+<label class="btn-retro" for="condongnet" onclick="pilihProduk('condongnet')">Condong Net<span>5.000</span></label>
+<label class="btn-retro" for="wifiid" onclick="pilihProduk('wifiid')">App<span>Gratis</span></label>
 </div>
 </div>
 
@@ -194,7 +195,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const dataProduk = {
-    axis: { id: 'a1', nama: 'Axis Aigo 5GB 1hari', harga: 7250, ket: 'Cara pakai:\n1. Salin kode voucher.\n2. Tekan *838*KODE_VOUCHER# di menu dial ponsel.\n3. Tekan OK/Panggil.' },
+    axis: { id: 'a1', nama: 'Axis Aigo 5GB 1hari', harga: 7000, ket: 'Cara pakai:\n1. Salin kode voucher.\n2. Tekan *838*KODE_VOUCHER# di menu dial ponsel.\n3. Tekan OK/Panggil.' },
     xl: { id: 'x1', nama: 'XL Flex 5GB 1hari', harga: 7750, ket: 'Cara pakai:\n1. Salin kode voucher.\n2. Tekan *123*234# atau buka aplikasi myXL.\n3. Masukkan kode voucher dan ikuti instruksi aktivasi.' },
     telkomsel: { id: 't1', nama: 'Telkomsel 1GB 1hari', harga: 8500, ket: 'Cara pakai:\n1. Salin kode voucher.\n2. Tekan *133*KODE_VOUCHER# di menu dial ponsel.\n3. Tekan OK/Panggil.' },
     indosat: { id: 'i1', nama: 'Indosat 5GB 1hari', harga: 8250, ket: 'Cara pakai:\n1. Salin kode voucher.\n2. Tekan *556*KODE_VOUCHER# di menu dial ponsel.\n3. Tekan OK/Panggil.' },
