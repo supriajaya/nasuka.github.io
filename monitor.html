@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+    <h3>Sistem Otomasi Saldo Aktif</h3>
+    <p id="status">Menunggu transaksi...</p>
+
+<script>
+    const firebaseConfig = {
+        databaseURL: "https://nasukawireless-5808a-default-rtdb.asia-southeast1.firebasedatabase.app"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Memantau setiap perubahan nominal transaksi dari MacroDroid
+    db.ref('transaksi/nominal_terbaru').on('value', async (snapshot) => {
+        const nominalMasuk = snapshot.val();
+        if (!nominalMasuk) return;
+
+        document.getElementById('status').innerText = "Mendeteksi: " + nominalMasuk;
+
+        // Cek apakah nominal masuk ada di pending_topup
+        const pendingRef = db.ref('pending_topup/' + nominalMasuk);
+        const snapshotPending = await pendingRef.once('value');
+
+        if (snapshotPending.exists()) {
+            const data = snapshotPending.val();
+            const userPhone = data.user_id;
+            const nominalAsli = data.nominal_asli;
+
+            // Update saldo user di Firebase
+            const userRef = db.ref('users/' + userPhone + '/saldo');
+            userRef.transaction((currentSaldo) => {
+                return (parseInt(currentSaldo || 0) + parseInt(nominalAsli));
+            });
+
+            // Hapus dari pending agar tidak terproses dua kali
+            pendingRef.remove();
+            
+            document.getElementById('status').innerText = "Sukses! Saldo " + userPhone + " bertambah " + nominalAsli;
+        } else {
+            document.getElementById('status').innerText = "Nominal " + nominalMasuk + " tidak cocok dengan tagihan manapun.";
+        }
+    });
+</script>
+</body>
+</html>
