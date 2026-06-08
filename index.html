@@ -244,10 +244,17 @@ function authApp() {
     });
 }
 
+
+
 function renderTampilanUser() {
     const el = document.getElementById('display-saldo');
-    if(!user) { el.innerText = " --"; } else { el.innerText = " Rp " + parseInt(user.saldo).toLocaleString(); }
+    if(!user || typeof user.saldo === 'undefined') { 
+        el.innerText = " Rp 0"; 
+    } else { 
+        el.innerText = " Rp " + parseInt(user.saldo).toLocaleString(); 
+    }
 }
+
 
 function pilihProduk(op) {
     selectedProduk = dataProduk[op];
