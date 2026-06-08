@@ -246,7 +246,7 @@ function authApp() {
 
 function renderTampilanUser() {
     const el = document.getElementById('display-saldo');
-    if(!user) { el.innerText = "Saldo: --"; } else { el.innerText = "Saldo: Rp " + parseInt(user.saldo).toLocaleString(); }
+    if(!user) { el.innerText = " --"; } else { el.innerText = "Saldo: Rp " + parseInt(user.saldo).toLocaleString(); }
 }
 
 function pilihProduk(op) {
