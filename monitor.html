@@ -1,38 +1,30 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-</head>
 <body>
-    <script>
-        const firebaseConfig = {
-            databaseURL: "https://nasukawireless-5808a-default-rtdb.asia-southeast1.firebasedatabase.app/"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
-        function prosesSaldo() {
-            const pendingRef = db.ref('pending_topup');
-            pendingRef.once('value', (snapshot) => {
-                snapshot.forEach((childSnapshot) => {
-                    const key = childSnapshot.key;
-                    const data = childSnapshot.val();
-                    const uid = data.user_id;
-                    const nominal = parseInt(data.nominal_asli);
+<script>
+  const firebaseConfig = { databaseURL: "https://nasukawireless-5808a-default-rtdb.asia-southeast1.firebasedatabase.app" };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-                    const userSaldoRef = db.ref('users/' + uid + '/saldo');
-                    userSaldoRef.transaction((currentSaldo) => {
-                        return (currentSaldo || 0) + nominal;
-                    }).then(() => {
-                        db.ref('pending_topup/' + key).remove();
-                    });
-                });
-            });
-        }
-        
-        // Panggil fungsi saat halaman selesai dimuat
-        window.onload = prosesSaldo;
-    </script>
+  // Memantau log baru
+  db.ref('logs').limitToLast(1).on('child_added', (snapshot) => {
+    const isiNotif = snapshot.val().notif;
+    
+    // Parsing Nominal (Contoh: "sebesar Rp 211")
+    const match = isiNotif.match(/Rp\s?([\d\.]+)/);
+    if (match) {
+      const nominal = parseInt(match[1].replace(/\./g, ''));
+      const targetUser = "085908590859"; // Logika filter ID user di sini
+
+      // Update Saldo via Transaction
+      db.ref('users/' + targetUser + '/saldo').transaction((currentSaldo) => {
+        return (currentSaldo || 0) + nominal;
+      });
+    }
+  });
+</script>
 </body>
 </html>
