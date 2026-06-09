@@ -1,55 +1,38 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Sistem Monitoring Saldo</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <style>
-        body { font-family: sans-serif; padding: 20px; background: #222; color: #fff; }
-        .box { padding: 20px; border: 1px solid #444; border-radius: 10px; background: #333; }
-    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="box">
-        <h3>Sistem Monitoring Otomatis</h3>
-        <p id="status">Menunggu transaksi masuk...</p>
-    </div>
+    <script>
+        const firebaseConfig = {
+            databaseURL: "https://nasukawireless-5808a-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-<script>
-    const firebaseConfig = {
-        databaseURL: "https://nasukawireless-5808a-default-rtdb.asia-southeast1.firebasedatabase.app"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+        function prosesSaldo() {
+            const pendingRef = db.ref('pending_topup');
+            pendingRef.once('value', (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const key = childSnapshot.key;
+                    const data = childSnapshot.val();
+                    const uid = data.user_id;
+                    const nominal = parseInt(data.nominal_asli);
 
-    // Memantau perubahan nominal transaksi secara real-time
-    db.ref('transaksi').on('child_changed', async (snapshot) => {
-        if (snapshot.key === "nominal_terbaru") {
-            const nominalMasuk = snapshot.val();
-            if (!nominalMasuk || nominalMasuk == 0) return;
-
-            document.getElementById('status').innerText = "Mendeteksi nominal: " + nominalMasuk;
-
-            const pendingRef = db.ref('pending_topup/' + nominalMasuk);
-            const snap = await pendingRef.once('value');
-
-            if (snap.exists()) {
-                const data = snap.val();
-                
-                // Menambah saldo user
-                const userRef = db.ref('users/' + data.user_id + '/saldo');
-                userRef.transaction((current) => {
-                    return (parseInt(current || 0) + parseInt(data.nominal_asli));
-                }).then(() => {
-                    pendingRef.remove(); // Hapus data pending setelah sukses
-                    document.getElementById('status').innerText = "Sukses! Saldo " + data.user_id + " bertambah Rp " + data.nominal_asli;
+                    const userSaldoRef = db.ref('users/' + uid + '/saldo');
+                    userSaldoRef.transaction((currentSaldo) => {
+                        return (currentSaldo || 0) + nominal;
+                    }).then(() => {
+                        db.ref('pending_topup/' + key).remove();
+                    });
                 });
-            } else {
-                document.getElementById('status').innerText = "Nominal " + nominalMasuk + " tidak ditemukan di antrean.";
-            }
+            });
         }
-    });
-</script>
+        
+        // Panggil fungsi saat halaman selesai dimuat
+        window.onload = prosesSaldo;
+    </script>
 </body>
 </html>
