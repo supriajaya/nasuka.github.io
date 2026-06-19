@@ -452,7 +452,7 @@ function initGlobalStatusListener() {
     
     const produkData = {
     pulsa: [
-        { op: 'XL', val: 'X5', harga: 6500, nama: 'XL 5rb' },
+        { op: 'XL', val: 'X5', harga: 106500, nama: 'XL 5rb' },
         { op: 'TSEL', val: 'S5', harga: 5500, nama: 'Telkomsel 5rb' }
       
     ],
