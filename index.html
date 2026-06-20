@@ -3,26 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <title>Index</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <link rel="stylesheet" href="https://nasuka.pro/naspro2.css">
+<link rel="stylesheet" href="https://nasuka.pro/naspro2.css">
 </head>
 <body>
 <header>
     <div class="menu-container">
         <div class="titik-tiga" onclick="toggleDropdown()">&#8942;</div>
         <div id="dropdownMenu" class="dropdown-menu">
-            
             <div onclick="window.AppInventor.setWebViewString('buka_profil')">Akun</div>           
-            <div             onclick="window.AppInventor.setWebViewString('buka_riwayat')">Riwayat</div>               
+            <div onclick="window.AppInventor.setWebViewString('buka_riwayat')">Riwayat</div>               
             <div onclick="window.AppInventor.setWebViewString('buka_pengaturan')">Pengaturan</div>      
-                    
         </div>        
     </div>
-    
     <div class="balance-container" style="display: none;">
         <span class="balance-label"></span>
         <span id="display-saldo" class="balance-value">Rp --</span>
@@ -38,13 +33,14 @@
 <input id="item7" name="multiples" type="radio">
 <input id="item8" name="multiples" type="radio">
 
-<div class="container">     <div class="carousel">
-<img src="https://nasuka.pro/gambar/pulsa.jpg" onclick="pilihKategori('Pulsa')">
-<img src="https:nasuka.pro/gambar/data.jpg" onclick="pilihKategori('Paket Data')">
-<img src="https://nasuka.pro/gambar/masaaktif.jpg" onclick="pilihKategori('Masa Aktif')">
-<img src="https://nasuka.pro/gambar/ewallet.jpg" onclick="pilihKategori('Ewallet')">
-<img src="https://nasuka.pro/gambar/smm.jpg" onclick="pilihKategori('SMM')">
-<img src="https://nasuka.pro/gambar/tokenlistrik.jpg" onclick="pilihKategori('Token Listrik')">
+<div class="container">     
+    <div class="carousel">
+        <img src="https://nasuka.pro/gambar/pulsa.jpg" onclick="pilihKategori('Pulsa')">
+        <img src="https://nasuka.pro/gambar/data.jpg" onclick="pilihKategori('Paket Data')">
+        <img src="https://nasuka.pro/gambar/masaaktif.jpg" onclick="pilihKategori('Masa Aktif')">
+        <img src="https://nasuka.pro/gambar/ewallet.jpg" onclick="pilihKategori('Ewallet')">
+        <img src="https://nasuka.pro/gambar/smm.jpg" onclick="pilihKategori('SMM')">
+        <img src="https://nasuka.pro/gambar/tokenlistrik.jpg" onclick="pilihKategori('Token Listrik')">
         <img src="">
         <img src="">
     </div>
@@ -54,7 +50,7 @@
     <input type="text" id="input-nomor-tujuan" placeholder="Target Nomor Tujuan / Url">
 </div>
 
-<div id="input-pln-container" class="card">
+<div id="input-pln-container" class="card" style="display:none;">
     <input type="text" id="meter_id" placeholder="ID Pelanggan" inputmode="numeric">
 </div>
 
@@ -74,107 +70,58 @@
 </div>
 
 <div class="panel-container">
-    
     <div id="panel-smm" class="card" style="display:none;">
-  
-    <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px;">
-        <button onclick="pilihSubSMM('Tiktok')">Tiktok</button>
-        <button onclick="pilihSubSMM('Youtube')">Youtube</button>
-        <button onclick="pilihSubSMM('Instagram')">Instagram</button>
-        <button onclick="pilihSubSMM('Facebook')">Facebook</button>
+        <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px;">
+            <button onclick="renderProdukDinamis('smm', 'Tiktok')">Tiktok</button>
+            <button onclick="renderProdukDinamis('smm', 'Youtube')">Youtube</button>
+            <button onclick="renderProdukDinamis('smm', 'Instagram')">Instagram</button>
+            <button onclick="renderProdukDinamis('smm', 'Facebook')">Facebook</button>
+        </div>
+        <div id="gridSmm" class="product-grid"></div> 
+        <div id="result" class="api-response"></div>
     </div>
-
-    <div id="gridSMM" class="product-grid"></div>
-    <div id="result" class="api-response"></div>
-</div>     
 
     <div id="panel-pln" class="card" style="display:none;">
         <button type="button" id="btnCheck">Cek Pelanggan</button>
         <div id="resultPLN" class="api-response"></div>
         <input type="text" id="order_meter_id" placeholder="ID Terverifikasi" readonly style="display:none;">
-        <div id="gridPLN" class="product-grid">
-     
-     
-            <div class="product-item" onclick="pilihProdukGlow(this, 'DDPLN5', 7000, 0, '')">
-                <div class="product-name">PLN 5.000</div>
-                <div class="product-price">Rp 7.000</div>
-            </div>
-            <div class="product-item" onclick="pilihProdukGlow(this, 'PLN10', 12000, 0, '')">
-                <div class="product-name">PLN 10.000</div>
-                <div class="product-price">Rp 12.000</div>
-            </div>
-            <div class="product-item" onclick="pilihProdukGlow(this, 'PLN15', 17000, 0, '')">
-                <div class="product-name">PLN 15.000</div>
-                <div class="product-price">Rp 17.000</div>
-            </div>
-            <div class="product-item" onclick="pilihProdukGlow(this, 'PLN20', 22000, 0, '')">
-                <div class="product-name">PLN 20.000</div>
-                <div class="product-price">Rp 22.000</div>
-            </div>
-            
-         <div class="product-item" onclick="pilihProdukGlow(this, 'PLN50', 52000, 0, '')">
-                <div class="product-name">PLN 25.000</div>
-                <div class="product-price">Rp 27.000</div>
-            </div>          
-            
-            
-            <div class="product-item" onclick="pilihProdukGlow(this, 'PLN50', 52000, 0, '')">
-                <div class="product-name">PLN 50.000</div>
-                <div class="product-price">Rp 52.000</div>
-            </div>     
-            
-         <div class="product-item" onclick="pilihProdukGlow(this, 'PLN50', 52000, 0, '')">
-                <div class="product-name">PLN 100.000</div>
-                <div class="product-price">Rp 102.000</div>
-            </div>     
-            
-           <div class="product-item" onclick="pilihProdukGlow(this, 'PLN50', 52000, 0, '')">
-                <div class="product-name">PLN 500.000</div>
-                <div class="product-price">Rp 502.000</div>
-            </div>        
-            
-       <div class="product-item" onclick="pilihProdukGlow(this, 'PLN50', 52000, 0, '')">
-                <div class="product-name">PLN 1.000.000</div>
-                <div class="product-price">Rp 1.000.000</div>
-            </div>                        
-        </div>
+        <div id="gridPln" class="product-grid"></div>
     </div>
     
     <div id="panel-pulsa" class="card" style="display:none;">
-    <div id="gridPulsa" class="product-grid"></div>
-    <div id="resultPulsa" class="api-response"></div>
-</div>  
+        <div id="gridPulsa" class="product-grid"></div>
+        <div id="resultPulsa" class="api-response"></div>
+    </div>  
             
     <div id="panel-paket" class="card" style="display:none;">
-    <div id="gridPaket" class="product-grid"></div>
-    <div id="resultPaket" class="api-response"></div>
-</div>
+        <div id="gridPaket" class="product-grid"></div>
+        <div id="resultPaket" class="api-response"></div>
+    </div>
        
     <div id="panel-aktif" class="card" style="display:none;">
-    <div id="gridAktif" class="product-grid"></div>
-    <div id="resultAktif" class="api-response"></div>
-</div>    
+        <div id="gridAktif" class="product-grid"></div>
+        <div id="resultAktif" class="api-response"></div>
+    </div>    
 
     <div id="panel-ewallet" class="card" style="display:none;">
-   
-    <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto;">
-        <button onclick="pilihSubEwallet('DANA')">DANA</button>
-        <button onclick="pilihSubEwallet('GOPAY')">GOPAY</button>
-        <button onclick="pilihSubEwallet('OVO')">OVO</button>
-        <button onclick="pilihSubEwallet('SHOPEEPAY')">SHOPEEPAY</button>
+        <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto;">
+            <button onclick="renderProdukDinamis('ewallet', 'DANA')">DANA</button>
+            <button onclick="renderProdukDinamis('ewallet', 'GOPAY')">GOPAY</button>
+            <button onclick="renderProdukDinamis('ewallet', 'OVO')">OVO</button>
+            <button onclick="renderProdukDinamis('ewallet', 'SHOPEEPAY')">SHOPEEPAY</button>
+        </div>
+        <div id="gridEwallet" class="product-grid"></div>
+        <div id="resultEwallet" class="api-response"></div>
     </div>
    
-    <div id="gridEwallet" class="product-grid"></div>
-    <div id="resultEwallet" class="api-response"></div>
-</div>
-   
-<div id="footer-order">
-    <button id="btn-beli-dinamis" onclick="eksekusiBeli()">Beli Sekarang</button>
-</div>
+    <div id="footer-order">
+        <button id="btn-beli-dinamis" onclick="eksekusiBeli()">Beli Sekarang</button>
+    </div>
 
-<div style="text-align:center; margin-bottom: 25px;">
-    <strong id="display-user"></strong>
-    <button id="logout-btn" onclick="logout()">Logout</button>
+    <div style="text-align:center; margin-bottom: 25px;">
+        <strong id="display-user"></strong>
+        <button id="logout-btn" onclick="logout()">Logout</button>
+    </div>
 </div>
 
 <div id="customAlert" class="modal-overlay">
@@ -193,7 +140,6 @@
 
 <div id="loginOverlay" class="login-overlay">
     <div class="login-box">
-      
         <input type="text" id="loginPhone" class="login-input" placeholder="Nomor Handphone" inputmode="numeric" pattern="[0-9]*" maxlength="13">
         <input type="password" id="loginPin" class="login-input" placeholder="PIN (4 Digit)" inputmode="numeric" pattern="[0-9]*" maxlength="4">
         <button id="btnLoginAction" class="login-btn" onclick="prosesLogin()">Masuk</button>
@@ -201,6 +147,194 @@
     </div>
 </div>
 
-<script src="https://nasuka.pro/naspro1.js"></script>
+<script>
+    const firebaseConfig = { databaseURL: "https://nasukawireless-73c75-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyaTRKbOCb3pPKdcpwFL9VQKQtib3TUR4sJbX5rLEbo4yIZheeHpdvBm5cU_Wn_pmn1/exec';
+
+    let userSaldo = 0;
+    let currentActiveType = 'pulsa';
+    let selectedProductValue = "";
+    let selectedProductHarga = 0;
+    let selectedProductQty = 0;
+    let selectedProductName = "";
+
+    function showAlert(msg) { document.getElementById('alertMessage').innerText = msg; document.getElementById('customAlert').style.display = 'flex'; }
+    function tutupCustomAlert() { document.getElementById('customAlert').style.display = 'none'; }
+    function resetSelectedProduct() { selectedProductValue = ""; selectedProductHarga = 0; selectedProductQty = 0; selectedProductName = ""; document.querySelectorAll('.product-item').forEach(el => el.classList.remove('selected')); }
+    function batasiInputAngka(elementId, maxLength) { const inputEl = document.getElementById(elementId); if(inputEl) { inputEl.addEventListener('input', function() { this.value = this.value.replace(/[^0-9]/g, ''); if (this.value.length > maxLength) this.value = this.value.slice(0, maxLength); }); } }
+
+    function formatStrukStatus(data) {
+        const now = new Date().toLocaleString('id-ID');
+        const snLine = (data.sn) ? `<div style="margin-top:10px;">SN/TOKEN:</div><div class="sn-box">${data.sn}</div>` : '';
+        return `<div class="struk-content"><div style="text-align:center; font-weight:bold; border-bottom: 1px dashed #000; padding-bottom:5px;"><br>STATUS: ${data.status.toUpperCase()}</div><div style="margin: 10px 0; font-size: 13px;"><div class="struk-row"><span>Waktu:</span> <span>${now}</span></div><div class="struk-row"><span>ID Order:</span> <span>${data.refID || '-'}</span></div><div class="struk-row"><span>Tujuan:</span> <span>${data.dest || '-'}</span></div><div class="struk-row"><span>Produk:</span> <span>${data.product || '-'}</span></div><div class="struk-row"><span>Harga:</span> <span>Rp ${data.price ? data.price.toLocaleString('id-ID') : '0'}</span></div></div>${snLine}<div style="border-top: 1px dashed #000; padding-top:5px; text-align:center; font-size: 12px;">Terima Kasih atas Kepercayaan Anda</div></div>`;
+    }
+
+    function formatApiResponse(res) {
+        if (res.success || res.status) {
+            const d = res.data || {};
+            const now = new Date().toLocaleString('id-ID');
+            return `<div class="struk-container"><div class="struk-header">NASUKA WIRELESS<br></div><div class="struk-body"><div><span>Waktu:</span> <span>${now}</span></div><div><span>ID Order:</span> <span>${d.order_number || '-'}</span></div><div><span>Tujuan:</span> <span>${document.getElementById('input-nomor-tujuan').value || document.getElementById('meter_id').value}</span></div><div><span>Produk:</span> <span>${selectedProductName || 'Reguler'}</span></div><div style="font-size: 16px; margin-top:10px;"><span>TOTAL:</span> <span>Rp ${selectedProductHarga.toLocaleString('id-ID')}</span></div></div><div class="struk-footer">TERIMA KASIH</div></div>`;
+        } else {
+            return `<div style="text-align:center; color: red;"><strong>TRANSAKSI GAGAL</strong><br>${res.message || 'Terjadi kesalahan sistem'}</div>`;
+        }
+    }
+
+    function detectOperator() {
+        const no = document.getElementById('input-nomor-tujuan').value;
+        const currentPanel = document.getElementById('panel-' + currentActiveType);
+        if (!currentPanel) return;
+        const items = currentPanel.querySelectorAll('.product-item');
+        if (no.length < 4) { items.forEach(item => item.style.display = 'flex'); return; }
+        
+        let prefix = no.substring(0, 4);
+        let operator = "";
+        if (['0811', '0812', '0813', '0821', '0822', '0852', '0853'].includes(prefix)) operator = "TSEL";
+        else if (['0817', '0818', '0819', '0877', '0878', '0859'].includes(prefix)) operator = "XL";
+        else if (['0831', '0832', '0833', '0838'].includes(prefix)) operator = "AXIS";
+        else if (['0814', '0815', '0816', '0855', '0856', '0857', '0858'].includes(prefix)) operator = "ISAT";
+        else if (['0895', '0896', '0897', '0898', '0899'].includes(prefix)) operator = "TRI";
+        else if (['0881', '0882', '0883', '0884', '0885', '0886', '0887', '0888', '0889'].includes(prefix)) operator = "FREN";
+        
+        items.forEach(item => {
+            const op = item.getAttribute('data-op');
+            item.style.display = (operator !== "" && op && op !== operator) ? 'none' : 'flex';
+        });
+    }
+
+    function renderProdukDinamis(type, sub = null) {
+        let path = sub ? `produk/${type}/${sub}` : `produk/${type}`;
+        db.ref(path).once('value', snapshot => {
+            let gridId = 'grid' + type.charAt(0).toUpperCase() + type.slice(1);
+            let grid = document.getElementById(gridId);
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            snapshot.forEach(child => {
+                const item = child.val();
+                const div = document.createElement('div');
+                div.className = 'product-item';
+                if(item.op) div.setAttribute('data-op', item.op);
+                div.onclick = function() { pilihProdukGlow(this, item.val, item.harga, item.qty || 0, item.nama || item.label); };
+                div.innerHTML = `<div class="product-name">${item.nama || item.label}</div><div class="product-price">Rp ${item.harga.toLocaleString('id-ID')}</div>`;
+                grid.appendChild(div);
+            });
+            detectOperator();
+        });
+    }
+
+    function switchTab(type) {
+        currentActiveType = type;
+        resetSelectedProduct();
+        const panels = ['panel-smm', 'panel-pln', 'panel-pulsa', 'panel-paket', 'panel-ewallet', 'panel-aktif'];
+        panels.forEach(id => document.getElementById(id).style.display = (id === 'panel-' + type) ? 'block' : 'none');
+        
+        const inputTop = document.getElementById('input-top-container');
+        const inputPln = document.getElementById('input-pln-container');
+        
+        if (type === 'pln') { 
+            inputTop.style.display = 'none'; inputPln.style.display = 'block'; 
+        } else { 
+            inputTop.style.display = 'block'; inputPln.style.display = 'none';
+        }
+        
+        if (type === 'smm') renderProdukDinamis('smm', 'Tiktok');
+        else if (type === 'ewallet') renderProdukDinamis('ewallet', 'DANA');
+        else renderProdukDinamis(type);
+    }
+
+    function pilihKategori(kategori) {
+        const mapping = { 'Pulsa': 'pulsa', 'Paket Data': 'paket', 'Ewallet': 'ewallet', 'Token Listrik': 'pln', 'SMM': 'smm', 'Masa Aktif': 'aktif' };
+        if(!mapping[kategori]) return;
+        switchTab(mapping[kategori]);
+        const radioMap = { 'Pulsa': 'item1', 'Paket Data': 'item2', 'Masa Aktif': 'item3', 'Token Listrik': 'item6', 'SMM': 'item5', 'Ewallet': 'item4' };
+        if(radioMap[kategori]) document.getElementById(radioMap[kategori]).checked = true;
+    }
+
+    function pilihProdukGlow(element, value, harga, qty, name) {
+        document.querySelectorAll('#panel-' + currentActiveType + ' .product-item').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedProductValue = value;
+        selectedProductHarga = harga;
+        selectedProductQty = qty;
+        selectedProductName = name;
+    }
+
+    function tampilkanModal(htmlContent) { const modal = document.getElementById('apiModal'); document.getElementById('modalBody').innerHTML = htmlContent; modal.style.display = 'flex'; }
+    function tutupModal() { document.getElementById('apiModal').style.display = 'none'; }
+    function showLogin() { document.getElementById('loginOverlay').style.display = 'flex'; }
+    function hideLogin() { document.getElementById('loginOverlay').style.display = 'none'; }
+
+    function prosesLogin() {
+        const phone = document.getElementById('loginPhone').value.trim();
+        const pin = document.getElementById('loginPin').value.trim();
+        if (!phone || !pin) return showAlert('Data wajib diisi!');
+        db.ref('users/' + phone).once('value', snap => {
+            if (snap.exists()) {
+                if (String(snap.val().pin) === String(pin)) { localStorage.setItem('userPhone', phone); hideLogin(); initUserSession(phone); } else { showAlert('PIN salah!'); }
+            } else {
+                db.ref('users/' + phone).set({ pin: pin, saldo: 0 }).then(() => { localStorage.setItem('userPhone', phone); hideLogin(); initUserSession(phone); });
+            }
+        });
+    }
+
+    function initUserSession(ph) {
+        if (ph) {
+            document.querySelector('.balance-container').style.display = 'flex';
+            db.ref('users/' + ph + '/saldo').on('value', snap => { userSaldo = snap.val() || 0; document.getElementById('display-saldo').innerText = "Rp " + userSaldo.toLocaleString('id-ID'); });
+            initGlobalStatusListener();
+        }
+    }
+
+    function initGlobalStatusListener() {
+        const userPhone = localStorage.getItem('userPhone');
+        if (!userPhone) return;
+        db.ref(`users/${userPhone}/riwayat`).on('child_changed', (snapshot) => { const data = snapshot.val(); if (data.status === 'success' || data.status === 'failed') tampilkanModal(formatStrukStatus(data)); });
+    }
+
+    async function postOrder(urlData) {
+        const btn = document.getElementById('btn-beli-dinamis'); btn.disabled = true; btn.innerText = 'Memproses...';
+        try {
+            const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(urlData) });
+            const result = await response.json();
+            if(result.status === true || result.success === true) {
+                await db.ref(`users/${localStorage.getItem('userPhone')}/riwayat/${urlData.refID}`).set({ refID: urlData.refID, product: urlData.product, dest: urlData.dest, status: 'ordered', price: urlData.price, timestamp: new Date().toISOString() });
+            }
+            tampilkanModal(formatApiResponse(result));
+        } catch (err) { showAlert('Terjadi kesalahan.'); } finally { btn.disabled = false; btn.innerText = 'Beli Sekarang'; }
+    }
+
+    function eksekusiBeli() {
+        const ph = localStorage.getItem('userPhone'); if (!ph) return showLogin();
+        const dest = (currentActiveType === 'pln') ? document.getElementById('order_meter_id').value : document.getElementById('input-nomor-tujuan').value;
+        if(!dest || !selectedProductValue) return showAlert("Lengkapi data!");
+        if (userSaldo < selectedProductHarga) return showAlert("Saldo kurang!");
+        const common = { refID: currentActiveType.toUpperCase() + Date.now(), userPhone: ph, price: selectedProductHarga, product: selectedProductValue, dest: dest };
+        if (currentActiveType === 'smm') postOrder({ ...common, action: 'order', service: selectedProductValue, quantity: selectedProductQty });
+        else if (currentActiveType === 'pln') postOrder({ ...common, action: 'orderPLN' });
+        else postOrder({ ...common, action: 'order' + currentActiveType.charAt(0).toUpperCase() + currentActiveType.slice(1) });
+    }
+
+    document.getElementById('btnCheck').onclick = async () => {
+        const m = document.getElementById('meter_id').value; if (!m) return showAlert("Masukkan ID!");
+        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'checkPLN', meter_id: m }) });
+        const data = await res.json();
+        if(data.success) { tampilkanModal(`<strong>Nama:</strong> ${data.data.name}<br><strong>Daya:</strong> ${data.data.power_formatted}`); document.getElementById('order_meter_id').value = data.data.meter_id; } else { tampilkanModal(`<strong>Error:</strong> ${data.message}`); }
+    };
+
+    function toggleDropdown() { const menu = document.getElementById('dropdownMenu'); menu.style.display = (menu.style.display === 'block') ? 'none' : 'block'; }
+    window.onclick = function(event) { if (!event.target.matches('.titik-tiga')) { document.getElementById("dropdownMenu").style.display = "none"; } }
+    function logout() { localStorage.clear(); location.reload(); }
+    
+    window.onload = () => {
+        initUserSession(localStorage.getItem('userPhone'));
+        document.getElementById('input-nomor-tujuan').addEventListener('input', detectOperator);
+        switchTab('pulsa');
+        batasiInputAngka('loginPhone', 13); 
+        batasiInputAngka('loginPin', 4); 
+        batasiInputAngka('meter_id', 20);
+    };
+</script>
 </body>
 </html>
