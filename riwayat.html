@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Riwayat Transaksi</title>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+    body { margin: 0; padding: 10px; font-family: sans-serif; background: #f4f4f4; }
+    .panel-container { width: 100%; max-width: 500px; margin: 0 auto; }
+    .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 15px; }
+    .tab-btn { padding: 8px 2px; border: none; border-radius: 6px; background: #ddd; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
+    .tab-btn.active { background: #007bff; color: white; }
+    h2 { font-size: 1.1rem; margin-top: 0; color: #333; }
+    .history-item { border-bottom: 1px solid #eee; padding: 12px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .history-info { flex: 1; overflow: hidden; }
+    .history-info strong { display: block; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-info small { color: #666; font-size: 0.8rem; }
+    .status-badge { font-size: 0.7rem; padding: 3px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+    .success { background: #d4edda; color: #155724; }
+    .ordered { background: #ffeeba; color: #856404; }
+    .failed { background: #f8d7da; color: #721c24; }
+    dialog { border: none; border-radius: 12px; padding: 0; width: 95%; max-width: 400px; }
+    .struk { padding: 20px; font-family: 'Courier New', Courier, monospace; text-align: center; }
+    .struk h3 { border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.1rem; }
+    .struk-info { text-align: left; font-size: 0.85rem; line-height: 1.5; }
+    .sn-box { background: #eee; padding: 10px; margin: 15px 0; border: 1px dashed #333; word-break: break-all; font-weight: bold; }
+    .btn-close { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="panel-container">
+    <div class="card">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('reguler')">Reguler</button>
+            <button class="tab-btn" onclick="switchTab('ewallet')">E-Wallet</button>
+            <button class="tab-btn" onclick="switchTab('smm')">SMM</button>
+            <button class="tab-btn" onclick="switchTab('pln')">PLN</button>
+        </div>
+        <h2 id="panelTitle">Riwayat Reguler</h2>
+        <div id="historyList"></div>
+    </div>
+</div>
+
+<dialog id="strukModal">
+    <div class="struk" id="modalContent"></div>
+    <button class="btn-close" onclick="document.getElementById('strukModal').close()">TUTUP</button>
+</dialog>
+
+<script>
+    const FIREBASE_URL = "https://nasukawireless-73c75-default-rtdb.asia-southeast1.firebasedatabase.app/";
+    firebase.initializeApp({ databaseURL: FIREBASE_URL });
+    
+    const productMapping = {
+        "40008": { name: "Tiktok Views 500", cat: "smm" },
+        "40009": { name: "Tiktok 500 Views", cat: "smm" },
+        "D1": { name: "DANA • Rp 1.000", cat: "ewallet" },
+        "XLA5": { name: "PULSA AXIS • 5.000", cat: "reguler" },
+        "PLN20": { name: "TOKEN PLN 20rb", cat: "pln" }
+    };
+
+    let currentCategory = 'reguler';
+
+    function getStatusText(status) {
+        const mapping = { 'success': 'Berhasil', 'ordered': 'Diproses', 'failed': 'Gagal' };
+        return mapping[status] || status;
+    }
+
+    function switchTab(cat) {
+        currentCategory = cat;
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.innerText.toLowerCase().replace('-', '') === cat) btn.classList.add('active');
+        });
+        document.getElementById('panelTitle').innerText = 'Riwayat ' + cat.charAt(0).toUpperCase() + cat.slice(1);
+        loadHistory();
+    }
+
+    function showDetail(item, key) {
+        const modal = document.getElementById('strukModal');
+        const content = document.getElementById('modalContent');
+        const prodData = productMapping[String(item.product)];
+        const displayName = prodData ? prodData.name : item.product;
+        
+        content.innerHTML = `
+            <h3>STRUK PEMBAYARAN</h3>
+            <div class="struk-info">
+                <div>Waktu: ${new Date(item.timestamp).toLocaleString('id-ID')}</div>
+                <div>ID Trx: ${key}</div>
+                <div>Produk: ${displayName}</div>
+                <div>Tujuan: ${item.dest}</div>
+                <div>Status: ${getStatusText(item.status)}</div>
+                <div style="margin-top:10px; border-top: 1px solid #000;">
+                    <strong>Total: Rp ${item.price ? item.price.toLocaleString('id-ID') : '0'}</strong>
+                </div>
+            </div>
+            ${item.sn ? `<div class="sn-box">${item.type === 'pln' ? 'TOKEN PLN:' : 'SN:'}<br>${item.sn}</div>` : ''}
+        `;
+        modal.showModal();
+    }
+
+    async function loadHistory() {
+        const ph = localStorage.getItem('userPhone');
+        const container = document.getElementById('historyList');
+        if (!ph) return;
+        
+        container.innerHTML = 'Memuat...';
+        
+        const res = await fetch(`${FIREBASE_URL}users/${ph}/riwayat.json`);
+        const data = await res.json();
+        
+        container.innerHTML = '';
+        if (!data) { container.innerHTML = 'Belum ada riwayat.'; return; }
+        
+        let items = Object.keys(data).map(key => ({ key, ...data[key] }));
+        
+        items = items.filter(item => {
+            const prodData = productMapping[String(item.product)];
+            const itemCat = prodData ? prodData.cat : (item.type || 'reguler');
+            return itemCat === currentCategory;
+        });
+
+        // LOGIKA BARU: Mengubah string timestamp menjadi objek Date untuk perbandingan yang valid
+        items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        if (items.length === 0) { container.innerHTML = 'Belum ada riwayat.'; return; }
+        
+        items.forEach(item => {
+            const prodData = productMapping[String(item.product)];
+            const displayName = prodData ? prodData.name : item.product;
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.onclick = () => showDetail(item, item.key);
+            div.innerHTML = `
+                <div class="history-info">
+                    <strong>${displayName}</strong>
+                    <small>${item.dest} • Rp ${item.price ? item.price.toLocaleString('id-ID') : '0'}</small>
+                </div>
+                <span class="status-badge ${item.status}">${getStatusText(item.status)}</span>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    loadHistory();
+</script>
+</body>
+</html>
