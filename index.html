@@ -7,15 +7,17 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-<style> body { margin: 0; padding: 9px 9px 90px 9px; display: flex; flex-direction: column; align-items: center; font-family: 'Inter', -apple-system, sans-serif; background: #d3d3d3; font-size: 80%; font-weight: bold; } header { position: relative; width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; padding: 6.75px 11.25px; background: #ffffff; border-radius: 7.2px; margin-bottom: 9px; box-sizing: border-box; box-shadow: 0 1.8px 2.7px -0.45px rgba(0,0,0,0.1); z-index: 100; } .menu-container { position: relative; display: flex; align-items: center; } .titik-tiga { cursor: pointer; padding: 5px 10px; font-size: 20px; font-weight: bold; color: #334155; } .dropdown-menu { display: none; position: absolute; top: 110%; left: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 120px; z-index: 999; } .dropdown-menu div { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; } .dropdown-menu div:last-child { border-bottom: none; } .dropdown-menu div:hover { background: #f8fafc; } .struk-container { font-family: 'Courier New', Courier, monospace; color: #000; text-align: center; background: #fff; padding: 10px; border: 1px solid #ccc; } .struk-content { font-family: 'Courier New', Courier, monospace; color: #000; width: 100%; } .struk-row { display: flex; justify-content: space-between; margin-bottom: 2px; } .sn-box { background: #000; color: #fff; padding: 5px; margin: 10px 0; text-align: center; font-weight: bold; font-size: 1.1em; } .struk-header { font-weight: bold; border-bottom: 2px dashed #000; padding-bottom: 5px; margin-bottom: 5px; } .struk-body { text-align: left; font-size: 14px; margin: 10px 0; } .struk-body div { display: flex; justify-content: space-between; margin-bottom: 4px; } .struk-footer { border-top: 2px dashed #000; padding-top: 5px; font-weight: bold; } .container { width: 216px; height: 129.6px; perspective: 432px; perspective-origin: 50% -10.8px; margin: 21.6px auto; margin-bottom: 8.64px; } .carousel { transform-style: preserve-3d; transform: translateZ(-259.2px); position: relative; width: 216px; height: 129.6px; transition: 1s; } .carousel img { position: absolute; border: 0.432px solid #222; opacity: .5; transition: 1s; width: 216px; height: 129.6px; background:#ccc; cursor: pointer; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); } .carousel img:nth-child(1) { transform: rotateY(0deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(2) { transform: rotateY(45deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(3) { transform: rotateY(90deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(4) { transform: rotateY(135deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(5) { transform: rotateY(180deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(6) { transform: rotateY(225deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(7) { transform: rotateY(270deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(8) { transform: rotateY(315deg) translateZ(259.2px) scale(.96); } .controls-wrapper { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 405px; align-items: center; padding: 0 4.5px; box-sizing: border-box; } .control-row { display: flex; justify-content: center; width: 100%; gap: 9px; flex-wrap: nowrap; margin-bottom: 9px; } .card-kategori { cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 4px; width: 22%; aspect-ratio: 1 / 1; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); box-sizing: border-box; } .card-kategori img { width: 40%; height: auto; margin-bottom: 4px; } .card-kategori span { font-weight: bold; font-size: 10px; color: #1e293b; text-transform: uppercase; text-align: center; line-height: 1.2; } .card-kategori:active { transform: scale(0.95); background: #f1f5f9; } .card-kategori.disabled { cursor: not-allowed; opacity: 0.5; } #input-nomor-tujuan { width: 100%; max-width: 387px; padding: 11.25px; font-size: 54.432px; border: 0.9px solid #e2e8f0; border-radius: 7.2px; margin: 6.75px 0; text-align: center; box-sizing: border-box; } input[type="radio"] { position: absolute; left: -9999px; } #input-top-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; } #input-pln-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; } #item1:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(0deg); } #item2:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-45deg); } #item3:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-90deg); } #item4:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-135deg); } #item5:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-180deg); } #item6:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-225deg); } #item7:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-270deg); } #item8:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-315deg); } #item1:checked ~ .container .carousel img:nth-child(1) { transform: rotateY(0deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item2:checked ~ .container .carousel img:nth-child(2) { transform: rotateY(45deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item3:checked ~ .container .carousel img:nth-child(3) { transform: rotateY(90deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item4:checked ~ .container .carousel img:nth-child(4) { transform: rotateY(135deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item5:checked ~ .container .carousel img:nth-child(5) { transform: rotateY(180deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item6:checked ~ .container .carousel img:nth-child(6) { transform: rotateY(225deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item7:checked ~ .container .carousel img:nth-child(7) { transform: rotateY(270deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item8:checked ~ .container .carousel img:nth-child(8) { transform: rotateY(315deg) translateZ(259.2px) scale(1.2); opacity: 1; } .panel-container { width: 100%; max-width: 400px; flex-grow: 1; overflow-y: auto; padding-bottom: 20px; } .card h2 { font-size: 1.8468em; } .card input, .card select, .card button { width: 100% !important; height: 36px !important; padding: 6px !important; font-size: 1.2312em !important; margin: 6px 0 !important; border-radius: 4.56px !important; border: 0.6px solid #ccc !important; box-sizing: border-box !important; } #btnCheck { background-color: #3b82f6 !important; border: none !important; color: #fff !important; font-weight: bold !important; cursor: pointer !important; } #btnCheck:active { transform: translateY(2px); } .api-response { padding: 7.2px; border-radius: 3.6px; background: #f8fafc; border-left: 2.4px solid #007bff; display: none; margin-top: 6px; font-size: 16.848px; line-height: 1.5; } #btn-beli-dinamis:active { transform: translateY(1.8px); box-shadow: 0 0.6px 0 #1e3a8a; } #footer-order { position: fixed !important; bottom: 0 !important; left: 0 !important; width: 100% !important; padding: 10px 0 !important; text-align: center; z-index: 9999 !important; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); height: auto !important; box-sizing: border-box !important; } #btn-beli-dinamis { width: 90%; max-width: 400px; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; } .product-grid { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 9px; box-sizing: border-box; } .product-item { display: flex; justify-content: space-between; align-items: center; padding: 9px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: 0.2s; box-sizing: border-box; } .product-item.selected { border: 2px solid #3b82f6; background: #eff6ff; } .product-name { font-size: 1.2636em; font-weight: 600; color: #1e293b; text-align: left; } .product-price { font-size: 1.2636em; font-weight: bold; color: #3b82f6; text-align: right; } #display-user { display: none; font-size: 15.552px; } #logout-btn { display: none; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 10000; } .modal-content { background: #fff; padding: 18px; border-radius: 9.6px; width: 90%; max-width: 300px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); box-sizing: border-box; font-size: 17.28px; line-height: 1.6; border-left: 4.8px solid #007bff; } .modal-content strong { color: #1e293b; } .modal-close-btn { margin-top: 12px; width: 100%; height: 33px; background-color: #007bff; color: white; border: none; border-radius: 4.8px; font-size: 17.28px; font-weight: bold; cursor: pointer; transition: 0.2s; } .modal-close-btn:hover { background-color: #0056b3; } .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; box-sizing: border-box; padding: 9px; } .login-brand { color: #1877f2; font-size: 1.5rem; font-weight: bold; margin-bottom: 12px; letter-spacing: -0.45px; } .login-box { background: #ffffff; padding: 20px; border-radius: 8px; width: 100%; max-width: 300px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); box-sizing: border-box; text-align: center; } .login-box h3 { margin-top: 0; font-size: 1.1rem; color: #1c1e21; margin-bottom: 15px; font-weight: 600; } .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dddfe2; border-radius: 6px; font-size: 1rem; box-sizing: border-box; outline: none; background: #f5f6f7; } .login-input:focus { border-color: #1877f2; background: #fff; box-shadow: 0 0 0 1px #e7f3ff; } .login-btn { width: 100%; padding: 12px; background-color: #1877f2; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; } .login-btn:hover { background-color: #166fe5; } .login-btn:disabled { background-color: #8cb4f5; cursor: not-allowed; } .login-close { margin-top: 10px; background: none; border: none; color: #65676b; font-size: 0.9rem; cursor: pointer; text-decoration: underline; width: auto !important; height: auto !important; padding: 5px !important; } /* Tombol Download */ .btn-download { position: fixed; bottom: 80px; right: 10px; background: #e11d48; color: white; padding: 10px 15px; border-radius: 50px; font-size: 12px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer; z-index: 9998; display: flex; align-items: center; gap: 5px; } </style>
+<style> body { margin: 0; padding: 9px 9px 90px 9px; display: flex; flex-direction: column; align-items: center; font-family: 'Inter', -apple-system, sans-serif; background: #d3d3d3; font-size: 80%; font-weight: bold; } header { position: relative; width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; padding: 6.75px 11.25px; background: #ffffff; border-radius: 7.2px; margin-bottom: 9px; box-sizing: border-box; box-shadow: 0 1.8px 2.7px -0.45px rgba(0,0,0,0.1); z-index: 100; } .menu-container { position: relative; display: flex; align-items: center; } .titik-tiga { cursor: pointer; padding: 5px 10px; font-size: 20px; font-weight: bold; color: #334155; } .dropdown-menu { display: none; position: absolute; top: 110%; left: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 120px; z-index: 999; } .dropdown-menu div { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; } .dropdown-menu div:last-child { border-bottom: none; } .dropdown-menu div:hover { background: #f8fafc; } .struk-container { font-family: 'Courier New', Courier, monospace; color: #000; text-align: center; background: #fff; padding: 10px; border: 1px solid #ccc; } .struk-content { font-family: 'Courier New', Courier, monospace; color: #000; width: 100%; } .struk-row { display: flex; justify-content: space-between; margin-bottom: 2px; } .sn-box { background: #000; color: #fff; padding: 5px; margin: 10px 0; text-align: center; font-weight: bold; font-size: 1.1em; } .struk-header { font-weight: bold; border-bottom: 2px dashed #000; padding-bottom: 5px; margin-bottom: 5px; } .struk-body { text-align: left; font-size: 14px; margin: 10px 0; } .struk-body div { display: flex; justify-content: space-between; margin-bottom: 4px; } .struk-footer { border-top: 2px dashed #000; padding-top: 5px; font-weight: bold; } .container { width: 216px; height: 129.6px; perspective: 432px; perspective-origin: 50% -10.8px; margin: 21.6px auto; margin-bottom: 8.64px; } .carousel { transform-style: preserve-3d; transform: translateZ(-259.2px); position: relative; width: 216px; height: 129.6px; transition: 1s; } .carousel img { position: absolute; border: 0.432px solid #222; opacity: .5; transition: 1s; width: 216px; height: 129.6px; background:#ccc; cursor: pointer; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); } .carousel img:nth-child(1) { transform: rotateY(0deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(2) { transform: rotateY(45deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(3) { transform: rotateY(90deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(4) { transform: rotateY(135deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(5) { transform: rotateY(180deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(6) { transform: rotateY(225deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(7) { transform: rotateY(270deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(8) { transform: rotateY(315deg) translateZ(259.2px) scale(.96); } .controls-wrapper { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 405px; align-items: center; padding: 0 4.5px; box-sizing: border-box; } .control-row { display: flex; justify-content: center; width: 100%; gap: 9px; flex-wrap: nowrap; margin-bottom: 9px; } .card-kategori { cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0; width: 22%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); box-sizing: border-box; overflow: hidden; } .card-kategori img { width: 100%; height: 100%; object-fit: cover; margin-bottom: 0; } .card-kategori span { display: none; } .card-kategori:active { transform: scale(0.95); background: #f1f5f9; } .card-kategori.disabled { cursor: not-allowed; opacity: 0.5; } #input-nomor-tujuan { width: 100%; max-width: 387px; padding: 11.25px; font-size: 54.432px; border: 0.9px solid #e2e8f0; border-radius: 7.2px; margin: 6.75px 0; text-align: center; box-sizing: border-box; } input[type="radio"] { position: absolute; left: -9999px; } #input-top-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; } #input-pln-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; } #item1:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(0deg); } #item2:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-45deg); } #item3:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-90deg); } #item4:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-135deg); } #item5:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-180deg); } #item6:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-225deg); } #item7:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-270deg); } #item8:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-315deg); } #item1:checked ~ .container .carousel img:nth-child(1) { transform: rotateY(0deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item2:checked ~ .container .carousel img:nth-child(2) { transform: rotateY(45deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item3:checked ~ .container .carousel img:nth-child(3) { transform: rotateY(90deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item4:checked ~ .container .carousel img:nth-child(4) { transform: rotateY(135deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item5:checked ~ .container .carousel img:nth-child(5) { transform: rotateY(180deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item6:checked ~ .container .carousel img:nth-child(6) { transform: rotateY(225deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item7:checked ~ .container .carousel img:nth-child(7) { transform: rotateY(270deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item8:checked ~ .container .carousel img:nth-child(8) { transform: rotateY(315deg) translateZ(259.2px) scale(1.2); opacity: 1; } .panel-container { width: 100%; max-width: 400px; flex-grow: 1; overflow-y: auto; padding-bottom: 20px; } .card h2 { font-size: 1.8468em; } .card input, .card select, .card button { width: 100% !important; height: 36px !important; padding: 6px !important; font-size: 1.2312em !important; margin: 6px 0 !important; border-radius: 4.56px !important; border: 0.6px solid #ccc !important; box-sizing: border-box !important; } #btnCheck { background-color: #3b82f6 !important; border: none !important; color: #fff !important; font-weight: bold !important; cursor: pointer !important; } #btnCheck:active { transform: translateY(2px); } .api-response { padding: 7.2px; border-radius: 3.6px; background: #f8fafc; border-left: 2.4px solid #007bff; display: none; margin-top: 6px; font-size: 16.848px; line-height: 1.5; } #btn-beli-dinamis:active { transform: translateY(1.8px); box-shadow: 0 0.6px 0 #1e3a8a; } #footer-order { position: fixed !important; bottom: 0 !important; left: 0 !important; width: 100% !important; padding: 10px 0 !important; text-align: center; z-index: 9999 !important; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); height: auto !important; box-sizing: border-box !important; background: #d3d3d3; } #btn-beli-dinamis { width: 90%; max-width: 400px; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; } .product-grid { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 9px; box-sizing: border-box; } .product-item { display: flex; justify-content: space-between; align-items: center; padding: 9px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: 0.2s; box-sizing: border-box; } .product-item.selected { border: 2px solid #3b82f6; background: #eff6ff; } .product-name { font-size: 1.2636em; font-weight: 600; color: #1e293b; text-align: left; } .product-price { font-size: 1.2636em; font-weight: bold; color: #3b82f6; text-align: right; } #display-user { display: none; font-size: 15.552px; } #logout-btn { display: none; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 10000; } .modal-content { background: #fff; padding: 18px; border-radius: 9.6px; width: 90%; max-width: 300px; box-shadow: 0 6px 15px rgba(0,0,0,0.2); box-sizing: border-box; font-size: 17.28px; line-height: 1.6; border-left: 4.8px solid #007bff; } .modal-content strong { color: #1e293b; } .modal-close-btn { margin-top: 12px; width: 100%; height: 33px; background-color: #007bff; color: white; border: none; border-radius: 4.8px; font-size: 17.28px; font-weight: bold; cursor: pointer; transition: 0.2s; } .modal-close-btn:hover { background-color: #0056b3; } .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; box-sizing: border-box; padding: 9px; } .login-brand { color: #1877f2; font-size: 1.5rem; font-weight: bold; margin-bottom: 12px; letter-spacing: -0.45px; } .login-box { background: #ffffff; padding: 20px; border-radius: 8px; width: 100%; max-width: 300px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); box-sizing: border-box; text-align: center; } .login-box h3 { margin-top: 0; font-size: 1.1rem; color: #1c1e21; margin-bottom: 15px; font-weight: 600; } .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dddfe2; border-radius: 6px; font-size: 1rem; box-sizing: border-box; outline: none; background: #f5f6f7; } .login-input:focus { border-color: #1877f2; background: #fff; box-shadow: 0 0 0 1px #e7f3ff; } .login-btn { width: 100%; padding: 12px; background-color: #1877f2; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; } .login-btn:hover { background-color: #166fe5; } .login-btn:disabled { background-color: #8cb4f5; cursor: not-allowed; } .login-close { margin-top: 10px; background: none; border: none; color: #65676b; font-size: 0.9rem; cursor: pointer; text-decoration: underline; width: auto !important; height: auto !important; padding: 5px !important; }
+.btn-download-float { position: fixed; bottom: 85px; right: 15px; background-color: #f59e0b; color: #fff; padding: 10px 15px; border-radius: 50px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); z-index: 9998; cursor: pointer; text-decoration: none; }
+</style>
 </head>
 <body>
 <header>
     <div class="menu-container">
         <div class="titik-tiga" onclick="toggleDropdown()">&#8942;</div>
         <div id="dropdownMenu" class="dropdown-menu">
-            <div onclick="cekLoginDanBukaRiwayat(); toggleDropdown();">Riwayat</div>     
-            <div onclick="window.open('https://nasuka.pro/info.html', '_blank'); toggleDropdown();">Informasi</div>               
+            <div onclick="buka_info(); toggleDropdown();">Informasi</div>
+            <div onclick="cekLoginDanBukaRiwayat(); toggleDropdown();">Riwayat Transaksi</div>            
             <div onclick="logoutUser(); toggleDropdown();">Logout</div>      
         </div>
     </div>
@@ -24,11 +26,6 @@
         <span id="display-saldo" class="balance-value">Rp --</span>
     </div>
 </header>
-
-
-<div class="btn-download" onclick="window.open('https://nasuka.pro/nasuka.apk', '_blank')">
-    <span>⬇</span> Download Aplikasi
-</div>
 
 <input checked id="item1" name="multiples" type="radio">
 <input id="item2" name="multiples" type="radio">
@@ -47,8 +44,8 @@
         <img src="https://nasuka.pro/gambar/ewallet.jpg" onclick="pilihKategori('Ewallet')">
         <img src="https://nasuka.pro/gambar/smm.jpg" onclick="pilihKategori('SMM')">
         <img src="https://nasuka.pro/gambar/tokenlistrik.jpg" onclick="pilihKategori('Token Listrik')">
-        <img src="https://nasuka.pro/gambar/nasukawireless.jpg" onclick="pilihKategori('Nasuka')">       
-        <img src="https://nasuka.pro/gambar/partnership.jpg">
+        <img src="https://nasuka.pro/gambar/gplay.jpg" onclick="pilihKategori('Gplay')">       
+        <img src="https://nasuka.pro/gambar/nasukawireless.jpg" onclick="pilihKategori('Wifi')">
     </div>
 </div>
 
@@ -62,38 +59,21 @@
 
 <div class="controls-wrapper">
     <div class="control-row">
-        <label class="card-kategori" for="item1" onclick="pilihKategori('Pulsa')"><span>Pulsa</span></label>
-        <label class="card-kategori" for="item2" onclick="pilihKategori('Paket Data')"><span>Data</span></label>
-        <label class="card-kategori" for="item3" onclick="pilihKategori('Masa Aktif')"><span>Masa</span></label>
-        <label class="card-kategori" for="item6" onclick="pilihKategori('Token Listrik')"><span>PLN</span></label>
+        <label class="card-kategori" for="item1" onclick="pilihKategori('Pulsa')"><img src="https://nasuka.pro/gambar/pulsa1.jpg"><span>PULSA</span></label>
+        <label class="card-kategori" for="item2" onclick="pilihKategori('Paket Data')"><img src="https://nasuka.pro/gambar/data1.jpg"><span>Data</span></label>
+        <label class="card-kategori" for="item3" onclick="pilihKategori('Masa Aktif')"><img src="https://nasuka.pro/gambar/masaaktif1.jpg"><span>Masa</span></label>
+        <label class="card-kategori" for="item6" onclick="pilihKategori('Token Listrik')"><img src="https://nasuka.pro/gambar/tokenlistrik1.jpg"><span>PLN</span></label>
     </div>
     <div class="control-row">
-        <label class="card-kategori" for="item5" onclick="pilihKategori('SMM')"><span>SMM</span></label>
-        <label class="card-kategori" for="item4" onclick="pilihKategori('Ewallet')"><span>Ewallet</span></label>
-        <label class="card-kategori" for="item7" onclick="pilihKategori('Nasuka')"><span>INFORMASI</span></label>
-        <label class="card-kategori disabled" for="item8"><span>Event</span></label>
+        <label class="card-kategori" for="item5" onclick="pilihKategori('SMM')"><img src="https://nasuka.pro/gambar/smm1.jpg"><span>SMM</span></label>
+        <label class="card-kategori" for="item4" onclick="pilihKategori('Ewallet')"><img src="https://nasuka.pro/gambar/ewallet1.jpg"><span>Ewallet</span></label>
+        <label class="card-kategori" for="item7" onclick="pilihKategori('Gplay')"><img src="https://nasuka.pro/gambar/gplay1.jpg"><span>Gplay</span></label>
+        <label class="card-kategori" for="item8" onclick="pilihKategori('Wifi')"><img src="https://nasuka.pro/gambar/nasukawireless1.jpg"><span>Wifi</span></label>
     </div>
 </div>
 
 <div class="panel-container">
-    <div id="panel-smm" class="card" style="display:none;">
-        <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px;">
-            <button onclick="renderProdukDinamis('smm', 'Tiktok')">Tiktok</button>
-            <button onclick="renderProdukDinamis('smm', 'Youtube')">Youtube</button>
-            <button onclick="renderProdukDinamis('smm', 'Instagram')">Instagram</button>
-            <button onclick="renderProdukDinamis('smm', 'Facebook')">Facebook</button>
-        </div>
-        <div id="gridSmm" class="product-grid"></div> 
-        <div id="result" class="api-response"></div>
-    </div>
-
-    <div id="panel-pln" class="card" style="display:none;">
-        <button type="button" id="btnCheck">Cek Pelanggan</button>
-        <div id="resultPLN" class="api-response"></div>
-        <input type="text" id="order_meter_id" placeholder="ID Terverifikasi" readonly style="display:none;">
-        <div id="gridPln" class="product-grid"></div>
-    </div>
-    
+  
     <div id="panel-pulsa" class="card" style="display:none;">
         <div id="gridPulsa" class="product-grid"></div>
         <div id="resultPulsa" class="api-response"></div>
@@ -108,9 +88,27 @@
         <div id="gridAktif" class="product-grid"></div>
         <div id="resultAktif" class="api-response"></div>
     </div>    
-
+    
+    <div id="panel-pln" class="card" style="display:none;">
+        <button type="button" id="btnCheck">Cek ID Pelanggan</button>
+        <input type="text" id="order_meter_id" placeholder="ID Terverifikasi" readonly style="display:none;">
+        <div id="gridPln" class="product-grid"></div>
+        <div id="resultPLN" class="api-response"></div>
+    </div>
+    
+    <div id="panel-smm" class="card" style="display:none;">
+        <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px;">
+            <button onclick="renderProdukDinamis('smm', 'Tiktok')">FOLLOWERS</button>
+            <button onclick="renderProdukDinamis('smm', 'Youtube')">LIKES</button>
+            <button onclick="renderProdukDinamis('smm', 'Shared')">SHARE</button>
+            <button onclick="renderProdukDinamis('smm', 'Facebook')">VIEWS</button>
+        </div>
+        <div id="gridSmm" class="product-grid"></div> 
+        <div id="result" class="api-response"></div>
+    </div>
+    
     <div id="panel-ewallet" class="card" style="display:none;">
-        <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto;">
+        <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px;">
             <button onclick="renderProdukDinamis('ewallet', 'DANA')">DANA</button>
             <button onclick="renderProdukDinamis('ewallet', 'GOPAY')">GOPAY</button>
             <button onclick="renderProdukDinamis('ewallet', 'OVO')">OVO</button>
@@ -120,15 +118,24 @@
         <div id="resultEwallet" class="api-response"></div>
     </div>
 
-    <div id="panel-nasuka" class="card" style="display:none;">
-        <div id="gridNasuka" class="product-grid"></div>
-        <div id="resultNasuka" class="api-response"></div>
+    <div id="panel-gplay" class="card" style="display:none;">
+        <div id="gridGplay" class="product-grid"></div>
+        <div id="resultGplay" class="api-response"></div>
+    </div>
+
+    <div id="panel-wifi" class="card" style="display:none;">
+        <div id="gridWifi" class="product-grid"></div>
+        <div id="resultWifi" class="api-response"></div>
     </div>
    
     <div id="footer-order">
         <button id="btn-beli-dinamis" onclick="eksekusiBeli()">Beli Sekarang</button>
     </div>
 </div>
+
+<a href="https://nasuka.pro/nasuka.apk" class="btn-download-float">
+    <span>⬇</span> Download Aplikasi
+</a>
 
 <div id="customAlert" class="modal-overlay">
     <div class="modal-content">
@@ -165,7 +172,6 @@
     let selectedProductHarga = 0;
     let selectedProductQty = 0;
     let selectedProductName = "";
-    let lastClickTime = 0;
 
     function showAlert(msg) { document.getElementById('alertMessage').innerText = msg; document.getElementById('customAlert').style.display = 'flex'; }
     function tutupCustomAlert() { document.getElementById('customAlert').style.display = 'none'; }
@@ -174,7 +180,7 @@
 
     function formatStrukStatus(data) {
         const now = new Date().toLocaleString('id-ID');
-        const snLine = (data.sn) ? `<div style="margin-top:10px;">SN/TOKEN:</div><div class="sn-box">${data.sn}</div>` : '';
+        const snLine = (data.sn) ? `<div style="margin-top:10px;">SN/VOUCHER:</div><div class="sn-box">${data.sn}</div>` : '';
         return `<div class="struk-content"><div style="text-align:center; font-weight:bold; border-bottom: 1px dashed #000; padding-bottom:5px;"><br>STATUS: ${data.status.toUpperCase()}</div><div style="margin: 10px 0; font-size: 13px;"><div class="struk-row"><span>Waktu:</span> <span>${now}</span></div><div class="struk-row"><span>ID Order:</span> <span>${data.refID || '-'}</span></div><div class="struk-row"><span>Tujuan:</span> <span>${data.dest || '-'}</span></div><div class="struk-row"><span>Produk:</span> <span>${data.product || '-'}</span></div><div class="struk-row"><span>Harga:</span> <span>Rp ${data.price ? data.price.toLocaleString('id-ID') : '0'}</span></div></div>${snLine}<div style="border-top: 1px dashed #000; padding-top:5px; text-align:center; font-size: 12px;">Terima Kasih atas Kepercayaan Anda</div></div>`;
     }
 
@@ -234,7 +240,7 @@
     function switchTab(type) {
         currentActiveType = type;
         resetSelectedProduct();
-        const panels = ['panel-smm', 'panel-pln', 'panel-pulsa', 'panel-paket', 'panel-ewallet', 'panel-aktif', 'panel-nasuka'];
+        const panels = ['panel-smm', 'panel-pln', 'panel-pulsa', 'panel-paket', 'panel-ewallet', 'panel-aktif', 'panel-gplay', 'panel-wifi'];
         panels.forEach(id => document.getElementById(id).style.display = (id === 'panel-' + type) ? 'block' : 'none');
         
         const inputTop = document.getElementById('input-top-container');
@@ -252,20 +258,10 @@
     }
 
     function pilihKategori(kategori) {
-        if (kategori === 'Nasuka') {
-            const currentTime = new Date().getTime();
-            if (currentTime - lastClickTime < 500) {
-                window.open('https://nasuka.pro/info', '_blank');
-                lastClickTime = 0;
-                return;
-            }
-            lastClickTime = currentTime;
-        }
-
-        const mapping = { 'Pulsa': 'pulsa', 'Paket Data': 'paket', 'Ewallet': 'ewallet', 'Token Listrik': 'pln', 'SMM': 'smm', 'Masa Aktif': 'aktif', 'Nasuka': 'nasuka' };
+        const mapping = { 'Pulsa': 'pulsa', 'Paket Data': 'paket', 'Ewallet': 'ewallet', 'Token Listrik': 'pln', 'SMM': 'smm', 'Masa Aktif': 'aktif', 'Gplay': 'gplay', 'Wifi': 'wifi' };
         if(!mapping[kategori]) return;
         switchTab(mapping[kategori]);
-        const radioMap = { 'Pulsa': 'item1', 'Paket Data': 'item2', 'Masa Aktif': 'item3', 'Token Listrik': 'item6', 'SMM': 'item5', 'Ewallet': 'item4', 'Nasuka': 'item7' };
+        const radioMap = { 'Pulsa': 'item1', 'Paket Data': 'item2', 'Masa Aktif': 'item3', 'Token Listrik': 'item6', 'SMM': 'item5', 'Ewallet': 'item4', 'Gplay': 'item7', 'Wifi': 'item8' };
         if(radioMap[kategori]) document.getElementById(radioMap[kategori]).checked = true;
     }
 
@@ -352,10 +348,50 @@
         const dest = (currentActiveType === 'pln') ? document.getElementById('order_meter_id').value : document.getElementById('input-nomor-tujuan').value;
         if(!dest || !selectedProductValue) return showAlert("Lengkapi data!");
         if (userSaldo < selectedProductHarga) return showAlert("Saldo kurang!");
-        const common = { refID: currentActiveType.toUpperCase() + Date.now(), userPhone: ph, price: selectedProductHarga, product: selectedProductValue, dest: dest };
-        if (currentActiveType === 'smm') postOrder({ ...common, action: 'order', service: selectedProductValue, quantity: selectedProductQty });
-        else if (currentActiveType === 'pln') postOrder({ ...common, action: 'orderPLN' });
-        else postOrder({ ...common, action: 'order' + currentActiveType.charAt(0).toUpperCase() + currentActiveType.slice(1) });
+        
+        const refID = currentActiveType.toUpperCase() + Date.now();
+        const common = { refID: refID, userPhone: ph, price: selectedProductHarga, product: selectedProductName, dest: dest };
+        
+        if (currentActiveType === 'wifi') {
+            const btn = document.getElementById('btn-beli-dinamis');
+            btn.disabled = true;
+            btn.innerText = 'Memproses...';
+
+            db.ref(`produk/wifi/${selectedProductValue}/stok`).orderByKey().limitToFirst(1).once('value', snapshot => {
+                if (!snapshot.exists()) {
+                    btn.disabled = false;
+                    btn.innerText = 'Beli Sekarang';
+                    return showAlert("Stok SN untuk produk ini sedang kosong.");
+                }
+
+                let snKey = "";
+                let snVal = "";
+                snapshot.forEach(child => {
+                    snKey = child.key;
+                    snVal = child.val();
+                });
+
+                db.ref().update({
+                    [`users/${ph}/saldo`]: firebase.database.ServerValue.increment(-selectedProductHarga),
+                    [`produk/wifi/${selectedProductValue}/stok/${snKey}`]: null 
+                }).then(() => {
+                    const orderData = { ...common, status: 'success', sn: snVal, timestamp: new Date().toISOString() };
+                    db.ref(`users/${ph}/riwayat/${refID}`).set(orderData);
+                    tampilkanModal(formatStrukStatus(orderData));
+                }).catch(err => {
+                    showAlert("Gagal transaksi: " + err.message);
+                }).finally(() => {
+                    btn.disabled = false;
+                    btn.innerText = 'Beli Sekarang';
+                });
+            });
+        } else if (currentActiveType === 'smm') {
+            postOrder({ ...common, action: 'order', service: selectedProductValue, quantity: selectedProductQty });
+        } else if (currentActiveType === 'pln') {
+            postOrder({ ...common, action: 'orderPLN' });
+        } else {
+            postOrder({ ...common, action: 'order' + currentActiveType.charAt(0).toUpperCase() + currentActiveType.slice(1) });
+        }
     }
 
     document.getElementById('btnCheck').onclick = async () => {
@@ -364,7 +400,7 @@
         const data = await res.json();
         if(data.success) { tampilkanModal(`<strong>Nama:</strong> ${data.data.name}<br><strong>Daya:</strong> ${data.data.power_formatted}`); document.getElementById('order_meter_id').value = data.data.meter_id; } else { tampilkanModal(`<strong>Error:</strong> ${data.message}`); }
     };
-
+    
     function toggleDropdown() { const menu = document.getElementById('dropdownMenu'); menu.style.display = (menu.style.display === 'block') ? 'none' : 'block'; }
     window.onclick = function(event) { if (!event.target.matches('.titik-tiga')) { document.getElementById("dropdownMenu").style.display = "none"; } }
     
@@ -373,6 +409,11 @@
         document.querySelector('.balance-container').style.display = 'none';
         document.getElementById('loginPhone').value = '';
         document.getElementById('loginPin').value = '';
+        location.reload();
+    }
+
+    function buka_info() {
+        window.location.href = "https://nasuka.pro/info.html";
     }
 
     function cekLoginDanBukaRiwayat() {
@@ -380,7 +421,7 @@
         if (!ph) {
             showLogin();
         } else {
-            window.open('https://nasuka.pro/riwayat.html', '_blank');
+            window.location.href = "https://nasuka.pro/riwayat.html";
         }
     }
 
