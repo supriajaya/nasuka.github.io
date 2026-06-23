@@ -162,10 +162,10 @@
 
 <script>
     const firebaseConfig = { databaseURL: "https://nasukawireless-73c75-default-rtdb.asia-southeast1.firebasedatabase.app/" };
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const API_URL = 'https://script.google.com/macros/s/AKfycbyaTRKbOCb3pPKdcpwFL9VQKQtib3TUR4sJbX5rLEbo4yIZheeHpdvBm5cU_Wn_pmn1/exec';
-
+    
     let userSaldo = 0;
     let currentActiveType = 'pulsa';
     let selectedProductValue = "";
@@ -204,8 +204,8 @@
         let prefix = no.substring(0, 4);
         let operator = "";
         if (['0811', '0812', '0813', '0821', '0822', '0852', '0853'].includes(prefix)) operator = "TSEL";
-        else if (['0817', '0818', '0819', '0877', '0878', '0859'].includes(prefix)) operator = "XL";
-        else if (['0831', '0832', '0833', '0838'].includes(prefix)) operator = "AXIS";
+        else if (['0817', '0818', '0819', '0877', '0878'].includes(prefix)) operator = "XL";
+        else if (['0831', '0832', '0859', '0833', '0838'].includes(prefix)) operator = "AXIS";
         else if (['0814', '0815', '0816', '0855', '0856', '0857', '0858'].includes(prefix)) operator = "ISAT";
         else if (['0895', '0896', '0897', '0898', '0899'].includes(prefix)) operator = "TRI";
         else if (['0881', '0882', '0883', '0884', '0885', '0886', '0887', '0888', '0889'].includes(prefix)) operator = "FREN";
@@ -216,6 +216,9 @@
         });
     }
 
+
+
+    
     function renderProdukDinamis(type, sub = null) {
         let path = sub ? `produk/${type}/${sub}` : `produk/${type}`;
         db.ref(path).once('value', snapshot => {
@@ -223,9 +226,24 @@
             let grid = document.getElementById(gridId);
             if (!grid) return;
             
-            grid.innerHTML = '';
+            let items = [];
             snapshot.forEach(child => {
-                const item = child.val();
+                items.push(child.val());
+            });
+
+            // Logika pengurutan: Operator (A-Z), lalu Harga (Kecil-Besar)
+            items.sort((a, b) => {
+                let opA = (a.op || "").toUpperCase();
+                let opB = (b.op || "").toUpperCase();
+                
+                if (opA < opB) return -1;
+                if (opA > opB) return 1;
+                
+                return a.harga - b.harga;
+            });
+
+            grid.innerHTML = '';
+            items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'product-item';
                 if(item.op) div.setAttribute('data-op', item.op);
@@ -236,6 +254,12 @@
             detectOperator();
         });
     }
+
+
+    
+
+
+
 
     function switchTab(type) {
         currentActiveType = type;
@@ -349,6 +373,9 @@
         if(!dest || !selectedProductValue) return showAlert("Lengkapi data!");
         if (userSaldo < selectedProductHarga) return showAlert("Saldo kurang!");
         
+        // Membersihkan kode produk sebelum dikirim
+        const finalProductCode = selectedProductValue.toString().trim();
+        
         const refID = currentActiveType.toUpperCase() + Date.now();
         const common = { refID: refID, userPhone: ph, price: selectedProductHarga, product: selectedProductName, dest: dest };
         
@@ -357,7 +384,7 @@
             btn.disabled = true;
             btn.innerText = 'Memproses...';
 
-            db.ref(`produk/wifi/${selectedProductValue}/stok`).orderByKey().limitToFirst(1).once('value', snapshot => {
+            db.ref(`produk/wifi/${finalProductCode}/stok`).orderByKey().limitToFirst(1).once('value', snapshot => {
                 if (!snapshot.exists()) {
                     btn.disabled = false;
                     btn.innerText = 'Beli Sekarang';
@@ -373,7 +400,7 @@
 
                 db.ref().update({
                     [`users/${ph}/saldo`]: firebase.database.ServerValue.increment(-selectedProductHarga),
-                    [`produk/wifi/${selectedProductValue}/stok/${snKey}`]: null 
+                    [`produk/wifi/${finalProductCode}/stok/${snKey}`]: null 
                 }).then(() => {
                     const orderData = { ...common, status: 'success', sn: snVal, timestamp: new Date().toISOString() };
                     db.ref(`users/${ph}/riwayat/${refID}`).set(orderData);
@@ -386,11 +413,11 @@
                 });
             });
         } else if (currentActiveType === 'smm') {
-            postOrder({ ...common, action: 'order', service: selectedProductValue, quantity: selectedProductQty });
+            postOrder({ ...common, action: 'order', service: finalProductCode, quantity: selectedProductQty });
         } else if (currentActiveType === 'pln') {
             postOrder({ ...common, action: 'orderPLN' });
         } else {
-            postOrder({ ...common, action: 'order' + currentActiveType.charAt(0).toUpperCase() + currentActiveType.slice(1) });
+            postOrder({ ...common, action: 'order' + currentActiveType.charAt(0).toUpperCase() + currentActiveType.slice(1), product: finalProductCode });
         }
     }
 
