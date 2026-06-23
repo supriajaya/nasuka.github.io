@@ -38,8 +38,8 @@
 
 <div class="container">     
     <div class="carousel">
-        <img src="https://nasuka.pro/gambar/pulsa.jpg" onclick="pilihKategori('Pulsa')">
         <img src="https://nasuka.pro/gambar/data.jpg" onclick="pilihKategori('Paket Data')">
+        <img src="https://nasuka.pro/gambar/pulsa.jpg" onclick="pilihKategori('Pulsa')">
         <img src="https://nasuka.pro/gambar/masaaktif.jpg" onclick="pilihKategori('Masa Aktif')">
         <img src="https://nasuka.pro/gambar/ewallet.jpg" onclick="pilihKategori('Ewallet')">
         <img src="https://nasuka.pro/gambar/smm.jpg" onclick="pilihKategori('SMM')">
@@ -50,7 +50,7 @@
 </div>
 
 <div id="input-top-container" class="card">
-    <input type="text" id="input-nomor-tujuan" placeholder="Nomor Tujuan / ID Pelanggan">
+    <input type="text" id="input-nomor-tujuan" placeholder="Nomor Tujuan">
 </div>
 
 <div id="input-pln-container" class="card" style="display:none;">
@@ -59,8 +59,8 @@
 
 <div class="controls-wrapper">
     <div class="control-row">
-        <label class="card-kategori" for="item1" onclick="pilihKategori('Pulsa')"><img src="https://nasuka.pro/gambar/pulsa1.jpg"><span>PULSA</span></label>
-        <label class="card-kategori" for="item2" onclick="pilihKategori('Paket Data')"><img src="https://nasuka.pro/gambar/data1.jpg"><span>Data</span></label>
+        <label class="card-kategori" for="item1" onclick="pilihKategori('Paket Data')"><img src="https://nasuka.pro/gambar/data1.jpg"><span>Data</span></label>
+        <label class="card-kategori" for="item2" onclick="pilihKategori('Pulsa')"><img src="https://nasuka.pro/gambar/pulsa1.jpg"><span>PULSA</span></label>
         <label class="card-kategori" for="item3" onclick="pilihKategori('Masa Aktif')"><img src="https://nasuka.pro/gambar/masaaktif1.jpg"><span>Masa</span></label>
         <label class="card-kategori" for="item6" onclick="pilihKategori('Token Listrik')"><img src="https://nasuka.pro/gambar/tokenlistrik1.jpg"><span>PLN</span></label>
     </div>
@@ -167,7 +167,7 @@
     const API_URL = 'https://script.google.com/macros/s/AKfycbyaTRKbOCb3pPKdcpwFL9VQKQtib3TUR4sJbX5rLEbo4yIZheeHpdvBm5cU_Wn_pmn1/exec';
     
     let userSaldo = 0;
-    let currentActiveType = 'pulsa';
+    let currentActiveType = 'paket';
     let selectedProductValue = "";
     let selectedProductHarga = 0;
     let selectedProductQty = 0;
@@ -216,9 +216,6 @@
         });
     }
 
-
-
-    
     function renderProdukDinamis(type, sub = null) {
         let path = sub ? `produk/${type}/${sub}` : `produk/${type}`;
         db.ref(path).once('value', snapshot => {
@@ -231,7 +228,6 @@
                 items.push(child.val());
             });
 
-            // Logika pengurutan: Operator (A-Z), lalu Harga (Kecil-Besar)
             items.sort((a, b) => {
                 let opA = (a.op || "").toUpperCase();
                 let opB = (b.op || "").toUpperCase();
@@ -254,12 +250,6 @@
             detectOperator();
         });
     }
-
-
-    
-
-
-
 
     function switchTab(type) {
         currentActiveType = type;
@@ -285,7 +275,7 @@
         const mapping = { 'Pulsa': 'pulsa', 'Paket Data': 'paket', 'Ewallet': 'ewallet', 'Token Listrik': 'pln', 'SMM': 'smm', 'Masa Aktif': 'aktif', 'Gplay': 'gplay', 'Wifi': 'wifi' };
         if(!mapping[kategori]) return;
         switchTab(mapping[kategori]);
-        const radioMap = { 'Pulsa': 'item1', 'Paket Data': 'item2', 'Masa Aktif': 'item3', 'Token Listrik': 'item6', 'SMM': 'item5', 'Ewallet': 'item4', 'Gplay': 'item7', 'Wifi': 'item8' };
+        const radioMap = { 'Paket Data': 'item1', 'Pulsa': 'item2', 'Masa Aktif': 'item3', 'Token Listrik': 'item6', 'SMM': 'item5', 'Ewallet': 'item4', 'Gplay': 'item7', 'Wifi': 'item8' };
         if(radioMap[kategori]) document.getElementById(radioMap[kategori]).checked = true;
     }
 
@@ -373,9 +363,7 @@
         if(!dest || !selectedProductValue) return showAlert("Lengkapi data!");
         if (userSaldo < selectedProductHarga) return showAlert("Saldo kurang!");
         
-        // Membersihkan kode produk sebelum dikirim
         const finalProductCode = selectedProductValue.toString().trim();
-        
         const refID = currentActiveType.toUpperCase() + Date.now();
         const common = { refID: refID, userPhone: ph, price: selectedProductHarga, product: selectedProductName, dest: dest };
         
@@ -458,7 +446,7 @@
             initUserSession(savedPh);
         }
         document.getElementById('input-nomor-tujuan').addEventListener('input', detectOperator);
-        switchTab('pulsa');
+        switchTab('paket');
         batasiInputAngka('loginPhone', 13); 
         batasiInputAngka('loginPin', 4); 
         batasiInputAngka('meter_id', 20);
