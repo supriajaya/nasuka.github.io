@@ -98,10 +98,10 @@
     
     <div id="panel-smm" class="card" style="display:none;">
         <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px;">
-            <button onclick="renderProdukDinamis('smm', 'Tiktok')">FOLLOWERS</button>
-            <button onclick="renderProdukDinamis('smm', 'Youtube')">LIKES</button>
-            <button onclick="renderProdukDinamis('smm', 'Shared')">SHARE</button>
-            <button onclick="renderProdukDinamis('smm', 'Facebook')">VIEWS</button>
+            <button onclick="renderProdukDinamis('smm', 'FOLLOWERS')">FOLLOWERS</button>
+            <button onclick="renderProdukDinamis('smm', 'LIKES')">LIKES</button>
+            <button onclick="renderProdukDinamis('smm', 'SHARED')">SHARE</button>
+            <button onclick="renderProdukDinamis('smm', 'VIEWS')">VIEWS</button>
         </div>
         <div id="gridSmm" class="product-grid"></div> 
         <div id="result" class="api-response"></div>
@@ -266,8 +266,8 @@
             inputTop.style.display = 'block'; inputPln.style.display = 'none';
         }
         
-        if (type === 'smm') renderProdukDinamis('smm', 'Tiktok');
-        else if (type === 'ewallet') renderProdukDinamis('ewallet', 'DANA');
+        if (type === 'smm') renderProdukDinamis('smm', 'FOLLOWERS', 'LIKES', 'SHARED', 'VIEWS');
+        else if (type === 'ewallet') renderProdukDinamis('ewallet', 'DANA', 'GOPAY', 'OVO', 'SHOPEEPAY');
         else renderProdukDinamis(type);
     }
 
