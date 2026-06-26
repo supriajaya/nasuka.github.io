@@ -2,76 +2,39 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Index</title>
+<title>Paket Data</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-<style> body { margin: 0; padding: 9px 9px 90px 9px; display: flex; flex-direction: column; align-items: center; font-family: 'Inter', -apple-system, sans-serif; background: #d3d3d3; font-size: 80%; font-weight: bold; } header { position: relative; width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; padding: 6.75px 11.25px; background: #ffffff; border-radius: 7.2px; margin-bottom: 9px; box-sizing: border-box; box-shadow: 0 1.8px 2.7px -0.45px rgba(0,0,0,0.1); z-index: 100; } .menu-container { position: relative; display: flex; align-items: center; } .titik-tiga { cursor: pointer; padding: 5px 10px; font-size: 20px; font-weight: bold; color: #334155; } .dropdown-menu { display: none; position: absolute; top: 110%; left: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 120px; z-index: 999; } .dropdown-menu div { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; } .dropdown-menu div:last-child { border-bottom: none; } .dropdown-menu div:hover { background: #f8fafc; } .struk-container { font-family: 'Courier New', Courier, monospace; color: #000; text-align: center; background: #fff; padding: 10px; border: 1px solid #ccc; } .struk-content { font-family: 'Courier New', Courier, monospace; color: #000; width: 100%; } .struk-row { display: flex; justify-content: space-between; margin-bottom: 2px; } .sn-box { background: #000; color: #fff; padding: 5px; margin: 10px 0; text-align: center; font-weight: bold; font-size: 1.1em; } .struk-header { font-weight: bold; border-bottom: 2px dashed #000; padding-bottom: 5px; margin-bottom: 5px; } .struk-body { text-align: left; font-size: 14px; margin: 10px 0; } .struk-body div { display: flex; justify-content: space-between; margin-bottom: 4px; } .struk-footer { border-top: 2px dashed #000; padding-top: 5px; font-weight: bold; } .container { width: 216px; height: 129.6px; perspective: 432px; perspective-origin: 50% -10.8px; margin: 21.6px auto; margin-bottom: 8.64px; } .carousel { transform-style: preserve-3d; transform: translateZ(-259.2px); position: relative; width: 216px; height: 129.6px; transition: 1s; } .carousel img { position: absolute; border: 0.432px solid #222; opacity: .5; transition: 1s; width: 216px; height: 129.6px; background:#ccc; cursor: pointer; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); } .carousel img:nth-child(1) { transform: rotateY(0deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(2) { transform: rotateY(45deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(3) { transform: rotateY(90deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(4) { transform: rotateY(135deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(5) { transform: rotateY(180deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(6) { transform: rotateY(225deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(7) { transform: rotateY(270deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(8) { transform: rotateY(315deg) translateZ(259.2px) scale(.96); } .controls-wrapper { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 405px; align-items: center; padding: 0 4.5px; box-sizing: border-box; } .control-row { display: flex; justify-content: center; width: 100%; gap: 9px; flex-wrap: nowrap; margin-bottom: 9px; } .card-kategori { cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0; width: 22%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); box-sizing: border-box; overflow: hidden; } .card-kategori img { width: 100%; height: 100%; object-fit: cover; margin-bottom: 0; } .card-kategori span { display: none; } .card-kategori:active { transform: scale(0.95); background: #f1f5f9; } .card-kategori.disabled { cursor: not-allowed; opacity: 0.5; } #input-nomor-tujuan { width: 100%; max-width: 387px; padding: 11.25px; font-size: 20px; border: 0.9px solid #e2e8f0; border-radius: 7.2px; margin: 6.75px 0; text-align: center; box-sizing: border-box; } input[type="radio"] { position: absolute; left: -9999px; } #input-top-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; } #input-pln-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; }
-
-
- #item1:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(0deg); }
-#item2:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-45deg); }
-#item3:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-90deg); }
-#item4:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-135deg); }
-
-
-#item5:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-180deg); }
-#item6:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-225deg); }
-#item7:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-270deg); }
-#item8:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-315deg); }
-
- 
- 
- 
- 
- #item1:checked ~ .container .carousel img:nth-child(1) { transform: rotateY(0deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item2:checked ~ .container .carousel img:nth-child(2) { transform: rotateY(45deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item3:checked ~ .container .carousel img:nth-child(3) { transform: rotateY(90deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item4:checked ~ .container .carousel img:nth-child(4) { transform: rotateY(135deg) translateZ(259.2px) scale(1.2); opacity: 1; } 
- 
- #item5:checked ~ .container .carousel img:nth-child(5) { transform: rotateY(180deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item6:checked ~ .container .carousel img:nth-child(6) { transform: rotateY(225deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item7:checked ~ .container .carousel img:nth-child(7) { transform: rotateY(270deg) translateZ(259.2px) scale(1.2); opacity: 1; } #item8:checked ~ .container .carousel img:nth-child(8) { transform: rotateY(315deg) translateZ(259.2px) scale(1.2); opacity: 1; } 
- 
- 
- .panel-container { width: 100%; max-width: 400px; flex-grow: 1; overflow-y: auto; padding-bottom: 20px; } .card h2 { font-size: 1.8468em; } .card input, .card select, .card button { width: 100% !important; height: 36px !important; padding: 6px !important; font-size: 1.2312em !important; margin: 6px 0 !important; border-radius: 4.56px !important; border: 0.6px solid #ccc !important; box-sizing: border-box !important; }
- 
-  
-  #btnCheck {
-    background-color: #c0c0c0 !important;
-    border: 2px solid !important;
-    border-color: #ffffff #808080 #808080 #ffffff !important;
-    color: #000 !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    padding: 6px !important;
+<style> body { margin: 0; padding: 9px 9px 90px 9px; display: flex; flex-direction: column; align-items: center; font-family: 'Inter', -apple-system, sans-serif; background: #d3d3d3; font-size: 80%; font-weight: bold; } header { position: relative; width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center; padding: 6.75px 11.25px; background: #ffffff; border-radius: 7.2px; margin-bottom: 9px; box-sizing: border-box; box-shadow: 0 1.8px 2.7px -0.45px rgba(0,0,0,0.1); z-index: 100; } .menu-container { position: relative; display: flex; align-items: center; } .titik-tiga { cursor: pointer; padding: 5px 10px; font-size: 20px; font-weight: bold; color: #334155; } .dropdown-menu { display: none; position: absolute; top: 110%; left: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 120px; z-index: 999; } .dropdown-menu div { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; } .dropdown-menu div:last-child { border-bottom: none; } .dropdown-menu div:hover { background: #f8fafc; } .struk-container { font-family: 'Courier New', Courier, monospace; color: #000; text-align: center; background: #fff; padding: 10px; border: 1px solid #ccc; } .struk-content { font-family: 'Courier New', Courier, monospace; color: #000; width: 100%; } .struk-row { display: flex; justify-content: space-between; margin-bottom: 2px; } .sn-box { background: #000; color: #fff; padding: 5px; margin: 10px 0; text-align: center; font-weight: bold; font-size: 1.1em; } .struk-header { font-weight: bold; border-bottom: 2px dashed #000; padding-bottom: 5px; margin-bottom: 5px; } .struk-body { text-align: left; font-size: 14px; margin: 10px 0; } .struk-body div { display: flex; justify-content: space-between; margin-bottom: 4px; } .struk-footer { border-top: 2px dashed #000; padding-top: 5px; font-weight: bold; } .container { width: 172.8px; height: 103.68px; perspective: 345.6px; perspective-origin: 50% -8.64px; margin: 17.28px auto; margin-bottom: 6.912px; } .carousel { transform-style: preserve-3d; transform: translateZ(-207.36px); position: relative; width: 172.8px; height: 103.68px; transition: 1s; } .carousel img { position: absolute; border: 0.3456px solid #222; opacity: .5; transition: 1s; width: 172.8px; height: 103.68px; background:#ccc; cursor: pointer; border-radius: 9.6px; box-shadow: 0 3.2px 6.4px rgba(0,0,0,0.3); } .carousel img:nth-child(1) { transform: rotateY(0deg) translateZ(207.36px) scale(.96); } .carousel img:nth-child(2) { transform: rotateY(45deg) translateZ(207.36px) scale(.96); } .carousel img:nth-child(3) { transform: rotateY(90deg) translateZ(207.36px) scale(.96); } .carousel img:nth-child(4) { transform: rotateY(135deg) translateZ(207.36px) scale(.96); } .carousel img:nth-child(5) { transform: rotateY(180deg) translateZ(207.36px) scale(.96); } .carousel img:nth-child(6) { transform: rotateY(225deg) translateZ(207.36px) scale(.96); } .carousel img:nth-child(7) { transform: rotateY(270deg) translateZ(207.36px) scale(.96); } .carousel img:nth-child(8) { transform: rotateY(315deg) translateZ(207.36px) scale(.96); } .controls-wrapper { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 405px; align-items: center; padding: 0 4.5px; box-sizing: border-box; } .control-row { display: flex; justify-content: center; width: 100%; gap: 9px; flex-wrap: nowrap; margin-bottom: 9px; } .card-data { cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0; width: 22%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); box-sizing: border-box; overflow: hidden; } .card-data img { width: 100%; height: 100%; object-fit: cover; margin-bottom: 0; } .card-data span { display: none; } .card-data:active { transform: scale(0.95); background: #f1f5f9; } .card-data.disabled { cursor: not-allowed; opacity: 0.5; } #input-nomor-tujuan { width: 100%; max-width: 387px; padding: 11.25px; font-size: 20px; border: 0.9px solid #e2e8f0; border-radius: 7.2px; margin: 6.75px 0; text-align: center; box-sizing: border-box; } input[type="radio"] { position: absolute; left: -9999px; } #input-top-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; } #input-pln-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; } #item1:checked ~ .container .carousel { transform: translateZ(-207.36px) rotateY(0deg); } #item2:checked ~ .container .carousel { transform: translateZ(-207.36px) rotateY(-45deg); } #item3:checked ~ .container .carousel { transform: translateZ(-207.36px) rotateY(-90deg); } #item4:checked ~ .container .carousel { transform: translateZ(-207.36px) rotateY(-135deg); } #item5:checked ~ .container .carousel { transform: translateZ(-207.36px) rotateY(-180deg); } #item6:checked ~ .container .carousel { transform: translateZ(-207.36px) rotateY(-225deg); } #item7:checked ~ .container .carousel { transform: translateZ(-207.36px) rotateY(-270deg); } #item8:checked ~ .container .carousel { transform: translateZ(-207.36px) rotateY(-315deg); } #item1:checked ~ .container .carousel img:nth-child(1) { transform: rotateY(0deg) translateZ(207.36px) scale(1.2); opacity: 1; } #item2:checked ~ .container .carousel img:nth-child(2) { transform: rotateY(45deg) translateZ(207.36px) scale(1.2); opacity: 1; } #item3:checked ~ .container .carousel img:nth-child(3) { transform: rotateY(90deg) translateZ(207.36px) scale(1.2); opacity: 1; } #item4:checked ~ .container .carousel img:nth-child(4) { transform: rotateY(135deg) translateZ(207.36px) scale(1.2); opacity: 1; } #item5:checked ~ .container .carousel img:nth-child(5) { transform: rotateY(180deg) translateZ(207.36px) scale(1.2); opacity: 1; } #item6:checked ~ .container .carousel img:nth-child(6) { transform: rotateY(225deg) translateZ(207.36px) scale(1.2); opacity: 1; } #item7:checked ~ .container .carousel img:nth-child(7) { transform: rotateY(270deg) translateZ(207.36px) scale(1.2); opacity: 1; } #item8:checked ~ .container .carousel img:nth-child(8) { transform: rotateY(315deg) translateZ(207.36px) scale(1.2); opacity: 1; } .panel-container { width: 100%; max-width: 400px; flex-grow: 1; overflow-y: auto; padding-bottom: 20px; } .card h2 { font-size: 1.8468em; } .card input, .card select, .card button { width: 100% !important; height: 36px !important; padding: 6px !important; font-size: 1.2312em !important; margin: 6px 0 !important; border-radius: 4.56px !important; border: 0.6px solid #ccc !important; box-sizing: border-box !important; } #btnCheck { background-color: #3b82f6 !important; border: none !important; color: #fff !important; font-weight: bold !important; cursor: pointer !important; } #btnCheck:active { transform: translateY(2px); } .api-response { padding: 7.2px; border-radius: 3.6px; background: #f8fafc; border-left: 2.4px solid #007bff; display: none; margin-top: 6px; font-size: 16.848px; line-height: 1.5; } 
+#btn-proses-beli-data {
+    width: 90%;
+    max-width: 400px;
+    padding: 10px;
+    background-color: #c0c0c0;
+    color: #000;
+    border: 2px solid;
+    border-color: #ffffff #808080 #808080 #ffffff;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
     text-align: center;
 }
 
-#btnCheck:active {
-    border-color: #808080 #ffffff #ffffff #808080 !important;
+#btn-proses-beli-data:active {
+    border-color: #808080 #ffffff #ffffff #808080;
 }
 
-  
-  
-  
-  .api-response { padding: 7.2px; border-radius: 3.6px; background: #f8fafc; border-left: 2.4px solid #007bff; display: none; margin-top: 6px; font-size: 16.848px; line-height: 1.5; } #btn-beli-dinamis:active { transform: translateY(1.8px); box-shadow: 0 0.6px 0 #1e3a8a; } #footer-order { position: fixed !important; bottom: 0 !important; left: 0 !important; width: 100% !important; padding: 10px 0 !important; text-align: center; z-index: 9999 !important; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); height: auto !important; box-sizing: border-box !important; background: #d3d3d3; } #btn-beli-dinamis { width: 90%; max-width: 400px; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; } .product-grid { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 9px; box-sizing: border-box; } .product-item { display: flex; justify-content: space-between; align-items: center; padding: 9px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: 0.2s; box-sizing: border-box; } .product-item.selected { border: 2px solid #3b82f6; background: #eff6ff; } .product-name { font-size: 1.0108em; font-weight: 600; color: #1e293b; text-align: left; } .product-price { font-size: 1.0108em; font-weight: bold; color: #3b82f6; text-align: right; } #display-user { display: none; font-size: 15.552px; } #logout-btn { display: none; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 10000; } .modal-content { background: #c0c0c0; padding: 3px; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; width: 90%; max-width: 300px; box-sizing: border-box; font-family: 'Courier New', Courier, monospace; font-size: 14px; } .modal-close-btn { background: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; padding: 5px 15px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; } .modal-close-btn:active { border-color: #808080 #ffffff #ffffff #808080; } .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; box-sizing: border-box; padding: 9px; } .login-brand { color: #1877f2; font-size: 1.5rem; font-weight: bold; margin-bottom: 12px; letter-spacing: -0.45px; } .login-box { background: #ffffff; padding: 20px; border-radius: 8px; width: 100%; max-width: 300px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); box-sizing: border-box; text-align: center; } .login-box h3 { margin-top: 0; font-size: 1.1rem; color: #1c1e21; margin-bottom: 15px; font-weight: 600; } .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dddfe2; border-radius: 6px; font-size: 1rem; box-sizing: border-box; outline: none; background: #f5f6f7; } .login-input:focus { border-color: #1877f2; background: #fff; box-shadow: 0 0 0 1px #e7f3ff; } .login-btn { width: 100%; padding: 12px; background-color: #1877f2; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; } .login-btn:hover { background-color: #166fe5; } .login-btn:disabled { background-color: #8cb4f5; cursor: not-allowed; } .login-close { margin-top: 10px; background: none; border: none; color: #65676b; font-size: 0.9rem; cursor: pointer; text-decoration: underline; width: auto !important; height: auto !important; padding: 5px !important; }
-  #container-cek-id {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
 
-#loadingImage {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 250px;
-    z-index: 10;
-    pointer-events: none;
-}
+#footer-order { position: fixed !important; bottom: 0 !important; left: 0 !important; width: 100% !important; padding: 10px 0 !important; text-align: center; z-index: 9999 !important; box-shadow: 0 -2px 5px rgba(0,0,0,0.1); height: auto !important; box-sizing: border-box !important; background: #d3d3d3; } 
 
-  
-  
-  
+
+
+ .product-grid { display: none; flex-direction: column; gap: 6px; width: 100%; margin-top: 9px; box-sizing: border-box; } .product-item { display: flex; justify-content: space-between; align-items: center; padding: 9px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: 0.2s; box-sizing: border-box; } .product-item.selected { border: 2px solid #3b82f6; background: #eff6ff; } 
+.product-name { font-size: 1.13724em; font-weight: 600; color: #1e293b; text-align: left; } 
+.product-price { font-size: 1.13724em; font-weight: bold; color: #3b82f6; text-align: right; }
+#display-user { display: none; font-size: 15.552px; } #logout-btn { display: none; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 10000; } .modal-content { background: #c0c0c0; padding: 3px; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; width: 90%; max-width: 300px; box-sizing: border-box; font-family: 'Courier New', Courier, monospace; font-size: 14px; } .modal-close-btn { background: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; padding: 5px 15px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; } .modal-close-btn:active { border-color: #808080 #ffffff #ffffff #808080; } .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; box-sizing: border-box; padding: 9px; } .login-brand { color: #1877f2; font-size: 1.5rem; font-weight: bold; margin-bottom: 12px; letter-spacing: -0.45px; } .login-box { background: #ffffff; padding: 20px; border-radius: 8px; width: 100%; max-width: 300px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); box-sizing: border-box; text-align: center; } .login-box h3 { margin-top: 0; font-size: 1.1rem; color: #1c1e21; margin-bottom: 15px; font-weight: 600; } .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dddfe2; border-radius: 6px; font-size: 1rem; box-sizing: border-box; outline: none; background: #f5f6f7; } .login-input:focus { border-color: #1877f2; background: #fff; box-shadow: 0 0 0 1px #e7f3ff; } .login-btn { width: 100%; padding: 12px; background-color: #1877f2; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; } .login-btn:hover { background-color: #166fe5; } .login-btn:disabled { background-color: #8cb4f5; cursor: not-allowed; } .login-close { margin-top: 10px; background: none; border: none; color: #65676b; font-size: 0.9rem; cursor: pointer; text-decoration: underline; width: auto !important; height: auto !important; padding: 5px !important; }
 </style>
 </head>
 <body>
@@ -80,9 +43,9 @@
     <div class="menu-container">
         <div class="titik-tiga" onclick="toggleDropdown()">&#8942;</div>
         <div id="dropdownMenu" class="dropdown-menu">
-            <div onclick="buka_info(); toggleDropdown();">Informasi</div>
+          
             <div onclick="cekLoginDanBukaRiwayat(); toggleDropdown();">Riwayat Transaksi</div>            
-            <div onclick="logoutUser(); toggleDropdown();">Logout</div>      
+            
         </div>
     </div>
     <div class="balance-container" style="display: none;">
@@ -95,29 +58,17 @@
 <input id="item2" name="multiples" type="radio">
 <input id="item3" name="multiples" type="radio">
 <input id="item4" name="multiples" type="radio">
-
-
-
-
-
-
+<input id="item5" name="multiples" type="radio">
+<input id="item6" name="multiples" type="radio">
+<input id="item7" name="multiples" type="radio">
+<input id="item8" name="multiples" type="radio">
 
 <div class="container">     
     <div class="carousel">
-        <img src="https://nasuka.pro/gambar/data3.jpg" onclick="pilihKategori('Paket Data')">
-        <img src="https://nasuka.pro/gambar/pulsa.jpg" onclick="pilihKategori('Pulsa')">       
-       
-        <img src="https://nasuka.pro/gambar/tokenlistrik.jpg" onclick="pilihKategori('Token Listrik')">
-        
-         <img src="https://nasuka.pro/gambar/ewallet.jpg" onclick="pilihKategori('Ewallet')">       
-       
+        <img src="https://nasuka.pro/gambar/data3.jpg" onclick="logika_data('Paket Data')">
+      
     </div>
 </div>
-
-
-
-
-
 
 <div id="input-top-container" class="card">
     <input type="text" id="input-nomor-tujuan" placeholder="Nomor Tujuan">
@@ -127,15 +78,7 @@
     <input type="text" id="meter_id" placeholder="ID Pelanggan" inputmode="numeric">
 </div>
 
-<div class="controls-wrapper">
-    <div class="control-row">
-        <label class="card-kategori" for="item1" onclick="pilihKategori('Paket Data')"><img src="https://nasuka.pro/gambar/data1.jpg"><span>Data</span></label>
-        <label class="card-kategori" for="item2" onclick="pilihKategori('Pulsa')"><img src="https://nasuka.pro/gambar/pulsa1.jpg"><span>PULSA</span></label>       
-        <label class="card-kategori" for="item3" onclick="pilihKategori('Token Listrik')"><img src="https://nasuka.pro/gambar/tokenlistrik1.jpg"><span>PLN</span></label>       
-        <label class="card-kategori" for="item4" onclick="pilihKategori('Ewallet')"><img src="https://nasuka.pro/gambar/ewallet1.jpg"><span>Ewallet</span></label>
-       
-    </div>
-</div>
+
 
 <div class="panel-container">
     <div id="panel-pulsa" class="card" style="display:none;">
@@ -150,34 +93,42 @@
         <div id="gridAktif" class="product-grid"></div>
         <div id="resultAktif" class="api-response"></div>
     </div>    
-    
-    
-   <div id="panel-pln" class="card" style="display:none;">
-    <div id="container-cek-id">
+    <div id="panel-pln" class="card" style="display:none;">
         <button type="button" id="btnCheck">Cek ID Pelanggan</button>
-        <img id="loadingImage" src="https://nasuka.pro/gambar/loading.gif" style="display:none;">
+        <input type="text" id="order_meter_id" placeholder="ID Terverifikasi" readonly style="display:none;">
+        <div id="gridPln" class="product-grid"></div>
+        <div id="resultPLN" class="api-response"></div>
     </div>
-    <input type="text" id="order_meter_id" placeholder="ID Terverifikasi" readonly style="display:none;">
-    <div id="gridPln" class="product-grid"></div>
-    <div id="resultPLN" class="api-response"></div>
-</div>
-
-   
-   
-    
+    <div id="panel-smm" class="card" style="display:none;">
+        <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px;">
+            <button disabled>VIEWS</button>
+            <button disabled>LIKES</button>
+            <button disabled>SHARE</button>
+            <button disabled>FOLLOWERS</button>
+        </div>
+        <div id="gridSmm" class="product-grid"></div> 
+        <div id="result" class="api-response"></div>
+    </div>
     <div id="panel-ewallet" class="card" style="display:none;">
         <div style="display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 5px;">
-            <button onclick="renderProdukDinamis('ewallet', 'DANA')">DANA</button>
-            <button onclick="renderProdukDinamis('ewallet', 'GOPAY')">GOPAY</button>
-            <button onclick="renderProdukDinamis('ewallet', 'OVO')">OVO</button>
-            <button onclick="renderProdukDinamis('ewallet', 'SHOPEEPAY')">SHOPEEPAY</button>
+            <button disabled>DANA</button>
+            <button disabled>GOPAY</button>
+            <button disabled>OVO</button>
+            <button disabled>SHOPEEPAY</button>
         </div>
         <div id="gridEwallet" class="product-grid"></div>
         <div id="resultEwallet" class="api-response"></div>
     </div>
-   
+    <div id="panel-gplay" class="card" style="display:none;">
+        <div id="gridGplay" class="product-grid"></div>
+        <div id="resultGplay" class="api-response"></div>
+    </div>
+    <div id="panel-wifi" class="card" style="display:none;">
+        <div id="gridWifi" class="product-grid"></div>
+        <div id="resultWifi" class="api-response"></div>
+    </div>
     <div id="footer-order">
-        <button id="btn-beli-dinamis" onclick="eksekusiBeli()">Beli Sekarang</button>
+        <button id="btn-proses-beli-data" onclick="proses_beli_data()">Beli Sekarang</button>
     </div>
 </div>
 
@@ -242,8 +193,16 @@
         const no = document.getElementById('input-nomor-tujuan').value;
         const currentPanel = document.getElementById('panel-' + currentActiveType);
         if (!currentPanel) return;
+        
+        const grid = currentPanel.querySelector('.product-grid');
         const items = currentPanel.querySelectorAll('.product-item');
-        if (no.length < 4) { items.forEach(item => item.style.display = 'flex'); return; }
+
+        if (no.length < 4) {
+            grid.style.display = 'none';
+            return;
+        } else {
+            grid.style.display = 'flex';
+        }
         
         let prefix = no.substring(0, 4);
         let operator = "";
@@ -293,10 +252,10 @@
         });
     }
 
-    function switchTab(type) {
+    function switchtab_data(type) {
         currentActiveType = type;
         resetSelectedProduct();
-        const panels = ['panel-pln', 'panel-pulsa', 'panel-paket', 'panel-ewallet'];
+        const panels = ['panel-smm', 'panel-pln', 'panel-pulsa', 'panel-paket', 'panel-ewallet', 'panel-aktif', 'panel-gplay', 'panel-wifi'];
         panels.forEach(id => document.getElementById(id).style.display = (id === 'panel-' + type) ? 'block' : 'none');
         
         const inputTop = document.getElementById('input-top-container');
@@ -307,18 +266,26 @@
             inputTop.style.display = 'none'; inputPln.style.display = 'block'; 
         } else { 
             inputTop.style.display = 'block'; inputPln.style.display = 'none';
-            inputTujuan.placeholder = "Nomor Tujuan";
+            inputTujuan.placeholder = "Masukan Nomor Tujuan";
             inputTujuan.type = "text";
         }
         
-        if (type !== 'ewallet') renderProdukDinamis(type);
+        if (type !== 'smm' && type !== 'ewallet' && type !== 'pln') {
+            renderProdukDinamis(type);
+        }
     }
 
-    function pilihKategori(kategori) {
-        const mapping = { 'Pulsa': 'pulsa', 'Paket Data': 'paket', 'Ewallet': 'ewallet', 'Token Listrik': 'pln' };
+    function logika_data(kategori) {
+        const mapping = { 'Pulsa': 'pulsa', 'Paket Data': 'paket', 'Ewallet': 'ewallet', 'Token Listrik': 'pln', 'SMM': 'smm', 'Masa Aktif': 'aktif', 'Gplay': 'gplay', 'Wifi': 'wifi' };
         if(!mapping[kategori]) return;
-        switchTab(mapping[kategori]);
-        const radioMap = { 'Paket Data': 'item1', 'Pulsa': 'item2', 'Token Listrik': 'item3',  'Ewallet': 'item4' };
+        
+        if (['smm', 'ewallet', 'pln'].includes(mapping[kategori])) {
+            showAlert("Fitur ini sedang tidak tersedia.");
+            return;
+        }
+        
+        switchtab_data(mapping[kategori]);
+        const radioMap = { 'Paket Data': 'item1', 'Pulsa': 'item2', 'Masa Aktif': 'item3', 'Token Listrik': 'item6', 'SMM': 'item5', 'Ewallet': 'item4', 'Gplay': 'item7', 'Wifi': 'item8' };
         if(radioMap[kategori]) document.getElementById(radioMap[kategori]).checked = true;
     }
 
@@ -389,7 +356,7 @@
     }
 
     async function postOrder(urlData) {
-        const btn = document.getElementById('btn-beli-dinamis'); btn.disabled = true; btn.innerText = 'Memproses...';
+        const btn = document.getElementById('btn-proses-beli-data'); btn.disabled = true; btn.innerText = 'Memproses...';
         try {
             const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(urlData) });
             const result = await response.json();
@@ -400,9 +367,15 @@
         } catch (err) { showAlert('Terjadi kesalahan.'); } finally { btn.disabled = false; btn.innerText = 'Beli Sekarang'; }
     }
 
-    function eksekusiBeli() {
+    function proses_beli_data() {
         const ph = localStorage.getItem('userPhone'); if (!ph) return showLogin();
-        const dest = (currentActiveType === 'pln') ? document.getElementById('order_meter_id').value : document.getElementById('input-nomor-tujuan').value;
+        
+        if (['smm', 'ewallet', 'pln'].includes(currentActiveType)) {
+            showAlert("Fitur transaksi untuk kategori ini dinonaktifkan.");
+            return;
+        }
+
+        const dest = document.getElementById('input-nomor-tujuan').value;
         if(!dest || !selectedProductValue) return showAlert("Prosedur Belum Lengkap!");
         if (userSaldo < selectedProductHarga) return showAlert("Saldo Tidak Mencukupi!");
         
@@ -410,42 +383,44 @@
         const refID = currentActiveType.toUpperCase() + Date.now();
         const common = { refID: refID, userPhone: ph, price: selectedProductHarga, product: selectedProductName, dest: dest };
         
-        postOrder({ ...common, action: 'order' + currentActiveType.charAt(0).toUpperCase() + currentActiveType.slice(1), product: finalProductCode });
-    }
+        if (currentActiveType === 'wifi') {
+            const btn = document.getElementById('btn-proses-beli-data');
+            btn.disabled = true;
+            btn.innerText = 'Memproses...';
 
-    
-    document.getElementById('btnCheck').onclick = async () => {
-    const m = document.getElementById('meter_id').value;
-    const loader = document.getElementById('loadingImage');
-    
-    if (!m) return showAlert("Masukkan ID!");
-    
-    // Munculkan gambar
-    loader.style.display = 'block';
-    
-    try {
-        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'checkPLN', meter_id: m }) });
-        const data = await res.json();
-        
-        // Hilangkan gambar sebelum menampilkan modal
-        loader.style.display = 'none';
-        
-        if(data.success) { 
-            tampilkanModal(`<strong>Nama:</strong> ${data.data.name}<br><strong>Daya:</strong> ${data.data.power_formatted}`); 
-            document.getElementById('order_meter_id').value = data.data.meter_id; 
-        } else { 
-            tampilkanModal(`<strong>Error:</strong> ${data.message}`); 
+            db.ref(`produk/wifi/${finalProductCode}/stok`).orderByKey().limitToFirst(1).once('value', snapshot => {
+                if (!snapshot.exists()) {
+                    btn.disabled = false;
+                    btn.innerText = 'Beli Sekarang';
+                    return showAlert("Stok SN untuk produk ini sedang kosong.");
+                }
+
+                let snKey = "";
+                let snVal = "";
+                snapshot.forEach(child => {
+                    snKey = child.key;
+                    snVal = child.val();
+                });
+
+                db.ref().update({
+                    [`users/${ph}/saldo`]: firebase.database.ServerValue.increment(-selectedProductHarga),
+                    [`produk/wifi/${finalProductCode}/stok/${snKey}`]: null 
+                }).then(() => {
+                    const orderData = { ...common, status: 'success', sn: snVal, timestamp: new Date().toISOString() };
+                    db.ref(`users/${ph}/riwayat/${refID}`).set(orderData);
+                    tampilkanModal(formatStrukStatus(orderData));
+                }).catch(err => {
+                    showAlert("Gagal transaksi: " + err.message);
+                }).finally(() => {
+                    btn.disabled = false;
+                    btn.innerText = 'Beli Sekarang';
+                });
+            });
+        } else {
+            postOrder({ ...common, action: 'order' + currentActiveType.charAt(0).toUpperCase() + currentActiveType.slice(1), product: finalProductCode });
         }
-    } catch (err) {
-        // Pastikan gambar hilang jika terjadi error koneksi
-        loader.style.display = 'none';
-        showAlert("Gagal melakukan pengecekan.");
     }
-};
 
-    
-    
-    
     
     function toggleDropdown() { const menu = document.getElementById('dropdownMenu'); menu.style.display = (menu.style.display === 'block') ? 'none' : 'block'; }
     window.onclick = function(event) { if (!event.target.matches('.titik-tiga')) { document.getElementById("dropdownMenu").style.display = "none"; } }
@@ -457,7 +432,7 @@
         document.getElementById('loginPin').value = '';
         location.reload();
     }
-
+    
     function buka_info() {
         if (window.AppInventor) {
             window.AppInventor.setWebViewString('buka_info');
@@ -479,11 +454,20 @@
             initUserSession(savedPh);
         }
         document.getElementById('input-nomor-tujuan').addEventListener('input', detectOperator);
-        switchTab('paket');
+        switchtab_data('paket');
         batasiInputAngka('loginPhone', 13); 
         batasiInputAngka('loginPin', 4); 
-        batasiInputAngka('meter_id', 20);
     };
+
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            document.getElementById('footer-order').style.display = 'none';
+        });
+        input.addEventListener('blur', () => {
+            document.getElementById('footer-order').style.display = 'block';
+        });
+    });
 </script>
 </body>
 </html>
