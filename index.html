@@ -218,13 +218,7 @@
             <span id="display-saldo">Rp --</span>
         </div>
     </div>
-    <div class="header-section"
-    
-     
-     
-     onclick="buka_topup(); toggleDropdown();">Topup</div>
-     
-     
+    <div class="header-section" onclick="buka_topup(); toggleDropdown();">Topup</div>
 </header>
 
 <input checked id="item1" name="multiples" type="radio">
@@ -236,18 +230,10 @@
     <div class="carousel">
         <img src="https://nasuka.pro/gambar/data3.jpg" onclick="pilihKategori('Paket Data')">
         <img src="https://nasuka.pro/gambar/pulsa.jpg" onclick="pilihKategori('Pulsa')">       
-       
         <img src="https://nasuka.pro/gambar/tokenlistrik.jpg" onclick="pilihKategori('Token Listrik')">
-        
-         <img src="https://nasuka.pro/gambar/ewallet.jpg" onclick="pilihKategori('Ewallet')">       
-       
+        <img src="https://nasuka.pro/gambar/ewallet.jpg" onclick="pilihKategori('Ewallet')">       
     </div>
 </div>
-
-
-
-
-
 
 <div id="input-top-container" class="card">
     <input type="text" id="input-nomor-tujuan" placeholder="Nomor Tujuan">
@@ -363,56 +349,67 @@
         }
     }
     
+    
+    
         function detectOperator() {
-    const no = document.getElementById('input-nomor-tujuan').value;
-    const currentPanel = document.getElementById('panel-' + currentActiveType);
-    if (!currentPanel) return;
-    
-    const items = currentPanel.querySelectorAll('.product-item');
-    
-    // Jika bukan kategori pulsa atau paket, tampilkan semua dan keluar dari fungsi
-    if (currentActiveType !== 'pulsa' && currentActiveType !== 'paket') {
-        items.forEach(item => item.style.display = 'flex');
-        return;
-    }
-
-    if (no.length < 4) {
-        items.forEach(item => item.style.display = 'flex');
-        return;
-    }
-
-    const prefix = no.substring(0, 4);
-    let operator = "";
-
-    if (['0811', '0812', '0813', '0821', '0822', '0852', '0853', '0823'].includes(prefix)) operator = "TSEL";
-    else if (['0814', '0815', '0816', '0855', '0856', '0857', '0858'].includes(prefix)) operator = "ISAT";
-    else if (['0831', '0832', '0833',  '0838'].includes(prefix)) operator = "AXIS";
-    else if (['0888', '0888', '0888',  '0888'].includes(prefix)) operator = "FREN";
-    
-    else if (['0817', '0818', '0819', '0877', '0878', '0859'].includes(prefix)) operator = "XL";
-    else if (['0895', '0896', '0897', '0898', '0899'].includes(prefix)) operator = "TRI";
-
-    items.forEach(item => {
-        const itemOp = item.getAttribute('data-op');
-        if (operator === "") {
-            item.style.display = 'flex';
-        } else {
-            item.style.display = (itemOp === operator) ? 'flex' : 'none';
+        const no = document.getElementById('input-nomor-tujuan').value;
+        const currentPanel = document.getElementById('panel-' + currentActiveType);
+        if (!currentPanel) return;
+        
+        const items = currentPanel.querySelectorAll('.product-item');
+        
+        if (currentActiveType !== 'pulsa' && currentActiveType !== 'paket') {
+            items.forEach(item => item.style.display = 'flex');
+            return;
         }
-    });
-}
 
+        if (no.length < 4) {
+            items.forEach(item => item.style.display = 'flex');
+            return;
+        }
 
+        const prefix = no.substring(0, 4);
+        let operator = "";
+
+        if (['0811', '0812', '0813', '0821', '0822', '0852', '0853', '0823'].includes(prefix)) operator = "TSEL";
+        else if (['0814', '0815', '0816', '0855', '0856', '0857', '0858'].includes(prefix)) operator = "ISAT";
+        else if (['0831', '0859', '0832', '0833', '0838'].includes(prefix)) operator = "AXIS";
+        else if (['0817', '0818', '0819', '0877', '0878'].includes(prefix)) operator = "XL";
+        else if (['0895', '0896', '0897', '0898', '0899'].includes(prefix)) operator = "TRI";
+        else if (['0881', '0882', '0883', '0884', '0885', '0886', '0887', '0888', '0889'].includes(prefix)) operator = "FREN";
+
+        items.forEach(item => {
+            const itemOp = item.getAttribute('data-op');
+            if (operator === "") {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = (itemOp === operator) ? 'flex' : 'none';
+            }
+        });
+    }
+
+    
+    
+    
+    
     function renderProdukDinamis(type, sub = null) {
+        const inputVal = (type === 'pln') ? document.getElementById('meter_id').value : document.getElementById('input-nomor-tujuan').value;
         let gridId = 'grid' + type.charAt(0).toUpperCase() + type.slice(1);
         let grid = document.getElementById(gridId);
         
-        if (!grid) return;
+        if (type !== 'ewallet' && inputVal.length < 5) {
+            if (grid) grid.innerHTML = '';
+            return;
+        }
 
         let path = sub ? `produk/${type}/${sub}` : `produk/${type}`;
         db.ref(path).once('value', snapshot => {
+            if (!grid) return;
+            
             let items = [];
-            snapshot.forEach(child => { items.push(child.val()); });
+            snapshot.forEach(child => {
+                items.push(child.val());
+            });
 
             items.sort((a, b) => {
                 let opA = (a.op || "").toUpperCase();
@@ -431,14 +428,9 @@
                 div.innerHTML = `<div class="product-name">${item.nama || item.label}</div><div class="product-price">Rp ${item.harga.toLocaleString('id-ID')}</div>`;
                 grid.appendChild(div);
             });
-            // Jalankan filter setelah produk berhasil di-render
             detectOperator();
         });
     }
-
-    
-    
-        
 
     function switchTab(type) {
         currentActiveType = type;
