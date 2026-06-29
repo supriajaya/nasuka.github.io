@@ -8,8 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <style> 
-    
- body { 
+body { 
     margin: 0; 
     padding: 9px 9px 90px 9px; 
     display: flex; 
@@ -27,14 +26,11 @@
     font-weight: bold; 
 }
    
-    
- 
- 
- header {
+header {
     width: 100%;
     max-width: 400px;
     display: flex;
-    gap: 9px; /* Jarak antar card */
+    gap: 9px; 
     padding: 0;
     background: transparent;
     margin-bottom: 9px;
@@ -47,7 +43,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-image: url('https://nasuka.pro/gambar/ombak.gif');
+    background-image: url('https://nasuka.pro/gambar/ombk.gif');
     background-size: cover;
     background-position: center;
     padding: 6.75px 11.25px;
@@ -60,15 +56,11 @@
     min-height: 60px;
 }
 
-
 .menu-container {
     margin-right: 5px;
 }
 
- 
- 
- 
-  .dropdown-menu { display: none; position: absolute; top: 110%; left: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 120px; z-index: 999; } .dropdown-menu div { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; } .dropdown-menu div:last-child { border-bottom: none; } .dropdown-menu div:hover { background: #f8fafc; } .struk-container { font-family: 'Courier New', Courier, monospace; color: #000; text-align: center; background: #fff; padding: 10px; border: 1px solid #ccc; } .struk-content { font-family: 'Courier New', Courier, monospace; color: #000; width: 100%; } .struk-row { display: flex; justify-content: space-between; margin-bottom: 2px; } .sn-box { background: #000; color: #fff; padding: 5px; margin: 10px 0; text-align: center; font-weight: bold; font-size: 1.1em; } .struk-header { font-weight: bold; border-bottom: 2px dashed #000; padding-bottom: 5px; margin-bottom: 5px; } .struk-body { text-align: left; font-size: 14px; margin: 10px 0; } .struk-body div { display: flex; justify-content: space-between; margin-bottom: 4px; } .struk-footer { border-top: 2px dashed #000; padding-top: 5px; font-weight: bold; } .container { width: 216px; height: 129.6px; perspective: 432px; perspective-origin: 50% -10.8px; margin: 21.6px auto; margin-bottom: 8.64px; } .carousel { transform-style: preserve-3d; transform: translateZ(-259.2px); position: relative; width: 216px; height: 129.6px; transition: 1s; } .carousel img { position: absolute; border: 0.432px solid #222; opacity: .5; transition: 1s; width: 216px; height: 129.6px; background:#ccc; cursor: pointer; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); } .carousel img:nth-child(1) { transform: rotateY(0deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(2) { transform: rotateY(45deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(3) { transform: rotateY(90deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(4) { transform: rotateY(135deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(5) { transform: rotateY(180deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(6) { transform: rotateY(225deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(7) { transform: rotateY(270deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(8) { transform: rotateY(315deg) translateZ(259.2px) scale(.96); } .controls-wrapper { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 405px; align-items: center; padding: 0 4.5px; box-sizing: border-box; } .control-row { display: flex; justify-content: center; width: 100%; gap: 9px; flex-wrap: nowrap; margin-bottom: 9px; } .card-kategori { cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0; width: 22%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); box-sizing: border-box; overflow: hidden; } .card-kategori img { width: 100%; height: 100%; object-fit: cover; margin-bottom: 0; } .card-kategori span { display: none; } .card-kategori:active { transform: scale(0.95); background: #f1f5f9; } .card-kategori.disabled { cursor: not-allowed; opacity: 0.5; } #input-nomor-tujuan { width: 100%; max-width: 387px; padding: 11.25px; font-size: 20px; border: 0.9px solid #e2e8f0; border-radius: 7.2px; margin: 6.75px 0; text-align: center; box-sizing: border-box; } input[type="radio"] { position: absolute; left: -9999px; } #input-top-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; } #input-pln-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; }
+.dropdown-menu { display: none; position: absolute; top: 110%; left: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 120px; z-index: 999; } .dropdown-menu div { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; } .dropdown-menu div:last-child { border-bottom: none; } .dropdown-menu div:hover { background: #f8fafc; } .struk-container { font-family: 'Courier New', Courier, monospace; color: #000; text-align: center; background: #fff; padding: 10px; border: 1px solid #ccc; } .struk-content { font-family: 'Courier New', Courier, monospace; color: #000; width: 100%; } .struk-row { display: flex; justify-content: space-between; margin-bottom: 2px; } .sn-box { background: #000; color: #fff; padding: 5px; margin: 10px 0; text-align: center; font-weight: bold; font-size: 1.1em; } .struk-header { font-weight: bold; border-bottom: 2px dashed #000; padding-bottom: 5px; margin-bottom: 5px; } .struk-body { text-align: left; font-size: 14px; margin: 10px 0; } .struk-body div { display: flex; justify-content: space-between; margin-bottom: 4px; } .struk-footer { border-top: 2px dashed #000; padding-top: 5px; font-weight: bold; } .container { width: 216px; height: 129.6px; perspective: 432px; perspective-origin: 50% -10.8px; margin: 21.6px auto; margin-bottom: 8.64px; } .carousel { transform-style: preserve-3d; transform: translateZ(-259.2px); position: relative; width: 216px; height: 129.6px; transition: 1s; } .carousel img { position: absolute; border: 0.432px solid #222; opacity: .5; transition: 1s; width: 216px; height: 129.6px; background:#ccc; cursor: pointer; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); } .carousel img:nth-child(1) { transform: rotateY(0deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(2) { transform: rotateY(45deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(3) { transform: rotateY(90deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(4) { transform: rotateY(135deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(5) { transform: rotateY(180deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(6) { transform: rotateY(225deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(7) { transform: rotateY(270deg) translateZ(259.2px) scale(.96); } .carousel img:nth-child(8) { transform: rotateY(315deg) translateZ(259.2px) scale(.96); } .controls-wrapper { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 405px; align-items: center; padding: 0 4.5px; box-sizing: border-box; } .control-row { display: flex; justify-content: center; width: 100%; gap: 9px; flex-wrap: nowrap; margin-bottom: 9px; } .card-kategori { cursor: pointer; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 0; width: 22%; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); box-sizing: border-box; overflow: hidden; } .card-kategori img { width: 100%; height: 100%; object-fit: cover; margin-bottom: 0; } .card-kategori span { display: none; } .card-kategori:active { transform: scale(0.95); background: #f1f5f9; } .card-kategori.disabled { cursor: not-allowed; opacity: 0.5; } #input-nomor-tujuan { width: 100%; max-width: 387px; padding: 11.25px; font-size: 20px; border: 0.9px solid #e2e8f0; border-radius: 7.2px; margin: 6.75px 0; text-align: center; box-sizing: border-box; } input[type="radio"] { position: absolute; left: -9999px; } #input-top-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; } #input-pln-container { width: 90%; max-width: 540px; margin: 9px auto; display: none; }
  #item1:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(0deg); }
 #item2:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-45deg); }
 #item3:checked ~ .container .carousel { transform: translateZ(-259.2px) rotateY(-90deg); }
@@ -102,51 +94,78 @@
    
    #btn-beli-dinamis { width: 90%; max-width: 400px; padding: 15px; background-color: maroon; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
 
-   
-   
- 
-   
-   
-   
-   .product-grid { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 9px; box-sizing: border-box; } 
-   
-   
-   
-   .product-item {
+.product-grid { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    width: 100%; 
+    padding: 0 4px;
+} 
+
+.product-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    overflow: hidden; 
+}
+
+.product-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 9px;
-    background: #c0c0c0;
-    border: 2px solid;
-    border-color: #ffffff #808080 #808080 #ffffff;
-    cursor: pointer;
-    transition: 0.2s;
-    box-sizing: border-box;
+    padding: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.product-name { 
+    font-size: 14px; 
+    font-weight: 600; 
+    color: #1e293b; 
+} 
+
+.product-price { 
+    background: #10b981; 
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.product-details {
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #475569;
+    background: #f8fafc;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
     margin-bottom: 4px;
 }
 
 .product-item.selected {
-    background: #c0c0c0;
-    border-color: #808080 #ffffff #ffffff #808080;
+    border: 2px solid #10b981 !important;
+    position: relative;
 }
 
-.product-item:active {
-    border-color: #808080 #ffffff #ffffff #808080;
+.product-item.selected::after {
+    content: "✅";
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 16px;
+    z-index: 10;
 }
 
-  
-   
-   
-   
-   
-    .product-name { font-size: 1.2000em; font-weight: 600; color: #1e293b; text-align: left; } 
-    
-    .product-price { font-size: 1.2000em; font-weight: bold; color: black; text-align: right; } #display-user { display: none; font-size: 15.552px; }
-    
-    
-    
-     #logout-btn { display: none; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 10000; } .modal-content { background: #c0c0c0; padding: 3px; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; width: 90%; max-width: 300px; box-sizing: border-box; font-family: 'Courier New', Courier, monospace; font-size: 14px; } .modal-close-btn { background: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; padding: 5px 15px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; } .modal-close-btn:active { border-color: #808080 #ffffff #ffffff #808080; } .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; box-sizing: border-box; padding: 9px; } .login-brand { color: #1877f2; font-size: 1.5rem; font-weight: bold; margin-bottom: 12px; letter-spacing: -0.45px; } .login-box { background: #ffffff; padding: 20px; border-radius: 8px; width: 100%; max-width: 300px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); box-sizing: border-box; text-align: center; } .login-box h3 { margin-top: 0; font-size: 1.1rem; color: #1c1e21; margin-bottom: 15px; font-weight: 600; } .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dddfe2; border-radius: 6px; font-size: 1rem; box-sizing: border-box; outline: none; background: #f5f6f7; } .login-input:focus { border-color: #1877f2; background: #fff; box-shadow: 0 0 0 1px #e7f3ff; } .login-btn { width: 100%; padding: 12px; background-color: #1877f2; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; } .login-btn:hover { background-color: #166fe5; } .login-btn:disabled { background-color: #8cb4f5; cursor: not-allowed; } .login-close { margin-top: 10px; background: none; border: none; color: #65676b; font-size: 0.9rem; cursor: pointer; text-decoration: underline; width: auto !important; height: auto !important; padding: 5px !important; }
+ #logout-btn { display: none; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 10000; } .modal-content { background: #c0c0c0; padding: 3px; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; width: 90%; max-width: 300px; box-sizing: border-box; font-family: 'Courier New', Courier, monospace; font-size: 14px; } .modal-close-btn { background: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; padding: 5px 15px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; } .modal-close-btn:active { border-color: #808080 #ffffff #ffffff #808080; } .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; box-sizing: border-box; padding: 9px; } .login-brand { color: #1877f2; font-size: 1.5rem; font-weight: bold; margin-bottom: 12px; letter-spacing: -0.45px; } .login-box { background: #ffffff; padding: 20px; border-radius: 8px; width: 100%; max-width: 300px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); box-sizing: border-box; text-align: center; } .login-box h3 { margin-top: 0; font-size: 1.1rem; color: #1c1e21; margin-bottom: 15px; font-weight: 600; } .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dddfe2; border-radius: 6px; font-size: 1rem; box-sizing: border-box; outline: none; background: #f5f6f7; } .login-input:focus { border-color: #1877f2; background: #fff; box-shadow: 0 0 0 1px #e7f3ff; } .login-btn { width: 100%; padding: 12px; background-color: #1877f2; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; } .login-btn:hover { background-color: #166fe5; } .login-btn:disabled { background-color: #8cb4f5; cursor: not-allowed; } .login-close { margin-top: 10px; background: none; border: none; color: #65676b; font-size: 0.9rem; cursor: pointer; text-decoration: underline; width: auto !important; height: auto !important; padding: 5px !important; }
   #container-cek-id { position: relative; display: flex; flex-direction: column; align-items: center; }
 #loadingImage { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 250px; z-index: 10; pointer-events: none; }
 
@@ -188,8 +207,6 @@
 .btn-retro:active {
     border-color: #808080 #ffffff #ffffff #808080;
 }
-
-
 </style>
 </head>
 <body>
@@ -201,7 +218,6 @@
     <button class="btn-retro">Term</button>
       <button class="btn-retro">Privacy</button>
     <button class="btn-retro">Tentang</button>
-    
 </div>
 
 <header>
@@ -349,9 +365,7 @@
         }
     }
     
-    
-    
-        function detectOperator() {
+    function detectOperator() {
         const no = document.getElementById('input-nomor-tujuan').value;
         const currentPanel = document.getElementById('panel-' + currentActiveType);
         if (!currentPanel) return;
@@ -387,10 +401,6 @@
             }
         });
     }
-
-    
-    
-    
     
     function renderProdukDinamis(type, sub = null) {
         const inputVal = (type === 'pln') ? document.getElementById('meter_id').value : document.getElementById('input-nomor-tujuan').value;
@@ -407,25 +417,64 @@
             if (!grid) return;
             
             let items = [];
-            snapshot.forEach(child => {
-                items.push(child.val());
-            });
+            snapshot.forEach(child => { items.push(child.val()); });
 
-            items.sort((a, b) => {
-                let opA = (a.op || "").toUpperCase();
-                let opB = (b.op || "").toUpperCase();
-                if (opA < opB) return -1;
-                if (opA > opB) return 1;
-                return a.harga - b.harga;
-            });
+            items.sort((a, b) => (a.harga || 0) - (b.harga || 0));
 
             grid.innerHTML = '';
+
             items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'product-item';
-                if(item.op) div.setAttribute('data-op', item.op);
-                div.onclick = function() { pilihProdukGlow(this, item.val, item.harga, item.qty || 0, item.nama || item.label); };
-                div.innerHTML = `<div class="product-name">${item.nama || item.label}</div><div class="product-price">Rp ${item.harga.toLocaleString('id-ID')}</div>`;
+                
+                if (item.op) div.setAttribute('data-op', item.op);
+                
+                div.onclick = function() { 
+                    pilihProdukGlow(this, item.val, item.harga, item.qty || 0, item.nama || item.label); 
+                };
+
+                let baris1Teks = "-";
+                let baris2Teks = "-";
+                let statusBerlaku = "Nasional";
+
+                if (type === 'ewallet') {
+                    const nominalRaw = (item.nama || item.label).replace(/[^0-9]/g, '');
+                    const nominal = parseInt(nominalRaw) || 0;
+                    const biayaLayanan = item.harga - nominal;
+                    baris1Teks = `Transfer: Rp ${nominal.toLocaleString('id-ID')}`;
+                    baris2Teks = `Cost: Rp ${biayaLayanan.toLocaleString('id-ID')}`;
+                } else {
+                    const namaProduk = (item.nama || "").toLowerCase();
+                    
+                    if (namaProduk.includes("gb")) {
+                        const match = namaProduk.match(/(\d+\s*gb)/);
+                        baris1Teks = `🌐 Kuota: ${match ? match[1].toUpperCase() : "Data"}`;
+                    } else if (namaProduk.includes("unlimited")) {
+                        baris1Teks = `🌐 Kuota: Unlimited`;
+                    } else {
+                        baris1Teks = `📱 Pulsa Reguler: ${item.nama || item.label}`;
+                    }
+
+                    if (namaProduk.includes("jam")) {
+                        baris2Teks = `⏰ Masa Aktif: ${namaProduk.match(/(\d+\s*jam)/) ? namaProduk.match(/(\d+\s*jam)/)[0] : "1 Jam"}`;
+                    } else if (namaProduk.includes("hari")) {
+                        baris2Teks = `⏰ Masa Aktif: ${namaProduk.match(/(\d+\s*hari)/) ? namaProduk.match(/(\d+\s*hari)/)[0] : "1 Hari"}`;
+                    } else if (namaProduk.includes("bulan")) {
+                        baris2Teks = `⏰ Masa Aktif: ${namaProduk.match(/(\d+\s*bulan)/) ? namaProduk.match(/(\d+\s*bulan)/)[0] : "30 Hari"}`;
+                    }
+                }
+
+                div.innerHTML = `
+                    <div class="product-header">
+                        <div class="product-name">${item.nama || item.label}</div>
+                        <div class="product-price">Rp ${item.harga.toLocaleString('id-ID')}</div>
+                    </div>
+                    <div class="product-details">
+                        <div class="detail-row">${baris1Teks}</div>
+                        <div class="detail-row">${baris2Teks}</div>
+                       <div class="detail-row">🇮🇩 Berlaku : ${statusBerlaku}</div>  
+                    </div>
+                `;
                 grid.appendChild(div);
             });
             detectOperator();
@@ -465,8 +514,9 @@
     }
 
     function pilihProdukGlow(element, value, harga, qty, name) {
-        document.querySelectorAll('#panel-' + currentActiveType + ' .product-item').forEach(el => el.classList.remove('selected'));
-        element.classList.add('selected');
+        const items = document.querySelectorAll('#panel-' + currentActiveType + ' .product-item');
+        items.forEach(el => el.classList.remove('selected'));   
+        element.classList.add('selected');   
         selectedProductValue = value;
         selectedProductHarga = harga;
         selectedProductQty = qty;
