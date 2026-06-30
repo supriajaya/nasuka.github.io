@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>informasi</title>
+<title>Nas 123</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -38,12 +38,11 @@
 
 <header>
     <div class="balance-container" style="display: none; margin-bottom: 20px;">
-        <span id="display-saldo" style="font-size: 20px; font-weight: bold;">Rp 0</span>
-    </div>
+        </div>
 </header>
 
 <div class="controls-wrapper">
-    <div class="card-kategori" onclick="pilihKategori('saldo')">Tambah Saldo</div>
+   
     <div class="card-kategori" onclick="pilihKategori('produk')">Tentang Produk</div>
     <div class="card-kategori" onclick="pilihKategori('refund')">Term & Condition</div>
     <div class="card-kategori" onclick="pilihKategori('kebijakan-refund')">Kebijakan Refund</div>
@@ -51,31 +50,13 @@
 
 <div class="controls-wrapper">
     <div class="card-kategori" onclick="pilihKategori('akun')">Akun Saya</div>
-    <div class="card-kategori" onclick="pilihKategori('faq')">Pertanyaan Umum</div>
-    <div class="card-kategori" onclick="pilihKategori('privacy')">Kebijakan Privacy</div>
-    <div class="card-kategori" onclick="pilihKategori('developer')">Tentang Developer</div>
+    <div class="card-kategori" onclick="pilihKategori('faq')">Faq</div>
+    
+    <div class="card-kategori" onclick="pilihKategori('developer')">Tentang</div>
 </div>
 
 <div class="panel-container">
-    <div id="panel-saldo" class="menu-panel">
-        <div class="card">
-            <p class="sub-title">Tanpa minimum, Tanpa Biaya Admin</p>
-            <input type="number" id="nominal" inputmode="numeric" placeholder="Nominal (Contoh: 1000)">
-            <button onclick="prosesTopup()">Request</button>
-        </div>
-        <div id="info-area-2" class="card">
-            <div class="panduan">
-                <p>Buka aplikasi Ewallet/Mbanking anda<br>
-                Pilih QRIS dan scan QR kami.</p>       
-                <div id="info-msg" style="margin: 0 0 10px 0; font-weight: bold; color: #000; font-size: 15px;">Masukan nominal: ....</div>
-                <li>Pastikan nama merchant adalah <strong>NASUKA FOODS.</strong></li>         
-                <li>Saldo anda di sistem kami akan otomatis bertambah</li>         
-                <img src="https://nasuka.pro/gambar/qris.jpg" alt="QRIS" class="qris-img">
-            </div>
-        </div>
-    </div>
-
-    <div id="panel-produk" class="menu-panel card">
+    <div id="panel-produk" class="menu-panel card" style="display: block;">
         <h3>Daftar Produk Unggulan</h3>
         <p>Kami menyediakan layanan digital lengkap untuk kebutuhan sehari-hari termurah untuk Anda</p>
         <ul>
@@ -110,6 +91,7 @@
     <div id="panel-akun" class="menu-panel card">
         <h3>Informasi Akun</h3>
         <p><strong>No. HP Terdaftar :</strong> <span id="user-phone-display"></span></p>
+        <p><strong>Saldo Anda :</strong> <span id="display-saldo" style="font-weight: bold; color: #28a745;">Rp 0</span></p>
     </div>
 
     <div id="panel-faq" class="menu-panel card">
@@ -167,7 +149,7 @@
 </div>
 
 <script>
-    const firebaseConfig = { databaseURL: "https://nasukawireless-73c75-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    const firebaseConfig = { databaseURL: "https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -209,42 +191,12 @@
 
     function initUserSession(ph) {
         if (ph) {
-            document.querySelector('.balance-container').style.display = 'block';
             document.getElementById('user-phone-display').innerText = ph;
             db.ref('users/' + ph + '/saldo').on('value', snap => { 
                 const saldo = snap.val() || 0; 
-                document.getElementById('display-saldo').innerText = "Saldo: Rp " + saldo.toLocaleString('id-ID'); 
+                document.getElementById('display-saldo').innerText = "Rp " + saldo.toLocaleString('id-ID'); 
             });
         }
-    }
-
-    function prosesTopup() {
-        const userPhone = localStorage.getItem('userPhone');
-        if (!userPhone) { showLogin(); return; }
-        
-        const nominalVal = document.getElementById('nominal').value;
-        const nominalInput = parseInt(nominalVal);
-        const infoMsg = document.getElementById('info-msg');
-
-        if (isNaN(nominalInput) || nominalInput <= 0) { 
-            showCustomAlert("Masukkan nominal yang valid!"); 
-            return; 
-        }
-
-        db.ref('users/' + userPhone).once('value', (snap) => {
-            const userData = snap.val();
-            const kodeUnik = parseInt(userData.kodeUnik || 0);
-            const total = nominalInput + kodeUnik;
-
-            db.ref('pending_topup/' + userPhone).set({
-                bayar_via_qris: total,
-                status: "menunggu",
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            }, (error) => {
-                if (error) { showCustomAlert("Gagal memproses: " + error.message); } 
-                else { infoMsg.innerText = "Masukan nominal: Rp " + total.toLocaleString('id-ID'); }
-            });
-        });
     }
 
     function showCustomAlert(pesan, judul = "Informasi") {
@@ -260,7 +212,6 @@
     document.addEventListener('DOMContentLoaded', () => {
         const ph = localStorage.getItem('userPhone');
         if (ph) initUserSession(ph);
-        pilihKategori('saldo');
     });
 </script>
 </body>
