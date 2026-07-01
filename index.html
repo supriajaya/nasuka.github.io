@@ -198,6 +198,7 @@ header {
 
 #container-cek-id { position: relative; display: flex; flex-direction: column; align-items: center; }
 #loadingImage { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 250px; z-index: 10; pointer-events: none; }
+#globalLoader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99999; display: none; }
 
 #panel-ewallet button {
     background-color: #c0c0c0 !important;
@@ -231,17 +232,27 @@ header {
 }
 .btn-retro:active { border-color: #808080 #ffffff #ffffff #808080; }
 
-.panel-topup { display: none;  padding: 20px; border-radius: 12px; margin-top: 10px; }
-.qris-img { width: 100%; margin: 15px 0; border-radius: 8px; }
+
+#globalLoader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99999;
+    display: none;
+    width: 300px;
+    height: auto;
+}
 </style>
 </head>
 <body>
+<img id="globalLoader" src="https://nasuka.pro/gambar/loading.gif">
+
 <div class="nav-bar-retro">
     <button class="btn-retro" onclick="handleMenuAuth('profil')">Profil</button>
     <button class="btn-retro" onclick="handleMenuAuth('riwayat')">Riwayat</button>
-    
-    <button class="btn-retro" onclick="switchTab('info')">info</button>    
-    <button class="btn-retro" onclick="switchTab('topup')">Topup</button>   
+    <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/info.html'">Info</button>   
+    <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/topup.html'">Topup</button>   
     <button class="btn-retro" id="btn-saldo"><span id="display-saldo">Rp --</span></button>
 </div>
 
@@ -249,13 +260,20 @@ header {
 <input id="item2" name="multiples" type="radio">
 <input id="item3" name="multiples" type="radio">
 <input id="item4" name="multiples" type="radio">
-
+<div class="container">     
+    <div class="carousel">
+        <img src="https://nasuka.pro/gambar/data3.jpg" onclick="pilihKategori('Paket Data')">
+        <img src="https://nasuka.pro/gambar/pulsa.jpg" onclick="pilihKategori('Pulsa')">       
+        <img src="https://nasuka.pro/gambar/tokenlistrik.jpg" onclick="pilihKategori('Token Listrik')">
+        <img src="https://nasuka.pro/gambar/ewallet.jpg" onclick="pilihKategori('Ewallet')">       
+    </div>
+</div>
 <div id="input-top-container" class="card">
-    <input type="text" id="input-nomor-tujuan" placeholder="Nomor Tujuan">
+    <input type="text" id="input-nomor-tujuan" placeholder="Nomor Tujuan" inputmode="numeric" pattern="[0-9]*">
 </div>
 
 <div id="input-pln-container" class="card" style="display:none;">
-    <input type="text" id="meter_id" placeholder="ID Pelanggan" inputmode="numeric">
+    <input type="text" id="meter_id" placeholder="ID Pelanggan" inputmode="numeric" pattern="[0-9]*">
 </div>
 
 <div class="controls-wrapper">
@@ -264,40 +282,10 @@ header {
     <label class="card-kategori" for="item2" onclick="pilihKategori('Pulsa')"><img src="https://nasuka.pro/gambar/pulsa1.jpg"></label>       
     <label class="card-kategori" for="item3" onclick="pilihKategori('Token Listrik')"><img src="https://nasuka.pro/gambar/tokenlistrik1.jpg"></label>       
     <label class="card-kategori" for="item4" onclick="pilihKategori('Ewallet')"><img src="https://nasuka.pro/gambar/ewallet1.jpg"></label>
-    <label class="card-kategori" onclick="pilihKategori('Lainnya')"><img src="https://nasuka.pro/gambar/loading.gif"></label>
 </div>
 </div>
 
 <div class="panel-container">
-    
-    
-   
-    <div id="panel-topup" class="panel-topup">
-        <div class="card" style="padding: 15px;  border-radius: 12px; margin-bottom: 15px;">
-           
-         
-            <input type="number" id="nominal" inputmode="numeric" placeholder="Nominal (Contoh: 10000) " style="width: 100%; height: 45px; padding: 10px; font-size: 10px; border: 1px solid black; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px;">
-            <button onclick="prosesTopup()" style="width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 10px; cursor: pointer;">Booking Saldo</button>
-        </div>
-        
-        <div class="card" style="padding: 5px;  border-radius: 12px;">
-            
-            <img src="https://nasuka.pro/gambar/qris.jpg" alt="QRIS" class="qris-img" style="width: 100%; max-width: 200px; display: block; margin: 0 auto 15px auto; border-radius: 8px; border: 1px solid #eee;">
-            
-            <div style="font-size: 13px; color: black; line-height: 1.6;">
-                <p style="margin: 0 0 8px 0;">1. Scan QRIS menggunakan aplikasi E-Wallet/M-Banking Anda.</p>
-                <p style="margin: 0 0 8px 0;">2. Masukkan nominal transfer:</p>
-                <div id="info-msg" style="background: #f1f5f9; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 12px; color: black;">-</div>
-                <p style="margin: 0 0 8px 0;">3. Pastikan nominal transfer sama persis dengan nominal diatas (Itu Nominal booking + id unik anda)</p>
-                
-                
-         <p style="margin: 0 0 8px 0;">4. Pastikan nama merchant: <strong>NASUKA FOODS</strong>.</p>        
-         <p style="margin: 0 0 8px 0;">5. Selesaikan pembayaran</p>        
-                <p style="margin: 0;">6. Saldo akan otomatis masuk ke akun Anda setelah pembayaran terverifikasi.</p>
-            </div>
-        </div>
-    </div>
-
     <div id="panel-pulsa" class="card" style="display:none;">
         <div id="gridPulsa" class="product-grid"></div>
         <div id="resultPulsa" class="api-response"></div>
@@ -306,10 +294,6 @@ header {
         <div id="gridPaket" class="product-grid"></div>
         <div id="resultPaket" class="api-response"></div>
     </div>
-    <div id="panel-aktif" class="card" style="display:none;">
-        <div id="gridAktif" class="product-grid"></div>
-        <div id="resultAktif" class="api-response"></div>
-    </div>    
     <div id="panel-pln" class="card" style="display:none;">
     <div id="container-cek-id">
         <button type="button" id="btnCheck">Cek ID Pelanggan</button>
@@ -387,27 +371,6 @@ header {
         }
     }
 
-    function prosesTopup() {
-        const ph = localStorage.getItem('userPhone');
-        if (!ph) return showLogin();
-        const nominalInput = parseInt(document.getElementById('nominal').value);
-        if (isNaN(nominalInput) || nominalInput <= 0) return showAlert("Masukkan nominal valid!");
-
-        db.ref('users/' + ph).once('value', snap => {
-            const data = snap.val();
-            const kodeUnik = parseInt(data.kodeUnik || 0);
-            const total = nominalInput + kodeUnik;
-            db.ref('pending_topup/' + ph).set({
-                bayar_via_qris: total,
-                status: "menunggu",
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            }).then(() => {
-                document.getElementById('info-msg').innerText = "Rp " + total.toLocaleString('id-ID');
-                showAlert("Request berhasil, silakan transfer sesuai nominal tertera!");
-            });
-        });
-    }
-
     function formatStrukStatus(data) {
         const now = new Date().toLocaleString('id-ID');
         const snLine = (data.sn) ? `<div style="margin-top:10px;">SN/VOUCHER:</div><div class="sn-box">${data.sn}</div>` : '';
@@ -477,13 +440,17 @@ header {
                 div.onclick = function() { pilihProdukGlow(this, item.val, item.harga, item.qty || 0, item.nama || item.label); };
                 let baris1Teks = "-";
                 let baris2Teks = "-";
-                let statusBerlaku = "Nasional";
+                let htmlBerlaku = "";
+                
                 if (type === 'ewallet') {
                     const nominalRaw = (item.nama || item.label).replace(/[^0-9]/g, '');
                     const nominal = parseInt(nominalRaw) || 0;
                     const biayaLayanan = item.harga - nominal;
                     baris1Teks = `Transfer: Rp ${nominal.toLocaleString('id-ID')}`;
                     baris2Teks = `Cost: Rp ${biayaLayanan.toLocaleString('id-ID')}`;
+                } else if (type === 'pln') {
+                    baris1Teks = `⚡ Produk: ${item.nama || item.label}`;
+                    baris2Teks = `ID Pelanggan : ${inputVal}`;
                 } else {
                     const namaProduk = (item.nama || "").toLowerCase();
                     if (namaProduk.includes("gb")) {
@@ -501,7 +468,9 @@ header {
                     } else if (namaProduk.includes("bulan")) {
                         baris2Teks = `⏰ Masa Aktif: ${namaProduk.match(/(\d+\s*bulan)/) ? namaProduk.match(/(\d+\s*bulan)/)[0] : "30 Hari"}`;
                     }
+                    htmlBerlaku = `<div class="detail-row">🇮🇩 Berlaku : Nasional</div>`;
                 }
+                
                 div.innerHTML = `
                     <div class="product-header">
                         <div class="product-name">${item.nama || item.label}</div>
@@ -510,7 +479,7 @@ header {
                     <div class="product-details">
                         <div class="detail-row">${baris1Teks}</div>
                         <div class="detail-row">${baris2Teks}</div>
-                       <div class="detail-row">🇮🇩 Berlaku : ${statusBerlaku}</div>  
+                        ${htmlBerlaku}
                     </div>
                 `;
                 grid.appendChild(div);
@@ -522,16 +491,16 @@ header {
     function switchTab(type) {
         currentActiveType = type;
         resetSelectedProduct();
-        const panels = ['panel-pln', 'panel-pulsa', 'panel-paket', 'panel-ewallet', 'panel-topup'];
+        const panels = ['panel-pln', 'panel-pulsa', 'panel-paket', 'panel-ewallet'];
         panels.forEach(id => document.getElementById(id).style.display = (id === 'panel-' + type) ? 'block' : 'none');
         const grids = ['gridPulsa', 'gridPaket', 'gridPln', 'gridEwallet'];
         grids.forEach(id => { const g = document.getElementById(id); if(g) g.innerHTML = ''; });
         const inputTop = document.getElementById('input-top-container');
         const inputPln = document.getElementById('input-pln-container');
         const footerOrder = document.getElementById('footer-order');
-        footerOrder.style.display = (type === 'topup') ? 'none' : 'block';
-        if (type === 'pln') { inputTop.style.display = 'none'; inputPln.style.display = 'block'; } else if (type !== 'topup') { inputTop.style.display = 'block'; inputPln.style.display = 'none'; } else { inputTop.style.display = 'none'; inputPln.style.display = 'none'; }
-        if (type !== 'ewallet' && type !== 'pln' && type !== 'topup') renderProdukDinamis(type);
+        footerOrder.style.display = 'block';
+        if (type === 'pln') { inputTop.style.display = 'none'; inputPln.style.display = 'block'; } else { inputTop.style.display = 'block'; inputPln.style.display = 'none'; }
+        if (type !== 'ewallet' && type !== 'pln') renderProdukDinamis(type);
     }
     
     function pilihKategori(kategori) {
@@ -592,13 +561,16 @@ header {
     }
 
     async function postOrder(urlData) {
-        const btn = document.getElementById('btn-beli-dinamis'); btn.disabled = true; btn.innerText = 'Memproses...';
+        const btn = document.getElementById('btn-beli-dinamis'); 
+        const loader = document.getElementById('globalLoader');
+        btn.disabled = true; 
+        loader.style.display = 'block';
         try {
             const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(urlData) });
             const result = await response.json();
             if(result.status === true || result.success === true) { await db.ref(`users/${localStorage.getItem('userPhone')}/riwayat/${urlData.refID}`).set({ refID: urlData.refID, product: urlData.product, dest: urlData.dest, status: 'ordered', price: urlData.price, timestamp: new Date().toISOString() }); }
             tampilkanModal(formatApiResponse(result));
-        } catch (err) { showAlert('Terjadi kesalahan.'); } finally { btn.disabled = false; btn.innerText = 'Beli Sekarang'; }
+        } catch (err) { showAlert('Terjadi kesalahan.'); } finally { btn.disabled = false; loader.style.display = 'none'; }
     }
 
     function eksekusiBeli() {
@@ -631,7 +603,7 @@ header {
         document.getElementById('input-nomor-tujuan').addEventListener('input', () => { detectOperator(); renderProdukDinamis(currentActiveType); });
         document.getElementById('meter_id').addEventListener('input', () => { if(document.getElementById('meter_id').value.length < 5) document.getElementById('gridPln').innerHTML = ''; });
         switchTab('paket');
-        batasiInputAngka('loginPhone', 13); batasiInputAngka('loginPin', 4); batasiInputAngka('meter_id', 20);
+        batasiInputAngka('loginPhone', 13); batasiInputAngka('loginPin', 4); batasiInputAngka('meter_id', 20); batasiInputAngka('input-nomor-tujuan', 15);
     };
 </script>
 </body>
