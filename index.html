@@ -240,13 +240,13 @@ header {
     transform: translate(-50%, -50%);
     z-index: 99999;
     display: none;
-    width: 300px;
+    width: 200px;
     height: auto;
 }
 </style>
 </head>
 <body>
-<img id="globalLoader" src="https://nasuka.pro/gambar/loading.gif">
+<img id="globalLoader" src="https://nasuka.pro/gambar/loading3.gif">
 
 <div class="nav-bar-retro">
     <button class="btn-retro" onclick="handleMenuAuth('profil')">Profil</button>
@@ -297,7 +297,7 @@ header {
     <div id="panel-pln" class="card" style="display:none;">
     <div id="container-cek-id">
         <button type="button" id="btnCheck">Cek ID Pelanggan</button>
-        <img id="loadingImage" src="https://nasuka.pro/gambar/loading.gif" style="display:none;">
+        <img id="loadingImage" src="https://nasuka.pro/gambar/loading2.gif" style="display:none;">
     </div>
     <input type="text" id="order_meter_id" placeholder="ID Terverifikasi" readonly style="display:none;">
     <div id="gridPln" class="product-grid"></div>
@@ -568,8 +568,16 @@ header {
         try {
             const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(urlData) });
             const result = await response.json();
-            if(result.status === true || result.success === true) { await db.ref(`users/${localStorage.getItem('userPhone')}/riwayat/${urlData.refID}`).set({ refID: urlData.refID, product: urlData.product, dest: urlData.dest, status: 'ordered', price: urlData.price, timestamp: new Date().toISOString() }); }
-            tampilkanModal(formatApiResponse(result));
+            if(result.status === true || result.success === true) { 
+                await db.ref(`users/${localStorage.getItem('userPhone')}/riwayat/${urlData.refID}`).set({ refID: urlData.refID, product: urlData.product, dest: urlData.dest, status: 'ordered', price: urlData.price, timestamp: new Date().toISOString() }); 
+                tampilkanModal(formatApiResponse(result));
+            } else {
+                if (result.message && (result.message.toLowerCase().includes("digit") || result.message.toLowerCase().includes("validasi") || result.message.toLowerCase().includes("gagal"))) {
+                    showAlert('Nomor ID salah');
+                } else {
+                    tampilkanModal(`<div style="text-align:center; color: red;"><strong>TRANSAKSI GAGAL</strong><br>${result.message || 'Terjadi kesalahan sistem'}</div>`);
+                }
+            }
         } catch (err) { showAlert('Terjadi kesalahan.'); } finally { btn.disabled = false; loader.style.display = 'none'; }
     }
 
@@ -593,7 +601,17 @@ header {
             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'checkPLN', meter_id: m }) });
             const data = await res.json();
             loader.style.display = 'none';
-            if(data.success) { tampilkanModal(`<strong>Nama:</strong> ${data.data.name}<br><strong>Daya:</strong> ${data.data.power_formatted}`); document.getElementById('order_meter_id').value = data.data.meter_id; renderProdukDinamis('pln'); } else { tampilkanModal(`<strong>Error:</strong> ${data.message}`); }
+            if(data.success) { 
+                tampilkanModal(`<strong>Nama:</strong> ${data.data.name}<br><strong>Daya:</strong> ${data.data.power_formatted}`); 
+                document.getElementById('order_meter_id').value = data.data.meter_id; 
+                renderProdukDinamis('pln'); 
+            } else { 
+                if (data.message && (data.message.toLowerCase().includes("digit") || data.message.toLowerCase().includes("validasi") || data.message.toLowerCase().includes("gagal"))) {
+                    showAlert('Nomor ID salah');
+                } else {
+                    tampilkanModal(`<strong>Error:</strong> ${data.message || 'Cek ID Gagal'}`); 
+                }
+            }
         } catch (err) { loader.style.display = 'none'; showAlert("Gagal melakukan pengecekan."); }
     };
 
