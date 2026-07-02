@@ -300,6 +300,7 @@ header {
         <img id="loadingImage" src="https://nasuka.pro/gambar/loading2.gif" style="display:none;">
     </div>
     <input type="text" id="order_meter_id" placeholder="ID Terverifikasi" readonly style="display:none;">
+    <div id="info-pelanggan" style="margin: 10px 0; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; display:none; font-size: 13px; color: #1e293b;"></div>
     <div id="gridPln" class="product-grid"></div>
     <div id="resultPLN" class="api-response"></div>
 </div>
@@ -422,7 +423,7 @@ header {
         const inputVal = (type === 'pln') ? document.getElementById('meter_id').value : document.getElementById('input-nomor-tujuan').value;
         let gridId = 'grid' + type.charAt(0).toUpperCase() + type.slice(1);
         let grid = document.getElementById(gridId);
-        if (type !== 'ewallet' && inputVal.length < 5) {
+        if (type !== 'ewallet' && type !== 'pln' && inputVal.length < 5) {
             if (grid) grid.innerHTML = '';
             return;
         }
@@ -445,9 +446,8 @@ header {
                 if (type === 'ewallet') {
                     const nominalRaw = (item.nama || item.label).replace(/[^0-9]/g, '');
                     const nominal = parseInt(nominalRaw) || 0;
-                    const biayaLayanan = item.harga - nominal;
                     baris1Teks = `Transfer: Rp ${nominal.toLocaleString('id-ID')}`;
-                    baris2Teks = `Cost: Rp ${biayaLayanan.toLocaleString('id-ID')}`;
+                    baris2Teks = `Tujuan: ${inputVal || '-'}`;
                 } else if (type === 'pln') {
                     baris1Teks = `⚡ Produk: ${item.nama || item.label}`;
                     baris2Teks = `ID Pelanggan : ${inputVal}`;
@@ -595,14 +595,17 @@ header {
     document.getElementById('btnCheck').onclick = async () => {
         const m = document.getElementById('meter_id').value;
         const loader = document.getElementById('loadingImage');
+        const infoDiv = document.getElementById('info-pelanggan');
         if (!m) return showAlert("Masukkan ID!");
         loader.style.display = 'block';
+        infoDiv.style.display = 'none';
         try {
             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'checkPLN', meter_id: m }) });
             const data = await res.json();
             loader.style.display = 'none';
             if(data.success) { 
-                tampilkanModal(`<strong>Nama:</strong> ${data.data.name}<br><strong>Daya:</strong> ${data.data.power_formatted}`); 
+                infoDiv.innerHTML = `<strong>Nama:</strong> ${data.data.name}<br><strong>Daya:</strong> ${data.data.power_formatted}`;
+                infoDiv.style.display = 'block';
                 document.getElementById('order_meter_id').value = data.data.meter_id; 
                 renderProdukDinamis('pln'); 
             } else { 
@@ -619,7 +622,12 @@ header {
         const savedPh = localStorage.getItem('userPhone');
         if (savedPh) initUserSession(savedPh);
         document.getElementById('input-nomor-tujuan').addEventListener('input', () => { detectOperator(); renderProdukDinamis(currentActiveType); });
-        document.getElementById('meter_id').addEventListener('input', () => { if(document.getElementById('meter_id').value.length < 5) document.getElementById('gridPln').innerHTML = ''; });
+        document.getElementById('meter_id').addEventListener('input', () => { 
+            if(document.getElementById('meter_id').value.length < 5) {
+                document.getElementById('gridPln').innerHTML = '';
+                document.getElementById('info-pelanggan').style.display = 'none';
+            }
+        });
         switchTab('paket');
         batasiInputAngka('loginPhone', 13); batasiInputAngka('loginPin', 4); batasiInputAngka('meter_id', 20); batasiInputAngka('input-nomor-tujuan', 15);
     };
