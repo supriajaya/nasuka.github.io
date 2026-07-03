@@ -216,6 +216,25 @@ header {
     width: 200px;
     height: auto;
 }
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+.product-price { 
+    background: #10b981; 
+    color: white; 
+    padding: 2px 6px; 
+    border-radius: 4px; 
+    font-size: 11px; 
+    font-weight: bold; 
+    align-self: flex-start;
+    animation: blink 1.5s infinite;
+}
+
+
 </style>
 </head>
 <body>
@@ -411,7 +430,7 @@ header {
         });
     }
 
-    function switchTab(type) {
+        function switchTab(type) {
         currentActiveType = type;
         resetSelectedProduct();
         const panels = ['panel-pln', 'panel-pulsa', 'panel-paket', 'panel-ewallet'];
@@ -421,8 +440,15 @@ header {
         const inputTop = document.getElementById('input-top-container');
         const inputPln = document.getElementById('input-pln-container');
         if (type === 'pln') { inputTop.style.display = 'none'; inputPln.style.display = 'block'; } else { inputTop.style.display = 'block'; inputPln.style.display = 'none'; }
-        renderProdukDinamis(type);
+        
+        // Tambahkan logika ini untuk Ewallet
+        if (type === 'ewallet') {
+            renderProdukDinamis('ewallet', 'DANA');
+        } else {
+            renderProdukDinamis(type);
+        }
     }
+
     
     function pilihKategori(kategori) {
         const semuaKategori = document.querySelectorAll('.card-kategori');
