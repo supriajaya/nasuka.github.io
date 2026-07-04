@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Aplikasi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+   body { margin: 0; padding: 9px 9px 90px 9px; display: flex; flex-direction: column; align-items: center; font-family: 'Inter', -apple-system, sans-serif; background-image: url('https://nasuka.pro/gambar/ga.jpg'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat; min-height: 100vh; font-size: 80%; font-weight: bold; }
+   .nav-bar-retro { display: flex; justify-content: space-between; width: 100%; max-width: 400px; margin-bottom: 9px; gap: 4px; }
+   .btn-retro { background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; padding: 6px 2px; font-size: 11px; font-weight: bold; cursor: pointer; flex: 1; text-align: center; }
+   .btn-retro:active { border-color: #808080 #ffffff #ffffff #808080; }
+   .card { background: rgba(255, 255, 255, 0.9); border: 2px solid #808080; padding: 10px; width: 100%; max-width: 400px; margin-top: 10px; display: none; position: relative; padding-bottom: 60px; }
+   .image-container { display: flex; gap: 5px; margin-bottom: 10px; }
+   .image-container img { width: calc(33.33% - 4px); height: auto; }
+   .action-btn { position: absolute; bottom: 10px; left: 10px; right: 10px; display: flex; align-items: center; justify-content: center; padding: 10px; background: #000; color: #fff; text-decoration: none; cursor: pointer; border: none; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="nav-bar-retro"> 
+    <button class="btn-retro" onclick="showContent('indoor')">Versi Konter Tunggal</button>     
+    <button class="btn-retro" onclick="showContent('developer')">Versi White Label</button>           
+</div>
+
+<div id="indoor" class="card">
+    <div class="image-container">
+        <img src="https://nasuka.pro/gambar/alldata.jpg" alt="I1">
+        <img src="https://nasuka.pro/gambar/alldata.jpg" alt="I2">
+        <img src="https://nasuka.pro/gambar/alldata.jpg" alt="I3">
+    </div>
+    <p>Aplikasi Versi Pengusaha Perorangan</p>
+    <a href="https://nasuka.pro" class="action-btn">Download APK</a>
+</div>
+
+<div id="developer" class="card">
+    <div class="image-container">
+        <img src="https://nasuka.pro/gambar/alldata.jpg" alt="D1">
+        <img src="https://nasuka.pro/gambar/alldata.jpg" alt="D2">
+        <img src="https://nasuka.pro/gambar/alldata.jpg" alt="D3">
+    </div>
+    <p>Aplikasi Versi Pengusaha Corporation </p>
+    <a href="https://wa.me/62859109819017" class="action-btn">Hubungi Developer</a>
+</div>
+
+<script>
+    function showContent(id) {
+        document.querySelectorAll('.card').forEach(div => div.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
