@@ -71,6 +71,19 @@
    
     
      .product-details { padding: 10px 12px; font-size: 12px; color: #475569; background: #f8fafc; } .detail-row { display: flex; align-items: center; margin-bottom: 4px; } .product-item.selected { border: 2px solid #10b981 !important; position: relative; } .product-item.selected::after { content: "✅"; position: absolute; top: 5px; right: 5px; font-size: 16px; z-index: 10; } .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 10000; } .modal-content { background: #ffffff; padding: 24px; border: none; border-radius: 16px; width: 90%; max-width: 350px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); font-family: 'Inter', sans-serif; font-size: 14px; box-sizing: border-box; } .modal-header { font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #1e293b; } .modal-data-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; } .modal-close-btn { background: #1e293b; border: none; color: white; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 20px; transition: background 0.2s; } .modal-close-btn:hover { background: #334155; } .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; box-sizing: border-box; padding: 9px; } .login-brand { color: #1877f2; font-size: 1.5rem; font-weight: bold; margin-bottom: 12px; letter-spacing: -0.45px; } .login-box { background: #ffffff; padding: 20px; border-radius: 8px; width: 100%; max-width: 300px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); box-sizing: border-box; text-align: center; } .login-box h3 { margin-top: 0; font-size: 1.1rem; color: #1c1e21; margin-bottom: 15px; font-weight: 600; } .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dddfe2; border-radius: 6px; font-size: 1rem; box-sizing: border-box; outline: none; background: #f5f6f7; } .login-input:focus { border-color: #1877f2; background: #fff; box-shadow: 0 0 0 1px #e7f3ff; } .login-btn { width: 100%; padding: 12px; background-color: #1877f2; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; } .login-btn:hover { background-color: #166fe5; } .login-btn:disabled { background-color: #8cb4f5; cursor: not-allowed; } .login-close { margin-top: 10px; background: none; border: none; color: #65676b; font-size: 0.9rem; cursor: pointer; text-decoration: underline; width: auto !important; height: auto !important; padding: 5px !important; }  #loadingImage { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 250px; z-index: 10; pointer-events: none; } #globalLoader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99999; display: none; } .nav-bar-retro { display: flex; justify-content: space-between; width: 100%; margin-bottom: 9px; gap: 4px; } .btn-retro { background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; padding: 6px 2px; font-size: 11px; font-weight: bold; cursor: pointer; flex: 1; text-align: center; } .btn-retro:active { border-color: #808080 #ffffff #ffffff #808080; } #globalLoader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99999; display: none; width: 200px; height: auto; }
+.toggle-harga-btn {
+    background: #e2e8f0;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+.hidden-details {
+    display: none;
+}
 
 </style>
 </head>
@@ -78,12 +91,9 @@
 <img id="globalLoader" src="https://nasuka.pro/gambar/loading3.gif">
 
 <div class="nav-bar-retro">
-  
     <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/web.html'">Versi Web</button>     
-      <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/aplikasi.html'">Versi Aplikasi</button>   
+    <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/aplikasi.html'">Versi Aplikasi</button>   
     <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/info.html'">Informasi</button>   
-     
-    
 </div>
 
 <input checked id="item1" name="multiples" type="radio">
@@ -107,8 +117,6 @@ Daftar Harga
     <input type="text" id="meter_id" placeholder="Masukkan ID meteran" inputmode="numeric" pattern="[0-9]*">
 </div>
 
-
-
 <div class="controls-wrapper">
     <div class="control-row">
     <label class="card-kategori" for="item1" onclick="pilihKategori('Paket Data')"><span>Paket Data</span></label>
@@ -117,8 +125,6 @@ Daftar Harga
     <label class="card-kategori" for="item4" onclick="pilihKategori('Token Listrik')"><span>PLN</span></label>
 </div>
 </div>
-
-
 
 <div class="controls-wrapper">
     <div class="control-row">
@@ -139,62 +145,33 @@ Daftar Harga
 </div>
 
 <div class="panel-container">
-    <div id="panel-pulsa" class="card" style="display:none;">
-        <div id="gridPulsa" class="product-grid"></div>
-        <div id="resultPulsa" class="api-response"></div>
-    </div>  
-    <div id="panel-paket" class="card" style="display:none;">
-        <div id="gridPaket" class="product-grid"></div>
-        <div id="resultPaket" class="api-response"></div>
-    </div>
+    <div id="panel-pulsa" class="card" style="display:none;"><div id="gridPulsa" class="product-grid"></div><div id="resultPulsa" class="api-response"></div></div>  
+    <div id="panel-paket" class="card" style="display:none;"><div id="gridPaket" class="product-grid"></div><div id="resultPaket" class="api-response"></div></div>
     <div id="panel-pln" class="card" style="display:none;">
-    <div id="container-cek-id">
-        <button type="button" id="btnCheck">NTX</button>
-      
-    </div>
+    <div id="container-cek-id"><button type="button" id="btnCheck">NTX</button></div>
     <input type="text" id="order_meter_id" placeholder="ID Terverifikasi" readonly style="display:none;">
     <div id="info-pelanggan" style="margin: 10px 0; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; display:none; font-size: 13px; color: #1e293b;"></div>
-    <div id="gridPln" class="product-grid"></div>
-    <div id="resultPLN" class="api-response"></div>
+    <div id="gridPln" class="product-grid"></div><div id="resultPLN" class="api-response"></div></div>
+    <div id="panel-dana" class="card" style="display:none;"><div id="gridDana" class="product-grid"></div><div id="resultDana" class="api-response"></div></div>
+    <div id="panel-ovo" class="card" style="display:none;"><div id="gridOvo" class="product-grid"></div><div id="resultOvo" class="api-response"></div></div>
+    <div id="panel-gopay" class="card" style="display:none;"><div id="gridGopay" class="product-grid"></div><div id="resultGopay" class="api-response"></div></div>
+    <div id="panel-shopeepay" class="card" style="display:none;"><div id="gridShopeepay" class="product-grid"></div><div id="resultShopeepay" class="api-response"></div></div>
+    <div id="panel-isaku" class="card" style="display:none;"><div id="gridIsaku" class="product-grid"></div><div id="resultIsaku" class="api-response"></div></div>
+    <div id="panel-doku" class="card" style="display:none;"><div id="gridDoku" class="product-grid"></div><div id="resultDoku" class="api-response"></div></div>
+    <div id="panel-linkaja" class="card" style="display:none;"><div id="gridLinkaja" class="product-grid"></div><div id="resultLinkaja" class="api-response"></div></div>
+    <div id="panel-kaspro" class="card" style="display:none;"><div id="gridKaspro" class="product-grid"></div><div id="resultKaspro" class="api-response"></div></div>
+    <div id="panel-masaaktif" class="card" style="display:none;"><div id="gridMasaaktif" class="product-grid"></div><div id="resultMasaaktif" class="api-response"></div></div>
+    <div id="footer-order"></div>
 </div>
-    <div id="panel-dana" class="card" style="display:none;">
-        <div id="gridDana" class="product-grid"></div>
-        <div id="resultDana" class="api-response"></div>
-    </div>
-    <div id="panel-ovo" class="card" style="display:none;">
-        <div id="gridOvo" class="product-grid"></div>
-        <div id="resultOvo" class="api-response"></div>
-    </div>
-    <div id="panel-gopay" class="card" style="display:none;">
-        <div id="gridGopay" class="product-grid"></div>
-        <div id="resultGopay" class="api-response"></div>
-    </div>
-    <div id="panel-shopeepay" class="card" style="display:none;">
-        <div id="gridShopeepay" class="product-grid"></div>
-        <div id="resultShopeepay" class="api-response"></div>
-    </div>
-    <div id="panel-isaku" class="card" style="display:none;">
-        <div id="gridIsaku" class="product-grid"></div>
-        <div id="resultIsaku" class="api-response"></div>
-    </div>
-    <div id="panel-doku" class="card" style="display:none;">
-        <div id="gridDoku" class="product-grid"></div>
-        <div id="resultDoku" class="api-response"></div>
-    </div>
-    <div id="panel-linkaja" class="card" style="display:none;">
-        <div id="gridLinkaja" class="product-grid"></div>
-        <div id="resultLinkaja" class="api-response"></div>
-    </div>
-    <div id="panel-kaspro" class="card" style="display:none;">
-        <div id="gridKaspro" class="product-grid"></div>
-        <div id="resultKaspro" class="api-response"></div>
-    </div>
-    <div id="panel-masaaktif" class="card" style="display:none;">
-        <div id="gridMasaaktif" class="product-grid"></div>
-        <div id="resultMasaaktif" class="api-response"></div>
-    </div>
-    <div id="footer-order">
-      
+
+<div id="priceModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">Edit Harga Jual</div>
+        <input type="number" id="inputNewPrice" class="login-input" placeholder="Masukkan harga">
+        <div style="display: flex; gap: 10px;">
+            <button class="modal-close-btn" onclick="tutupPriceModal()">Batal</button>
+            <button class="modal-close-btn" id="btnSavePrice" style="background: #10b981; margin-top:0;">Simpan</button>
+        </div>
     </div>
 </div>
 
@@ -233,22 +210,35 @@ Daftar Harga
     let selectedProductHarga = 0;
     let selectedProductQty = 0;
     let selectedProductName = "";
+    
+    let currentTargetVal = "";
+    let currentTargetModalAsli = 0;
 
     function showAlert(msg) { document.getElementById('alertMessage').innerText = msg; document.getElementById('customAlert').style.display = 'flex'; }
     function tutupCustomAlert() { document.getElementById('customAlert').style.display = 'none'; }
     function resetSelectedProduct() { selectedProductValue = ""; selectedProductHarga = 0; selectedProductQty = 0; selectedProductName = ""; document.querySelectorAll('.product-item').forEach(el => el.classList.remove('selected')); }
     function batasiInputAngka(elementId, maxLength) { const inputEl = document.getElementById(elementId); if(inputEl) { inputEl.addEventListener('input', function() { this.value = this.value.replace(/[^0-9]/g, ''); if (this.value.length > maxLength) this.value = this.value.slice(0, maxLength); }); } }
 
-    function handleMenuAuth(type) {
-        if (!localStorage.getItem('userPhone')) {
-            showLogin();
-        } else {
-            if (type === 'profil') {
-                window.location.href = 'https://nasuka.pro/profil.html';
-            } else if (type === 'riwayat') {
-                window.location.href = 'https://nasuka.pro/riwayat.html';
-            }
-        }
+    function bukaPriceModal(val, hargaAsli, currentJual) {
+        currentTargetVal = val;
+        currentTargetModalAsli = hargaAsli;
+        document.getElementById('inputNewPrice').value = currentJual;
+        document.getElementById('priceModal').style.display = 'flex';
+    }
+
+    function tutupPriceModal() { document.getElementById('priceModal').style.display = 'none'; }
+
+    document.getElementById('btnSavePrice').onclick = function() {
+        const newPrice = parseInt(document.getElementById('inputNewPrice').value) || 0;
+        updateMarkupProduk(currentTargetVal, newPrice - currentTargetModalAsli);
+        tutupPriceModal();
+    };
+
+    async function updateMarkupProduk(productVal, newMarkup) {
+        const phone = localStorage.getItem('userPhone');
+        if (!phone) return;
+        await db.ref(`users/${phone}/markup_custom/${productVal}`).set(parseInt(newMarkup) || 0);
+        renderProdukDinamis(currentActiveType);
     }
 
     function formatStrukStatus(data) {
@@ -298,14 +288,32 @@ Daftar Harga
         });
     }
     
-    
-        
-            function renderProdukDinamis(type) {
+    function toggleDetail(event, id) {
+        event.stopPropagation();
+        const el = document.getElementById(id);
+        const btn = event.target;
+        if (el.style.display === 'block') {
+            el.style.display = 'none';
+            btn.innerText = 'Detail';
+        } else {
+            el.style.display = 'block';
+            btn.innerText = 'Tutup';
+        }
+    }
+
+      async function renderProdukDinamis(type) {
+        const phone = localStorage.getItem('userPhone');
+        let customMarkups = {};
+        if (phone) {
+            const snap = await db.ref(`users/${phone}/markup_custom`).once('value');
+            customMarkups = snap.val() || {};
+        }
+
         const inputVal = (type === 'pln') ? document.getElementById('meter_id').value : document.getElementById('input-nomor-tujuan').value;
         let gridId = 'grid' + type.charAt(0).toUpperCase() + type.slice(1);
         let grid = document.getElementById(gridId);
         
-        let path = `produk/${type}`;
+        let path = `produkwhitelabel/${type}`;
         db.ref(path).once('value', snapshot => {
             if (!grid) return;
             let items = [];
@@ -322,7 +330,18 @@ Daftar Harga
                 const div = document.createElement('div');
                 div.className = 'product-item';
                 if (item.op) div.setAttribute('data-op', item.op);
-                div.onclick = function() { pilihProdukGlow(this, item.val, item.harga, item.qty || 0, item.nama || item.label); };
+                
+                const hargaAsli = parseInt(item.harga);
+                const markup = customMarkups[item.val] || 0;
+                const hargaJual = parseInt(item.harga_jual || item.harga) + markup;
+                
+                const labelMarkup = markup >= 0 ? "Keuntungan" : "Kerugian";
+                const warnaMarkup = markup >= 0 ? "#059669" : "#dc2626";
+                const detailId = 'detail-' + Math.random().toString(36).substr(2, 9);
+                
+                div.onclick = function() { 
+                    pilihProdukGlow(this, item.val, hargaAsli, item.qty || 0, item.nama || item.label); 
+                };
                 
                 let baris1Teks = "-";
                 let baris2Teks = "-";
@@ -364,7 +383,17 @@ Daftar Harga
                 div.innerHTML = `
                     <div class="product-header">
                         <div class="product-name">${item.nama || item.label}</div>
-                        <div class="product-price">Rp ${item.harga.toLocaleString('id-ID')}</div>
+                        <div class="harga-wrapper" style="display: flex; flex-direction: column; align-items: flex-start;">
+                            <span class="product-price" style="cursor:pointer; border: 1px dashed #fff;" onclick="event.stopPropagation(); bukaPriceModal('${item.val}', ${hargaAsli}, ${hargaJual});">
+                                Rp ${hargaJual.toLocaleString('id-ID')} ⚙️
+                            </span>
+                            <button class="toggle-harga-btn" onclick="toggleDetail(event, '${detailId}')">Detail</button>
+                            <div id="${detailId}" class="hidden-details" style="display:none; margin-top:5px;">
+                                <span style="font-size: 11px; color: #666; display:block;">Harga Modal: Rp ${hargaAsli.toLocaleString('id-ID')}</span>
+                                <span style="font-size: 11px; color: ${warnaMarkup}; font-weight: bold; display:block;">${labelMarkup}: Rp ${Math.abs(markup).toLocaleString('id-ID')}</span>
+                                <span style="font-size: 9px; color: #475569; display:block; margin-top:4px; font-style: italic;">Saldo yang terpotong adalah saldo senilai harga modal, ${labelMarkup.toLowerCase()} adalah uang yang anda hasilkan dari penjualan ke customers</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="product-details">
                         <div class="detail-row">${baris1Teks}</div>
@@ -377,9 +406,10 @@ Daftar Harga
             detectOperator();
         });
     }
-
-        
-        
+  
+    
+    
+    
     function switchTab(type) {
         currentActiveType = type;
         resetSelectedProduct();
@@ -398,11 +428,8 @@ Daftar Harga
         footerOrder.style.display = 'block';
         if (type === 'pln') { inputTop.style.display = 'none'; inputPln.style.display = 'block'; } else { inputTop.style.display = 'block'; inputPln.style.display = 'none'; }
         
-        // Perubahan: Panggil render langsung jika PLN agar produk muncul tanpa menunggu aksi
         renderProdukDinamis(type);
     }
-
-    
     
     function pilihKategori(kategori) {
         const semuaKategori = document.querySelectorAll('.card-kategori');
@@ -450,7 +477,7 @@ Daftar Harga
 
     function initUserSession(ph) {
         if (ph) {
-            db.ref('users/' + ph + '/saldo').on('value', snap => { userSaldo = snap.val() || 0; document.getElementById('display-saldo').innerText = "Rp " + userSaldo.toLocaleString('id-ID'); });
+            db.ref('users/' + ph + '/saldo').on('value', snap => { userSaldo = snap.val() || 0; });
             initGlobalStatusListener();
         }
     }
@@ -462,9 +489,7 @@ Daftar Harga
     }
 
     async function postOrder(urlData) {
-        const btn = document.getElementById('btn-beli-dinamis'); 
         const loader = document.getElementById('globalLoader');
-        btn.disabled = true; 
         loader.style.display = 'block';
         try {
             const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(urlData) });
@@ -473,24 +498,9 @@ Daftar Harga
                 await db.ref(`users/${localStorage.getItem('userPhone')}/riwayat/${urlData.refID}`).set({ refID: urlData.refID, product: urlData.product, dest: urlData.dest, status: 'ordered', price: urlData.price, timestamp: new Date().toISOString() }); 
                 tampilkanModal(formatApiResponse(result));
             } else {
-                if (result.message && (result.message.toLowerCase().includes("digit") || result.message.toLowerCase().includes("validasi") || result.message.toLowerCase().includes("gagal"))) {
-                    showAlert('Nomor ID salah');
-                } else {
-                    tampilkanModal(`<div style="text-align:center; color: red;"><strong>TRANSAKSI GAGAL</strong><br>${result.message || 'Terjadi kesalahan sistem'}</div>`);
-                }
+                tampilkanModal(`<div style="text-align:center; color: red;"><strong>TRANSAKSI GAGAL</strong><br>${result.message || 'Terjadi kesalahan sistem'}</div>`);
             }
-        } catch (err) { showAlert('Terjadi kesalahan.'); } finally { btn.disabled = false; loader.style.display = 'none'; }
-    }
-
-    function eksekusiBeli() {
-        const ph = localStorage.getItem('userPhone'); if (!ph) return showLogin();
-        const dest = (currentActiveType === 'pln') ? document.getElementById('order_meter_id').value : document.getElementById('input-nomor-tujuan').value;
-        if(!dest || !selectedProductValue) return showAlert("Prosedur Belum Lengkap!");
-        if (userSaldo < selectedProductHarga) return showAlert("Saldo Tidak Mencukupi!");
-        const finalProductCode = selectedProductValue.toString().trim();
-        const refID = currentActiveType.toUpperCase() + Date.now();
-        const common = { refID: refID, userPhone: ph, price: selectedProductHarga, product: selectedProductName, dest: dest };
-        postOrder({ ...common, action: 'order' + currentActiveType.charAt(0).toUpperCase() + currentActiveType.slice(1), product: finalProductCode });
+        } catch (err) { showAlert('Terjadi kesalahan.'); } finally { loader.style.display = 'none'; }
     }
 
     document.getElementById('btnCheck').onclick = async () => {
@@ -510,46 +520,39 @@ Daftar Harga
                 document.getElementById('order_meter_id').value = data.data.meter_id; 
                 renderProdukDinamis('pln'); 
             } else { 
-                if (data.message && (data.message.toLowerCase().includes("digit") || data.message.toLowerCase().includes("validasi") || data.message.toLowerCase().includes("gagal"))) {
-                    showAlert('Nomor ID salah');
-                } else {
-                    tampilkanModal(`<strong>Error:</strong> ${data.message || 'Cek ID Gagal'}`); 
-                }
+                tampilkanModal(`<strong>Error:</strong> ${data.message || 'Cek ID Gagal'}`); 
             }
         } catch (err) { loader.style.display = 'none'; showAlert("Gagal melakukan pengecekan."); }
     };
     
     window.onload = () => {
-    const savedPh = localStorage.getItem('userPhone');
-    if (savedPh) initUserSession(savedPh);
+        const savedPh = localStorage.getItem('userPhone');
+        if (savedPh) initUserSession(savedPh);
 
-    document.getElementById('input-nomor-tujuan').addEventListener('input', () => { 
-        detectOperator(); 
-        renderProdukDinamis(currentActiveType); 
-    });
+        document.getElementById('input-nomor-tujuan').addEventListener('input', () => { 
+            detectOperator(); 
+            renderProdukDinamis(currentActiveType); 
+        });
 
-    document.getElementById('meter_id').addEventListener('input', function() { 
-        if(this.value.length < 5) {
-            document.getElementById('gridPln').innerHTML = '';
-            document.getElementById('info-pelanggan').style.display = 'none';
-        } else if(this.value.length >= 11) {
-            document.getElementById('btnCheck').click();
-        }
-    });
+        document.getElementById('meter_id').addEventListener('input', function() { 
+            if(this.value.length < 5) {
+                document.getElementById('gridPln').innerHTML = '';
+                document.getElementById('info-pelanggan').style.display = 'none';
+            } else if(this.value.length >= 11) {
+                document.getElementById('btnCheck').click();
+            }
+        });
 
-    switchTab('pln');
+        switchTab('pln');
+        const kategoriPln = document.querySelector('label[onclick="pilihKategori(\'Token Listrik\')"]');
+        if(kategoriPln) kategoriPln.classList.add('active-kategori');
+        document.getElementById('item4').checked = true;
 
-    const kategoriPln = document.querySelector('label[onclick="pilihKategori(\'Token Listrik\')"]');
-    if(kategoriPln) kategoriPln.classList.add('active-kategori');
-    document.getElementById('item4').checked = true;
-
-    batasiInputAngka('loginPhone', 13); 
-    batasiInputAngka('loginPin', 4); 
-    batasiInputAngka('meter_id', 20); 
-    batasiInputAngka('input-nomor-tujuan', 15);
-};
-
-    
+        batasiInputAngka('loginPhone', 13); 
+        batasiInputAngka('loginPin', 4); 
+        batasiInputAngka('meter_id', 20); 
+        batasiInputAngka('input-nomor-tujuan', 15);
+    };
 </script>
 </body>
 </html>
