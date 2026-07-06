@@ -63,8 +63,8 @@
 
 <div class="nav-bar-retro">
     <button class="btn-retro" onclick="handleMenuAuth('riwayat')">Riwayat</button>
-    <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/info.html'">Info</button>   
-    <button class="btn-retro" onclick="window.location.href=''">Reload</button>   
+    <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/informasi.html'">Info</button>   
+    <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/topup.html'">Deposit</button>   
     <button class="btn-retro" id="btn-saldo"><span id="display-saldo">Rp --</span></button>
 </div>
 
@@ -92,10 +92,15 @@
 
 <div class="controls-wrapper">
     <div class="control-row">
-    <label class="card-kategori" for="item1" onclick="pilihKategori('Paket Data')"><img src="https://nasuka.pro/gambar/data1.jpg"></label>
+        <label class="card-kategori" for="item1" onclick="pilihKategori('Token Listrik')"><img src="https://nasuka.pro/gambar/pln.jpg"></label>
+    
+        
+    <label class="card-kategori" for="item4" onclick="pilihKategori('Paket Data')"><img src="https://nasuka.pro/gambar/data1.jpg"></label>
     <label class="card-kategori" for="item2" onclick="pilihKategori('Pulsa')"><img src="https://nasuka.pro/gambar/pulsa.jpg"></label>       
     <label class="card-kategori" for="item3" onclick="pilihKategori('Masa Aktif')"><img src="https://nasuka.pro/gambar/kalender.jpg"></label>       
-    <label class="card-kategori" for="item4" onclick="pilihKategori('Token Listrik')"><img src="https://nasuka.pro/gambar/pln.jpg"></label>
+   
+    
+    
 </div>
 </div>
 
@@ -471,7 +476,7 @@ const inputVal = (type === 'pln') ? (document.getElementById('meter_id').value |
         const mapping = { 'Pulsa': 'pulsa', 'Paket Data': 'paket', 'Dana': 'dana', 'Ovo': 'ovo', 'Gopay': 'gopay', 'Shopeepay': 'shopeepay', 'Isaku': 'isaku', 'Doku': 'doku', 'Linkaja': 'linkaja', 'Kaspro': 'kaspro', 'Token Listrik': 'pln', 'Masa Aktif': 'masaaktif' };
         if(!mapping[kategori]) return;
         switchTab(mapping[kategori]);
-        const radioMap = { 'Paket Data': 'item1', 'Pulsa': 'item2', 'Token Listrik': 'item4',  'Dana': 'item12', 'Ovo': 'item5', 'Gopay': 'item6', 'Shopeepay': 'item7', 'Isaku': 'item8', 'Doku': 'item9', 'Linkaja': 'item10', 'Kaspro': 'item11', 'Masa Aktif': 'item3' };
+        const radioMap = { 'Paket Data': 'item4', 'Pulsa': 'item2', 'Token Listrik': 'item1',  'Dana': 'item12', 'Ovo': 'item5', 'Gopay': 'item6', 'Shopeepay': 'item7', 'Isaku': 'item8', 'Doku': 'item9', 'Linkaja': 'item10', 'Kaspro': 'item11', 'Masa Aktif': 'item3' };
         if(radioMap[kategori]) document.getElementById(radioMap[kategori]).checked = true;
     }
 
@@ -579,7 +584,8 @@ const inputVal = (type === 'pln') ? (document.getElementById('meter_id').value |
         } catch (err) { loader.style.display = 'none'; showAlert("Gagal melakukan pengecekan."); }
     };
 
-    window.onload = () => {
+    
+        window.onload = () => {
         const savedPh = localStorage.getItem('userPhone');
         if (savedPh) initUserSession(savedPh);
         document.getElementById('input-nomor-tujuan').addEventListener('input', () => { detectOperator(); renderProdukDinamis(currentActiveType); });
@@ -589,9 +595,15 @@ const inputVal = (type === 'pln') ? (document.getElementById('meter_id').value |
                 document.getElementById('info-pelanggan').style.display = 'none';
             }
         });
-        switchTab('paket');
+    
+        switchTab('pln');
         batasiInputAngka('loginPhone', 13); batasiInputAngka('loginPin', 4); batasiInputAngka('meter_id', 20); batasiInputAngka('input-nomor-tujuan', 15);
     };
+
+    
+    
+    
+    
 </script>
 </body>
 </html>
