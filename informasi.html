@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>informasi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; margin: 0; background-color: #f8fafc; color: #1e293b; }
+    .card { background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid #e2e8f0; }
+    input { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: #fff; transition: border 0.2s; }
+    input:focus { outline: none; border-color: #3b82f6; ring: 2px solid #bfdbfe; }
+    
+    button { 
+        width: 100%; padding: 14px; background-color: #0f172a; color: #fff; 
+        border: none; border-radius: 12px; font-size: 16px; font-weight: 600; 
+        cursor: pointer; transition: all 0.2s ease;
+    }
+    button:hover { background-color: #1e293b; transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    
+    .controls-wrapper { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+    .card-kategori { 
+        flex: 1; padding: 12px 5px; background: #fff; border: 1px solid #e2e8f0;
+        text-align: center; cursor: pointer; border-radius: 12px;
+        font-size: 11px; font-weight: 600; transition: all 0.2s;
+    }
+    .card-kategori:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    
+    .menu-panel { display: none; }
+    .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; padding: 20px; box-sizing: border-box; }
+    .login-box { background: #ffffff; padding: 24px; border-radius: 20px; width: 100%; max-width: 320px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+    .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem; box-sizing: border-box; }
+    .login-btn { width: 100%; padding: 12px; background-color: #0f172a; color: #fff; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; border-radius: 10px; }
+    .login-close { margin-top: 15px; background: none; border: none; font-size: 0.9rem; cursor: pointer; color: #64748b; }
+    
+    .item-row { border-bottom: 1px solid #f1f5f9; padding: 12px 0; display: flex; flex-direction: column; }
+    .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .item-name { font-weight: 600; font-size: 14px; color: #334155; }
+    .item-price { font-weight: 700; color: #0f172a; font-size: 14px; }
+    
+    .wl-image { width: 100%; border-radius: 12px; margin: 15px 0; }
+    .wl-text { font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 15px; }
+</style>
+</head>
+<body>
+
+<div class="controls-wrapper">
+    <div class="card-kategori" onclick="pilihKategori('akun')">Akun</div>
+    <div class="card-kategori" onclick="pilihKategori('daftar-harga')">Daftar Harga</div>
+    <div class="card-kategori" onclick="pilihKategori('profit')">Profit</div>
+</div>
+
+<div class="controls-wrapper">
+    <div class="card-kategori" onclick="pilihKategori('faq')">Faq</div>
+    <div class="card-kategori" onclick="pilihKategori('privacy')">Privacy</div>
+    <div class="card-kategori" onclick="pilihKategori('refund')">Refund</div>
+</div>
+
+<div class="controls-wrapper">
+    <div class="card-kategori" onclick="pilihKategori('white-label')">White Label</div>
+    <div class="card-kategori" onclick="pilihKategori('term')">Term&Cond</div>
+    <div class="card-kategori" onclick="pilihKategori('tentang')">Tentang</div>
+</div>
+
+<div class="panel-container">
+    <div id="panel-akun" class="menu-panel card">
+        <h3>Informasi Akun</h3>
+        <p><strong>No. HP :</strong> <span id="user-phone-display">-</span></p>
+        <p><strong>Saldo :</strong> <span id="display-saldo" style="font-weight: bold;">Rp 0</span></p>
+    </div>
+    <div id="panel-daftar-harga" class="menu-panel card">
+        <h3>Daftar Harga</h3>
+        <input type="text" id="searchHarga" placeholder="Cari produk (contoh: dana, kuota, pln)..." onkeyup="filterHarga()">
+        <div id="list-harga">Memuat data...</div>
+    </div>
+    <div id="panel-profit" class="menu-panel card">
+        <h3>Potensi Profit</h3>
+        <p>Maksimalkan keuntungan penjualan.</p>
+    </div>
+    <div id="panel-faq" class="menu-panel card">
+        <h3>Pertanyaan Umum (FAQ)</h3>
+        <p>Transaksi diproses secara real-time otomatis.</p>
+    </div>
+    <div id="panel-privacy" class="menu-panel card">
+        <h3>Privacy Policy</h3>
+        <p>Data terjaga kerahasiaannya.</p>
+    </div>
+    <div id="panel-refund" class="menu-panel card">
+        <h3>Kebijakan Refund</h3>
+        <p>Dana dikembalikan jika transaksi gagal sistem.</p>
+    </div>
+    <div id="panel-white-label" class="menu-panel card">
+        <h3>Aplikasi White Label</h3>
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=400" alt="White Label Dashboard" class="wl-image">
+        <p class="wl-text">Miliki sistem PPOB profesional dengan brand Anda sendiri. Kami menyediakan infrastruktur siap pakai untuk bisnis transaksi digital Anda.</p>
+        <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=400" alt="Mobile App" class="wl-image">
+        <p class="wl-text">Integrasikan kemudahan transaksi ke pelanggan Anda dengan sistem yang stabil, cepat, dan terpercaya. Fokus pada pengembangan pasar, biarkan sistem kami yang bekerja.</p>
+      
+    </div>
+    <div id="panel-term" class="menu-panel card">
+        <h3>Term & Condition</h3>
+        <p>Pengguna wajib mematuhi ketentuan sistem.</p>
+    </div>
+    
+    
+    
+    
+  
+
+  <div id="panel-tentang" class="menu-panel card">
+        <h3>Tentang Kami</h3>
+        <img src="https://nasuka.pro/gambar/nasukawireless.jpg" alt="White Label Dashboard" class="wl-image">
+        <p class="wl-text"> NasukanWireless.</p>
+        <img src="https://nasuka.pro/gambar/alldata.jpg" alt="Mobile App" class="wl-image">
+        <p class="wl-text"> Indramayu</p>
+       
+    </div>
+    <div id="panel-term" class="menu-panel card">
+        <h3>Term & Condition</h3>
+        <p>Pengguna wajib mematuhi ketentuan sistem.</p>
+    </div>
+    <div id="panel-tentang" class="menu-panel card">
+        <h3>Tentang Kami</h3>
+        <p>Solusi transaksi digital efisien.</p>
+    </div>
+</div>
+
+
+
+
+
+
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+        <h3>Masuk Akun</h3>
+        <input type="text" id="loginPhone" class="login-input" placeholder="Nomor Handphone">
+        <input type="password" id="loginPin" class="login-input" placeholder="PIN (4 Digit)">
+        <button class="login-btn" onclick="prosesLogin()">Masuk</button>
+        <button class="login-close" onclick="hideLogin()">Batal</button>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let semuaProduk = [];
+
+    function pilihKategori(id) {
+        if (id === 'akun' && !localStorage.getItem('userPhone')) {
+            showLogin();
+            return;
+        }
+        document.querySelectorAll('.menu-panel').forEach(p => p.style.display = 'none');
+        document.getElementById('panel-' + id).style.display = 'block';
+    }
+
+    function showLogin() { document.getElementById('loginOverlay').style.display = 'flex'; }
+    function hideLogin() { document.getElementById('loginOverlay').style.display = 'none'; }
+
+    function prosesLogin() {
+        const phone = document.getElementById('loginPhone').value.trim();
+        const pin = document.getElementById('loginPin').value.trim();
+        if (!phone || !pin) return;
+        
+        db.ref('users/' + phone).once('value', snap => {
+            if (snap.exists() && String(snap.val().pin) === String(pin)) {
+                localStorage.setItem('userPhone', phone);
+                initUserSession(phone);
+                hideLogin();
+                pilihKategori('akun');
+            } else if (!snap.exists()) {
+                db.ref('users/' + phone).set({ pin: pin, saldo: 0 }).then(() => {
+                    localStorage.setItem('userPhone', phone);
+                    initUserSession(phone);
+                    hideLogin();
+                    pilihKategori('akun');
+                });
+            }
+        });
+    }
+
+    function initUserSession(ph) {
+        document.getElementById('user-phone-display').innerText = ph;
+        db.ref('users/' + ph + '/saldo').on('value', s => { 
+            document.getElementById('display-saldo').innerText = "Rp " + (s.val() || 0).toLocaleString('id-ID'); 
+        });
+    }
+
+    function loadHarga() {
+        db.ref('produkwhitelabel').on('value', snap => {
+            semuaProduk = [];
+            if (snap.exists()) {
+                snap.forEach(kategoriSnap => {
+                    const kategori = kategoriSnap.key;
+                    const produkData = kategoriSnap.val();
+                    for (let id in produkData) {
+                        semuaProduk.push({ kategori, id, ...produkData[id] });
+                    }
+                });
+                renderList(semuaProduk);
+            }
+        });
+    }
+
+    function renderList(data) {
+        const container = document.getElementById('list-harga');
+        container.innerHTML = '';
+        
+        const grup = data.reduce((acc, item) => {
+            if (!acc[item.kategori]) acc[item.kategori] = [];
+            acc[item.kategori].push(item);
+            return acc;
+        }, {});
+
+        for (let kategori in grup) {
+            const card = document.createElement('div');
+            card.style.marginBottom = '20px';
+            card.innerHTML = `<h4 style="margin:10px 0 5px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">${kategori.toUpperCase()}</h4>`;
+            
+            grup[kategori].sort((a, b) => Number(a.harga || 0) - Number(b.harga || 0))
+            .forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-name">${item.nama || item.id}</span>
+                        <span class="item-price">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+                card.appendChild(row);
+            });
+            container.appendChild(card);
+        }
+    }
+
+    function filterHarga() {
+        const query = document.getElementById('searchHarga').value.toLowerCase();
+        const filtered = semuaProduk.filter(item => 
+            (item.nama && item.nama.toLowerCase().includes(query)) || 
+            (item.kategori && item.kategori.toLowerCase().includes(query))
+        );
+        renderList(filtered);
+    }
+
+    window.onload = () => {
+        const ph = localStorage.getItem('userPhone');
+        if (ph) initUserSession(ph);
+        loadHarga();
+    };
+</script>
+</body>
+</html>
