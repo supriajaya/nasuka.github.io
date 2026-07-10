@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Web Bluetooth</title>
+<style>
+body{
+    font-family:Arial,sans-serif;
+    text-align:center;
+    margin-top:60px;
+}
+button{
+    padding:15px 25px;
+    font-size:18px;
+}
+#hasil{
+    margin-top:20px;
+    white-space:pre-wrap;
+}
+</style>
+</head>
+<body>
+
+<h2>Test Web Bluetooth</h2>
+
+<button id="btn">Cari Perangkat Bluetooth</button>
+
+<div id="hasil">Belum ada perangkat dipilih.</div>
+
+<script>
+document.getElementById("btn").onclick = async () => {
+    const hasil = document.getElementById("hasil");
+
+    if (!navigator.bluetooth) {
+        hasil.textContent = "Browser tidak mendukung Web Bluetooth.";
+        return;
+    }
+
+    try {
+        const device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true
+        });
+
+        hasil.textContent =
+            "Nama : " + (device.name || "(Tidak ada nama)") +
+            "\nID : " + device.id;
+
+    } catch (err) {
+        hasil.textContent = "Gagal / Dibatalkan:\n" + err.message;
+    }
+};
+</script>
+
+</body>
+</html>
