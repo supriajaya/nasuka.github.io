@@ -24,12 +24,20 @@
 <body>
 <img id="globalLoader" src="https://nasuka.pro/gambar/loading3.gif">
 
-<div class="nav-bar-retro">
-    <button class="btn-retro" onclick="handleMenuAuth('riwayat')">Riwayat</button>
-    <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/informasi.html'">Info</button>   
-    <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/topup.html'">Deposit</button>   
-    <button class="btn-retro" id="btn-saldo"><span id="display-saldo">Rp --</span></button>
+
+
+<div class="nav-bar-retro" style="flex-direction: column; align-items: flex-end;">
+    <div style="display: flex; gap: 4px; width: 100%;">
+        <button class="btn-retro" onclick="handleMenuAuth('riwayat')">Riwayat</button>
+        <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/informasi.html'">Info</button>   
+        <button class="btn-retro" onclick="window.location.href='https://nasuka.pro/topup.html'">Deposit</button>   
+        <button class="btn-retro" id="btn-saldo" onclick="toggleAuthPanel()"><span id="display-saldo">Rp --</span></button>
+    </div>
+    <button class="btn-retro" id="btn-logout" style="display: none; width: 100%; margin-top: 4px;" onclick="prosesLogout()">Keluar (Logout)</button>
 </div>
+
+
+
 
 <input checked id="item1" name="multiples" type="radio">
 <input id="item2" name="multiples" type="radio">
@@ -576,6 +584,45 @@
         switchTab('pln');
         batasiInputAngka('loginPhone', 13); batasiInputAngka('loginPin', 4); batasiInputAngka('meter_id', 20); batasiInputAngka('input-nomor-tujuan', 15);
     };
+    
+    
+    
+    
+        function toggleAuthPanel() {
+        if (!localStorage.getItem('userPhone')) {
+            showLogin();
+        } else {
+            const btnLogout = document.getElementById('btn-logout');
+            btnLogout.style.display = (btnLogout.style.display === 'none') ? 'block' : 'none';
+        }
+    }
+
+    function prosesLogout() {
+        localStorage.clear();
+        document.getElementById('display-saldo').innerText = "Rp --";
+        document.getElementById('btn-logout').style.display = 'none';
+        window.location.reload();
+    }
+
+    function initUserSession(ph) {
+        if (ph) {
+            db.ref('users/' + ph + '/saldo').on('value', snap => { 
+                userSaldo = snap.val() || 0; 
+                document.getElementById('display-saldo').innerText = "Rp " + userSaldo.toLocaleString('id-ID'); 
+            });
+            initGlobalStatusListener();
+            document.getElementById('btn-logout').style.display = 'none'; // Pastikan awal tersembunyi
+        }
+    }
+
+    function hideLogin() { 
+        document.getElementById('loginOverlay').style.display = 'none'; 
+        document.getElementById('btn-logout').style.display = 'none';
+    }
+
+    
+    
+    
 </script>
 </body>
 </html>
