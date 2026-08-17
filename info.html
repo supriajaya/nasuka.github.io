@@ -2,162 +2,244 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Nas 123</title>
+<title>informasi</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <style>
-    body { font-family: sans-serif; padding: 20px; margin: 0; background-color: #f4f7f6; }
-    .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-    button { width: 100%; padding: 14px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; margin: 0; background-color: #f8fafc; color: #1e293b; }
+  
+    
+    input { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 12px; box-sizing: border-box; background: #fff; transition: border 0.2s; }
+    input:focus { outline: none; border-color: #3b82f6; }
+    
+    button { 
+        width: 100%; padding: 14px; background-color: #0f172a; color: #fff; 
+        border: none; border-radius: 12px; font-size: 16px; font-weight: 600; 
+        cursor: pointer; transition: all 0.2s ease;
+    }
+    button:hover { background-color: #1e293b; transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
     
     .controls-wrapper { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
     .card-kategori { 
-        flex: 1; padding: 10px 5px; background: #fff; border-radius: 10px; 
-        text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        font-size: 11px; font-weight: bold; transition: 0.3s; border: 2px solid transparent;
+        flex: 1; padding: 12px 5px; background: #fff; border: 1px solid #e2e8f0;
+        text-align: center; cursor: pointer; border-radius: 12px;
+        font-size: 11px; font-weight: 600; transition: all 0.2s;
     }
-    .card-kategori:hover { border-color: #28a745; }
+    .card-kategori:hover { background: #f1f5f9; border-color: #cbd5e1; }
     
-    #info-area { padding: 15px; border-radius: 12px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border: 2px solid #28a745; }
-    .qris-img { width: 100%; margin: 15px 0; border-radius: 8px; }
-    .panduan { font-size: 14px; color: #444; line-height: 1.6; text-align: left; }
-    .sub-title { font-size: 70%; color: #666; }
     .menu-panel { display: none; }
-
-    .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; box-sizing: border-box; padding: 9px; }
-    .login-box { background: #ffffff; padding: 20px; border-radius: 8px; width: 100%; max-width: 300px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); box-sizing: border-box; text-align: center; }
-    .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #dddfe2; border-radius: 6px; font-size: 1rem; box-sizing: border-box; outline: none; background: #f5f6f7; }
-    .login-btn { width: 100%; padding: 12px; background-color: #1877f2; color: white; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
-    .login-close { margin-top: 10px; background: none; border: none; color: #65676b; font-size: 0.9rem; cursor: pointer; text-decoration: underline; }
+    .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; padding: 20px; box-sizing: border-box; }
+    .login-box { background: #ffffff; padding: 24px; border-radius: 20px; width: 100%; max-width: 320px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+    .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem; box-sizing: border-box; }
+    .login-btn { width: 100%; padding: 12px; background-color: #0f172a; color: #fff; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; border-radius: 10px; }
+    .login-close { margin-top: 15px; background: none; border: none; font-size: 0.9rem; cursor: pointer; color: #64748b; }
+    
+    .item-row { border-bottom: 1px solid #f1f5f9; padding: 12px 0; display: flex; flex-direction: column; }
+    .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .item-name { font-weight: 600; font-size: 14px; color: #334155; }
+    .item-price { font-weight: 700; color: #0f172a; font-size: 14px; }
+    
+    .wl-image { width: 100%; border-radius: 12px; margin: 15px 0; }
+    .wl-text { font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 15px; }
 </style>
 </head>
 <body>
 
-<header>
-    <div class="balance-container" style="display: none; margin-bottom: 20px;">
-        </div>
-</header>
-
 <div class="controls-wrapper">
-   
-    <div class="card-kategori" onclick="pilihKategori('produk')">Tentang Produk</div>
-    <div class="card-kategori" onclick="pilihKategori('refund')">Term & Condition</div>
-    <div class="card-kategori" onclick="pilihKategori('kebijakan-refund')">Kebijakan Refund</div>
+    <div class="card-kategori" onclick="pilihKategori('akun')">Akun</div>
+    <div class="card-kategori" onclick="pilihKategori('daftar-harga')">Daftar Harga</div>
+    <div class="card-kategori" onclick="pilihKategori('tarik-tunai')">Tarik Tunai</div>
 </div>
 
 <div class="controls-wrapper">
-    <div class="card-kategori" onclick="pilihKategori('akun')">Akun Saya</div>
+    <div class="card-kategori" onclick="pilihKategori('transfer-uang')">Transfer Uang</div>
+    <div class="card-kategori" onclick="pilihKategori('topup-digital')">Topup Digital</div>
+    <div class="card-kategori" onclick="pilihKategori('reward')">Reward</div>
+</div>
+
+<div class="controls-wrapper">
+    <div class="card-kategori" onclick="pilihKategori('riwayat')">Riwayat</div>
     <div class="card-kategori" onclick="pilihKategori('faq')">Faq</div>
-    
-    <div class="card-kategori" onclick="pilihKategori('developer')">Tentang</div>
+    <div class="card-kategori" onclick="pilihKategori('privacy')">Privacy</div>
+</div>
+
+<div class="controls-wrapper">
+    <div class="card-kategori" onclick="pilihKategori('refund')">Refund</div>
+    <div class="card-kategori" onclick="pilihKategori('kerjasama')">Kerjasama</div>
+    <div class="card-kategori" onclick="pilihKategori('tentang')">Tentang</div>
 </div>
 
 <div class="panel-container">
-    <div id="panel-produk" class="menu-panel card" style="display: block;">
-        <h3>Daftar Produk Unggulan</h3>
-        <p>Kami menyediakan layanan digital lengkap untuk kebutuhan sehari-hari termurah untuk Anda</p>
-        <ul>
-            <li><strong>Pulsa Reguler:</strong> Semua operator nasional dengan harga bersaing.</li>
-            <li><strong>Paket Data:</strong> Kuota internet stabil untuk berbagai operator.</li>
-            <li><strong>Token PLN:</strong> Tersedia nominal lengkap untuk kebutuhan listrik prabayar.</li>
-            <li><strong>E-Wallet:</strong> Top up saldo e-money (Dana, GoPay, OVO, ShopeePay) instan.</li>
-        </ul>
-        <p>Semua transaksi diproses secara otomatis 24 jam nonstop.</p>
-    </div>
-
-    <div id="panel-refund" class="menu-panel card">
-        <h3>Syarat & Ketentuan</h3>
-        <p>Dengan menggunakan layanan kami, Anda menyetujui ketentuan berikut:</p>
-        <ol>
-            <li><strong>Validitas Data:</strong> Pastikan nomor tujuan/ID pelanggan benar. Kesalahan input oleh pengguna tidak dapat kami refund.</li>
-            <li><strong>Gangguan Provider:</strong> Jika terjadi gangguan dari sisi provider, saldo akan otomatis kembali atau diproses sesuai prosedur.</li>
-            <li><strong>Status Transaksi:</strong> Transaksi dianggap sukses jika telah mendapat notifikasi "Sukses" dari sistem kami.</li>
-        </ol>
-    </div>
-
-    <div id="panel-kebijakan-refund" class="menu-panel card">
-        <h3>Kebijakan Refund</h3>
-        <p>Dana dapat dikembalikan (refund) jika:</p>
-        <ul>
-            <li>Transaksi berstatus gagal secara sistem namun saldo Anda telah terpotong.</li>
-            <li>Gangguan jaringan yang menyebabkan produk tidak terkirim dalam waktu lebih dari 1x24 jam.</li>
-        </ul>
-        <p>Refund tidak berlaku jika produk sudah berhasil dikirimkan ke nomor tujuan yang benar.</p>
-    </div>
-
     <div id="panel-akun" class="menu-panel card">
         <h3>Informasi Akun</h3>
-        <p><strong>No. HP Terdaftar :</strong> <span id="user-phone-display"></span></p>
-        <p><strong>Saldo Anda :</strong> <span id="display-saldo" style="font-weight: bold; color: #28a745;">Rp 0</span></p>
+        <p><strong>No. HP :</strong> <span id="user-phone-display">-</span></p>
+        <p><strong>Saldo :</strong> <span id="display-saldo" style="font-weight: bold;">Rp 0</span></p>
+        <p><strong>Poin :</strong> <span id="display-poin" style="font-weight: bold;">0</span></p>
     </div>
-
+    <div id="panel-daftar-harga" class="menu-panel card">
+        <h3>Daftar Harga</h3>
+        <input type="text" id="searchHarga" placeholder="Cari produk (contoh: dana, kuota, pln)..." onkeyup="filterHarga()">
+        <div id="list-harga">Memuat data...</div>
+    </div>
+    <div id="panel-tarik-tunai" class="menu-panel card">
+        <h3>Layanan Tarik Tunai</h3>
+        <img src="https://nasuka.pro/gambar/tariktunai.jpg" alt="Tarik Tunai" class="wl-image">
+        <p class="wl-text">Layanan tarik tunai saldo digital dan e-wallet kini tersedia untuk memudahkan mitra mencairkan dana secara cepat, aman, dan efisien langsung melalui sistem kami.</p>
+        <h4 style="margin: 15px 0 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Tabel Harga Admin Tarik Tunai</h4>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Nominal Rp 10.000 - Rp 100.000</span>
+                <span class="item-price">Rp 2.000</span>
+            </div>
+        </div>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Nominal Rp 101.000 - Rp 500.000</span>
+                <span class="item-price">Rp 5.000</span>
+            </div>
+        </div>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Nominal Rp 501.000 - Rp 1.000.000</span>
+                <span class="item-price">Rp 10.000</span>
+            </div>
+        </div>
+        <img src="https://nasuka.pro/gambar/supporttarik.jpg" alt="Support Tarik Tunai" class="wl-image">
+    </div>
+    <div id="panel-transfer-uang" class="menu-panel card">
+        <h3>Layanan Transfer Uang</h3>
+        <img src="https://nasuka.pro/gambar/transferuang.jpg" alt="Transfer Uang" class="wl-image">
+        <p class="wl-text">Nikmati kemudahan layanan transfer uang antar bank secara instan ke seluruh bank di Indonesia. Proses cepat, aman, dan dapat diandalkan langsung melalui sistem mitra kami.</p>
+        <h4 style="margin: 15px 0 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Tabel Biaya Admin Transfer Uang</h4>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Nominal Rp 10.000 - Rp 1.000.000</span>
+                <span class="item-price">Rp 3.500</span>
+            </div>
+        </div>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Nominal Rp 1.001.000 - Rp 5.000.000</span>
+                <span class="item-price">Rp 6.500</span>
+            </div>
+        </div>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Nominal Rp 5.001.000 - Rp 10.000.000</span>
+                <span class="item-price">Rp 10.000</span>
+            </div>
+        </div>
+        <img src="https://nasuka.pro/gambar/supporttransfer.jpg" alt="Support Transfer Uang" class="wl-image">
+    </div>
+    <div id="panel-topup-digital" class="menu-panel card">
+        <h3>Layanan Topup Uang Digital</h3>
+        <img src="https://nasuka.pro/gambar/topupdigital.jpg" alt="Topup Digital" class="wl-image">
+        <p class="wl-text">Isi ulang saldo dompet digital dan uang elektronik Anda seperti DANA, OVO, GoPay, ShopeePay, dan LinkAja secara instan. Transaksi otomatis 24 jam dengan biaya admin yang sangat terjangkau.</p>
+        <h4 style="margin: 15px 0 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Tabel Biaya Admin Topup Uang Digital</h4>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Nominal Rp 10.000 - Rp 50.000</span>
+                <span class="item-price">Rp 1.000</span>
+            </div>
+        </div>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Nominal Rp 51.000 - Rp 200.000</span>
+                <span class="item-price">Rp 1.500</span>
+            </div>
+        </div>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Nominal Rp 201.000 - Rp 1.000.000</span>
+                <span class="item-price">Rp 2.500</span>
+            </div>
+        </div>
+        <img src="https://nasuka.pro/gambar/supporttopup.jpg" alt="Support Topup Digital" class="wl-image">
+    </div>
+    <div id="panel-reward" class="menu-panel card">
+        <h3>Penukaran Reward Poin</h3>
+        <img src="https://nasuka.pro/gambar/reward.jpg" alt="Reward Poin" class="wl-image">
+        <p class="wl-text">Kumpulkan poin dari setiap transaksi Anda dan tukarkan dengan berbagai produk fisik menarik pilihan kami. Semakin sering bertransaksi, semakin banyak poin yang terkumpul untuk ditukarkan.</p>
+        <h4 style="margin: 15px 0 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Daftar Produk Fisik Reward</h4>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Mug Eksklusif Nasuka Wireless</span>
+                <span class="item-price">500 Poin</span>
+            </div>
+        </div>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Payung Lipat Premium</span>
+                <span class="item-price">1.200 Poin</span>
+            </div>
+        </div>
+        <div class="item-row">
+            <div class="item-header">
+                <span class="item-name">Tas Ransel Casual Eksklusif</span>
+                <span class="item-price">3.500 Poin</span>
+            </div>
+        </div>
+        <img src="https://nasuka.pro/gambar/supportreward.jpg" alt="Support Reward" class="wl-image">
+    </div>
+    <div id="panel-riwayat" class="menu-panel card">
+        <h3>Riwayat Transaksi</h3>
+        <div id="list-riwayat">Memuat riwayat...</div>
+    </div>
     <div id="panel-faq" class="menu-panel card">
         <h3>Pertanyaan Umum (FAQ)</h3>
-        <p><strong>Q: Berapa lama transaksi diproses?</strong><br>A: Transaksi diproses secara real-time (otomatis).</p>
-        <p><strong>Q: Apakah ada biaya admin?</strong><br>A: Kami memberikan layanan tanpa biaya admin tambahan untuk transaksi Anda.</p>
-        <p><strong>Q: Bagaimana memesan produk SMM ?</strong><br>A: Masukan Url video Sosmed anda (untuk layanan views/likes/shared) atau username untuk layanan followers.</p>
-        <p><strong>Q: Berapa lama progres layanan SMM?</strong><br>A: Progres layanan SMM akan segera diproses dan otomatis bekerja sesuai antrian</p>
+        <p>Sistem memproses transaksi secara real-time otomatis. Pastikan nomor tujuan akurat guna mencegah kendala pengiriman.</p>
     </div>
-    
     <div id="panel-privacy" class="menu-panel card">
-        <h3>Kebijakan Privasi</h3>
-        <p>Privasi Anda adalah prioritas kami. Data yang kami simpan (seperti nomor telepon) hanya digunakan untuk keperluan verifikasi transaksi dan pengelolaan saldo.</p>
-        <p>Kami tidak akan menyebarkan data pribadi Anda kepada pihak ketiga mana pun.</p>
+        <h3>Privacy Policy</h3>
+        <p>Kerahasiaan data pengguna dijamin sepenuhnya. PIN bersifat rahasia dan dilarang disebarluaskan kepada pihak mana pun.</p>
     </div>
-
-    <div id="panel-developer" class="menu-panel card">
-        <h3> Tentang Kami</h3>
-        <p>Aplikasi ini dikembangkan dengan dedikasi penuh untuk menghadirkan solusi transaksi digital yang efisien, cepat, dan terjangkau bagi para pengguna.</p>
-        <p>Kami berkomitmen untuk memberikan pengalaman transaksi pulsa, paket data, serta berbagai kebutuhan produk digital lainnya yang lebih praktis dan modern.</p>
-        <h3>Infrastruktur Teknologi </h3>
-        <p>Kami membangun ekosistem layanan dengan standar teknis yang handal guna memastikan setiap transaksi diproses dengan akurasi tinggi:</p>
-        <p><strong>Database :</strong> Seluruh data operasional dikelola melalui server mandiri (dedicated server). Pendekatan ini kami pilih untuk menjamin integritas data, keamanan informasi, serta kecepatan akses yang konsisten bagi seluruh pengguna.</p>
-        <p><strong>Sistem Pembayaran:</strong> Untuk memfasilitasi transaksi yang aman dan real-time, kami mengintegrasikan payment gateway melalui jembatan mandiri dengan metode <strong>QRIS</strong> Resmi <strong>BRI</strong>.</p>
-        <h3>Nilai Lebih Kami</h3>
-        <p><strong>Efisiensi Harga:</strong> Kami fokus memberikan harga yang sangat kompetitif di pasar, memastikan pengguna mendapatkan nilai ekonomis terbaik untuk setiap produk digital yang dibeli.</p>
-        <p><strong>Optimalisasi Layanan:</strong> Kami secara konsisten melakukan pengembangan infrastruktur dan optimasi sistem.</p>
-        <h3>Informasi Kontak & Operasional</h3>
-        <div style="line-height: 1.2;">
-            <strong>Alamat:</strong><br>Jl. Eretan Wetan, Kandanghaur, Indramayu, 45254, Jawabarat - Indonesia<br><br>
-            <strong>Kontak:</strong><br>
-            Email: nasukawireless@gmail.com<br>
-            Email: developer@nasuka.pro<br>
-            Phone: 0859109819017<br>
-            Website: https://nasuka.pro<br>
-        </div>
+    <div id="panel-refund" class="menu-panel card">
+        <h3>Kebijakan Refund</h3>
+        <p>Pengembalian dana diproses otomatis oleh sistem apabila transaksi dinyatakan gagal atau terjadi gangguan pada penyedia layanan.</p>
+    </div>
+    <div id="panel-kerjasama" class="menu-panel card">
+        <h3>Program Kerjasama</h3>
+        <img src="https://nasuka.pro/gambar/kerjasama.jpg" alt="Partnership" class="wl-image">
+        <p class="wl-text">Kami membuka peluang kerjasama strategis bagi agen, pemilik server, maupun pengembang aplikasi untuk mengintegrasikan layanan transaksi digital kami ke dalam platform Anda.</p>
+        <p class="wl-text">Dapatkan dukungan teknis penuh, stabilitas API, dan skema harga kompetitif untuk pengembangan bisnis jangka panjang.</p>
+        <img src="https://nasuka.pro/gambar/partnership-support.jpg" alt="Support Partnership" class="wl-image">
+    </div>
+    <div id="panel-tentang" class="menu-panel card">
+        <h3>Tentang Kami</h3>
+        <img src="https://nasuka.pro/gambar/developer1.jpg" alt="Logo" class="wl-image">
+        <p class="wl-text">NasukanWireless merupakan penyedia solusi transaksi digital efisien yang berlokasi di Indramayu. Fokus utama kami adalah stabilitas sistem dan kecepatan proses transaksi untuk seluruh mitra.</p>
     </div>
 </div>
 
 <div id="loginOverlay" class="login-overlay">
     <div class="login-box">
-        <input type="text" id="loginPhone" class="login-input" placeholder="Nomor Handphone" inputmode="numeric" pattern="[0-9]*" maxlength="13">
-        <input type="password" id="loginPin" class="login-input" placeholder="PIN (4 Digit)" inputmode="numeric" pattern="[0-9]*" maxlength="4">
-        <button id="btnLoginAction" class="login-btn" onclick="prosesLogin()">Masuk</button>
-        <button type="button" class="login-close" onclick="hideLogin()">Batal</button>
-    </div>
-</div>
-
-<div id="custom-alert" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
-    <div style="background: white; padding: 30px; border-radius: 15px; text-align: center; width: 100%; max-width: 400px;">
-        <h3 id="alert-title">Pemberitahuan</h3>
-        <p id="alert-msg" style="margin: 20px 0; font-size: 16px; color: #333;"></p>
-        <button onclick="tutupAlert()" style="background-color: #28a745; border: none; padding: 12px 25px; border-radius: 8px; color: white; font-weight: bold; width: 100%;">Mengerti</button>
+        <h3>Masuk Akun</h3>
+        <input type="text" id="loginPhone" class="login-input" placeholder="Nomor Handphone" inputmode="numeric">
+        <input type="password" id="loginPin" class="login-input" placeholder="PIN (4 Digit)" inputmode="numeric" maxlength="4">
+        <button class="login-btn" onclick="prosesLogin()">Masuk</button>
+        <button class="login-close" onclick="hideLogin()">Batal</button>
     </div>
 </div>
 
 <script>
     const firebaseConfig = { databaseURL: "https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app/" };
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    let semuaProduk = [];
 
-    function pilihKategori(kategori) {
-        document.querySelectorAll('.menu-panel').forEach(panel => {
-            panel.style.display = 'none';
-        });
-        document.getElementById('panel-' + kategori).style.display = 'block';
+    function pilihKategori(id) {
+        if ((id === 'akun' || id === 'riwayat') && !localStorage.getItem('userPhone')) {
+            showLogin();
+            return;
+        }
+        document.querySelectorAll('.menu-panel').forEach(p => p.style.display = 'none');
+        document.getElementById('panel-' + id).style.display = 'block';
+        if (id === 'riwayat') {
+            loadRiwayat();
+        }
     }
 
     function showLogin() { document.getElementById('loginOverlay').style.display = 'flex'; }
@@ -166,53 +248,144 @@
     function prosesLogin() {
         const phone = document.getElementById('loginPhone').value.trim();
         const pin = document.getElementById('loginPin').value.trim();
-        if (!phone || !pin) { showCustomAlert('Data wajib diisi!'); return; }
+        if (!phone || !pin) return;
         
         db.ref('users/' + phone).once('value', snap => {
-            if (snap.exists()) {
-                if (String(snap.val().pin) === String(pin)) { 
-                    localStorage.setItem('userPhone', phone); 
-                    hideLogin(); 
-                    initUserSession(phone); 
-                } else { showCustomAlert('PIN salah!'); }
-            } else {
-                db.ref('settings/userCounter').transaction(current => (current || 0) + 1, (error, committed, snapshot) => {
-                    if (committed) {
-                        db.ref('users/' + phone).set({ pin: pin, saldo: 0, kodeUnik: snapshot.val(), created_at: new Date().toISOString() }).then(() => { 
-                            localStorage.setItem('userPhone', phone); 
-                            hideLogin(); 
-                            initUserSession(phone); 
-                        });
-                    }
+            if (snap.exists() && String(snap.val().pin) === String(pin)) {
+                localStorage.setItem('userPhone', phone);
+                initUserSession(phone);
+                hideLogin();
+                pilihKategori('akun');
+            } else if (!snap.exists()) {
+                db.ref('users/' + phone).set({ pin: pin, saldo: 0, poin: 0 }).then(() => {
+                    localStorage.setItem('userPhone', phone);
+                    initUserSession(phone);
+                    hideLogin();
+                    pilihKategori('akun');
                 });
+            } else {
+                alert('PIN salah!');
             }
         });
     }
 
     function initUserSession(ph) {
-        if (ph) {
-            document.getElementById('user-phone-display').innerText = ph;
-            db.ref('users/' + ph + '/saldo').on('value', snap => { 
-                const saldo = snap.val() || 0; 
-                document.getElementById('display-saldo').innerText = "Rp " + saldo.toLocaleString('id-ID'); 
+        document.getElementById('user-phone-display').innerText = ph;
+        db.ref('users/' + ph + '/saldo').on('value', s => { 
+            document.getElementById('display-saldo').innerText = "Rp " + (s.val() || 0).toLocaleString('id-ID'); 
+        });
+        db.ref('users/' + ph + '/poin').on('value', s => { 
+            document.getElementById('display-poin').innerText = Number(s.val() || 0).toLocaleString('id-ID'); 
+        });
+    }
+
+    function loadHarga() {
+        db.ref('produk_agregator').on('value', snap => {
+            semuaProduk = [];
+            if (snap.exists()) {
+                snap.forEach(kategoriSnap => {
+                    const kategori = kategoriSnap.key;
+                    const produkData = kategoriSnap.val();
+                    for (let id in produkData) {
+                        if (produkData[id].harga) {
+                            semuaProduk.push({ kategori, id, ...produkData[id] });
+                        } else {
+                            for (let subId in produkData[id]) {
+                                semuaProduk.push({ kategori, id: subId, ...produkData[id][subId] });
+                            }
+                        }
+                    }
+                });
+                renderList(semuaProduk);
+            }
+        });
+    }
+
+    function renderList(data) {
+        const container = document.getElementById('list-harga');
+        container.innerHTML = '';
+        
+        const grup = data.reduce((acc, item) => {
+            if (!acc[item.kategori]) acc[item.kategori] = [];
+            acc[item.kategori].push(item);
+            return acc;
+        }, {});
+
+        for (let kategori in grup) {
+            const card = document.createElement('div');
+            card.style.marginBottom = '20px';
+            card.innerHTML = `<h4 style="margin:10px 0 5px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">${kategori.toUpperCase()}</h4>`;
+            
+            grup[kategori].sort((a, b) => Number(a.harga || 0) - Number(b.harga || 0))
+            .forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-name">${item.nama || item.id}</span>
+                        <span class="item-price">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+                card.appendChild(row);
             });
+            container.appendChild(card);
         }
     }
 
-    function showCustomAlert(pesan, judul = "Informasi") {
-        document.getElementById('alert-title').innerText = judul;
-        document.getElementById('alert-msg').innerText = pesan;
-        document.getElementById('custom-alert').style.display = 'flex';
+    function filterHarga() {
+        const query = document.getElementById('searchHarga').value.toLowerCase();
+        const filtered = semuaProduk.format ? [] : semuaProduk.filter(item => 
+            (item.nama && item.nama.toLowerCase().includes(query)) || 
+            (item.kategori && item.kategori.toLowerCase().includes(query))
+        );
+        renderList(filtered);
     }
 
-    function tutupAlert() {
-        document.getElementById('custom-alert').style.display = 'none';
+    function loadRiwayat() {
+        const ph = localStorage.getItem('userPhone');
+        const container = document.getElementById('list-riwayat');
+        if (!ph) {
+            container.innerHTML = 'Silakan login terlebih dahulu.';
+            return;
+        }
+        container.innerHTML = 'Memuat riwayat...';
+        
+        db.ref('users/' + ph + '/riwayat').once('value', snap => {
+            container.innerHTML = '';
+            if (!snap.exists()) {
+                container.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px;">Belum ada riwayat transaksi.</p>';
+                return;
+            }
+            snap.forEach(child => {
+                const item = child.val();
+                const refIdStr = String(item.refID || '').toLowerCase();
+                const isWifi = refIdStr.startsWith('wifi');
+                const labelDetail = isWifi ? 'Kode Voucher' : 'Tujuan/Detail';
+
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-name">${item.product || 'Transaksi'}</span>
+                        <span class="item-price">Rp ${Number(item.price || 0).toLocaleString('id-ID')}</span>
+                    </div>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                        ${labelDetail}: <strong style="color: #0f172a;">${item.dest || '-'}</strong><br>
+                        Ref ID: ${item.refID || '-'}<br>
+                        Status: ${item.status || '-'}<br>
+                        Waktu: ${item.timestamp ? new Date(item.timestamp).toLocaleString('id-ID') : '-'}
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    window.onload = () => {
         const ph = localStorage.getItem('userPhone');
         if (ph) initUserSession(ph);
-    });
+        loadHarga();
+    };
 </script>
 </body>
 </html>
