@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Nasuka Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+:root{--bg:#e9edf2;--ink:#0e1a2b;--mut:#667489;--line:#d8dee7;--card:#fff;--blue:#1a5fd0;--soft:#e8f0fd;--ok:#0f8a5f;--bad:#c62f3b;--warn:#a96a00}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 14px/1.45 'Manrope','Segoe UI',system-ui,sans-serif}
+header{background:var(--ink);color:#fff;display:flex;align-items:center;gap:28px;padding:16px 22px;position:sticky;top:0;z-index:5}
+.brand{font-weight:800;font-size:19px;display:flex;align-items:center;gap:10px}
+.brand span{font-weight:500;opacity:.7}
+#sys{width:9px;height:9px;border-radius:50%;background:#7b8798}
+#sys.on{background:#34d399}
+.saldo{margin-left:auto;text-align:right}
+.saldo small{display:block;color:#9fb0c7;font-size:12px}
+.saldo strong{font-size:30px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums;cursor:pointer}
+button{font:inherit;cursor:pointer}
+.ghost{background:transparent;border:1px solid #3a4a62;color:#fff;border-radius:8px;padding:8px 16px}
+main{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;padding:20px 22px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+.card.wide{grid-column:1/-1}
+.card h2{margin:0 0 14px;font-size:16px;font-weight:800;display:flex;justify-content:space-between;align-items:baseline}
+.card h2 em{font-style:normal;font-weight:500;font-size:12px;color:var(--mut)}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;color:var(--ink);margin-bottom:8px}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.row{display:flex;gap:8px}.row>*{flex:1}.row .cek{flex:0 0 auto;margin-bottom:8px}
+.cek{background:var(--soft);color:var(--blue);border:0;border-radius:8px;padding:0 14px;font-weight:700}
+.cekout{font-size:12.5px;margin:-2px 0 8px;min-height:0}.cekout.ok{color:var(--ok)}.cekout.bad{color:var(--bad)}
+.ops{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--mut);border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:700}
+.chip.sel{background:var(--blue);border-color:var(--blue);color:#fff}
+.list{max-height:210px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.item{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid #eef1f5;cursor:pointer}
+.item:last-child{border-bottom:0}.item:hover{background:#f6f8fb}
+.item.sel{background:var(--soft);box-shadow:inset 3px 0 0 var(--blue)}
+.item b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.empty{padding:14px;color:var(--mut);text-align:center}
+.foot{display:flex;align-items:center;gap:12px;margin-top:12px}
+.sum{flex:1;font-weight:700;font-variant-numeric:tabular-nums}
+.sum small{display:block;color:var(--mut);font-weight:500}
+.beli{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:11px 24px;font-weight:800}
+.beli:disabled{opacity:.5;cursor:wait}
+.hasil{margin-top:12px;font-size:13px;border-radius:8px;padding:0 12px}
+.hasil:not(:empty){padding:10px 12px;background:#f3f5f8}
+.hasil.sukses{background:#e4f6ee}.hasil.gagal{background:#fdebed}.hasil.pending,.hasil.processing{background:#fff4dd}
+.hasil code{background:#fff;padding:2px 6px;border-radius:4px;user-select:all;font-size:13px}
+.hasil.sukses b{color:var(--ok)}.hasil.gagal b{color:var(--bad)}.hasil.pending b,.hasil.processing b{color:var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--mut);font-weight:700;padding:6px 10px;border-bottom:1px solid var(--line)}
+td{padding:8px 10px;border-bottom:1px solid #eef1f5;vertical-align:top}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.pill{font-weight:800;font-size:12px}.pill.sukses{color:var(--ok)}.pill.gagal{color:var(--bad)}.pill.pending,.pill.processing{color:var(--warn)}
+dialog{border:0;border-radius:12px;padding:24px;width:380px;box-shadow:0 20px 50px rgba(14,26,43,.35)}
+dialog::backdrop{background:rgba(14,26,43,.55)}
+dialog h3{margin:0 0 14px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid #eef1f5}.kv span{color:var(--mut)}.kv b{text-align:right;word-break:break-all}
+.acts{display:flex;gap:10px;margin-top:18px}.acts button{flex:1;padding:11px;border-radius:8px;border:1px solid var(--line);background:#fff;font-weight:700}
+.acts .go{background:var(--blue);border-color:var(--blue);color:#fff}
+.err{color:var(--bad);font-size:13px;min-height:18px}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.sub{background:#f7f9fc;border:1px solid var(--line);border-radius:8px;padding:14px}
+.sub h3{margin:0 0 10px;font-size:14px;font-weight:800}
+.qris{display:block;width:100%;max-width:220px;margin:0 auto 12px;border-radius:8px;border:1px solid var(--line);background:#fff}
+.ku{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;color:var(--mut)}
+.ku b{font-size:22px;letter-spacing:2px;color:var(--ink);font-variant-numeric:tabular-nums}
+.calc{display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:var(--soft);border-radius:8px;padding:10px 12px}
+.calc b{font-size:20px;font-variant-numeric:tabular-nums}
+.warn{margin:10px 0 0;font-size:12.5px;color:var(--mut)}
+.kode{font-size:26px;letter-spacing:8px;text-align:center;font-variant-numeric:tabular-nums}
+.kode.salah{border-color:var(--bad)}
+.vmsg{min-height:18px;margin:-2px 0 8px;color:var(--bad);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Nasuka <span>Wireless</span><i id="sys" title="Status sistem"></i></div>
+  <div class="saldo"><small id="who">Belum masuk</small><strong id="saldo" title="Klik untuk sembunyikan/tampilkan">Rp --</strong></div>
+  <button class="ghost" id="auth">Masuk</button>
+</header>
+<main id="grid"></main>
+
+<dialog id="dlgLogin">
+  <form method="dialog" id="fLogin" onsubmit="return false">
+    <h3>Masuk akun</h3>
+    <input id="lp" placeholder="Nomor handphone" inputmode="numeric" maxlength="13" autocomplete="username">
+    <input id="lk" type="password" placeholder="PIN (4 digit)" inputmode="numeric" maxlength="4" autocomplete="current-password">
+    <div class="err" id="lerr"></div>
+    <div class="acts"><button type="button" id="lbatal">Batal</button><button class="go" id="lgo">Masuk</button></div>
+  </form>
+</dialog>
+<dialog id="dlgKonfirm">
+  <h3>Konfirmasi pembelian</h3>
+  <div id="kbody"></div>
+  <div class="acts"><button id="kbatal">Batal</button><button class="go" id="kya">Beli sekarang</button></div>
+</dialog>
+
+<script>
+firebase.initializeApp({databaseURL:"https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app/"});
+const db=firebase.database();
+const API='https://script.google.com/macros/s/AKfycbyCz8o5opNRSQs5qLgbA6ORyTMkCW3sp4zOF-da2RnSpSd85u2ZeffQ1L9qJvlWXeWh/exec';
+const ADMIN_TF=5000;
+const $=(s,r)=>(r||document).querySelector(s);
+const rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ST={sukses:'SUKSES',gagal:'GAGAL',pending:'PENDING',processing:'MEMPROSES'};
+let PH=localStorage.getItem('adminPhone')||'',saldo=0,sembunyi=false,refSaldo=null,sedang={};
+
+const norm=r=>{let n=String(r||'').replace(/\D/g,'');if(n.indexOf('62')===0)n='0'+n.slice(2);else if(n[0]==='8')n='0'+n;return n};
+const BANK={bri:'BRI',bca:'BCA',mandiri:'MANDIRI',bni:'BNI',danamon:'DANAMON',permata:'PERMATA',bii:'MAYBANK',bjb:'BJB',bjb_syr:'BJB SYARIAH',sinarmas:'BANK SINARMAS',mega:'BANK MEGA',kesejahteraan_ekonomi:'SEABANK',artos:'BANK JAGO',citibank:'CITIBANK',nationalnobu:'BANK NOBU'};
+
+// Konfigurasi modul: tambah/ubah baris di sini untuk menambah modul baru
+const MODS=[
+ {id:'pulsa',judul:'Pulsa',tag:'Seluler',path:'produk_agregator/pulsa',hist:'riwayat',
+  f:[{k:'dest',ph:'Nomor HP tujuan',max:13}],body:(p,v)=>({action:'orderPulsa',product:p.kode,dest:v.dest})},
+ {id:'paket',judul:'Paket Data',tag:'Seluler',path:'produk_agregator/paket',hist:'riwayat',
+  f:[{k:'dest',ph:'Nomor HP tujuan',max:13}],body:(p,v)=>({action:'orderPaket',product:p.kode,dest:v.dest})},
+ {id:'voucher',judul:'Voucher Kuota',tag:'Dikirim ke nomor akun yang login',path:'produk_agregator/voucher',hist:'riwayat',
+  f:[],body:p=>({action:'orderVoucher',product:p.kode,dest:PH}),tujuan:()=>PH},
+ {id:'aktivasi',judul:'Aktivasi',tag:'Voucher Axis',path:'produk_agregator/voucherpaketaxis',hist:'riwayat',
+  f:[{k:'dest',ph:'Pilih SN tersimpan',sn:'produk_agregator/vouchersn'}],body:(p,v)=>({action:'orderAktivasi',product:p.kode,dest:v.dest})},
+ {id:'token',judul:'Token PLN',tag:'Listrik prabayar',path:'produk_agregator/token',hist:'riwayat',
+  f:[{k:'dest',ph:'No. meter / ID pelanggan',max:12}],body:(p,v)=>({action:'orderPln',product:p.kode,dest:v.dest}),
+  cek:{label:'Cek ID',body:v=>({action:'checkId',product:'pln',dest:v.dest}),ok:r=>r.status===true?(r.data&&r.data.nama)||'Pelanggan ditemukan':null}},
+ {id:'freefire',judul:'Free Fire',tag:'Diamond',path:'produk_agregator/freefire',hist:'riwayat',
+  f:[{k:'dest',ph:'ID Free Fire (Player ID)',max:14}],body:(p,v)=>({action:'orderFreefire',product:p.kode,dest:v.dest})},
+ {id:'dana',judul:'DANA',tag:'Top up e-wallet',path:'produk_agregator/dana',hist:'riwayat_transfer',
+  f:[{k:'dest',ph:'Nomor DANA tujuan',max:13}],body:(p,v)=>({action:'topup_dana_produk',kode_produk:p.kode,tujuan:v.dest}),
+  cek:{label:'Cek nama',body:v=>({action:'cek_nama_dana',tujuan:v.dest}),ok:r=>r.status==='sukses'?(r.nama_akun||'Akun ditemukan'):null}},
+ {id:'tf',judul:'Transfer Bank',tag:'Biaya admin '+rp(ADMIN_TF),noprod:true,hist:'riwayat_transfer',
+  f:[{k:'bank',ph:'-- Pilih bank --',opts:BANK},{k:'dest',ph:'Nomor rekening',max:20},{k:'nominal',ph:'Nominal (Rp)',max:10}],
+  harga:v=>(Number(v.nominal)||0)+ADMIN_TF,nama:v=>'Transfer '+(BANK[v.bank]||''),
+  body:(p,v)=>({action:'transfer_bank',bank:v.bank,tujuan:v.dest,nominal:Number(v.nominal)})}
+];
+
+/* ---------- Produk ---------- */
+function kumpul(n,path,out,m){
+  Object.keys(n||{}).forEach(k=>{const v=n[k];if(!v||typeof v!=='object')return;
+    if(v.harga!==undefined){
+      if(Number(v.status)===1)out.push({kode:v.val||k,nama:v.nama||(v.nominal?(m.id==='freefire'?v.nominal+' Diamond':rp(v.nominal)):k),harga:Number(v.harga)||0,op:String(v.op||path[0]||'').trim().toUpperCase()});
+    }else kumpul(v,path.concat(k),out,m);});
+}
+function muatProduk(m){
+  const c=$('#m-'+m.id),list=$('.list',c);
+  db.ref(m.path).once('value',s=>{
+    const out=[];kumpul(s.val(),[],out,m);out.sort((a,b)=>a.harga-b.harga);
+    m.prods=out;const ops=[...new Set(out.map(p=>p.op).filter(Boolean))].sort();
+    m.ops=ops;m.op=ops[0]||'';drawOps(m);drawList(m);
+  },()=>{list.innerHTML='<div class="empty">Gagal memuat produk. Periksa koneksi.</div>'});
+}
+function drawOps(m){
+  const el=$('#m-'+m.id+' .ops');el.innerHTML='';
+  if(m.ops.length<2)return;
+  m.ops.forEach(o=>{const b=document.createElement('button');b.className='chip'+(o===m.op?' sel':'');b.textContent=o;
+    b.onclick=()=>{m.op=o;m.sel=null;drawOps(m);drawList(m);sum(m)};el.appendChild(b)});
+}
+function drawList(m){
+  const c=$('#m-'+m.id),list=$('.list',c);
+  const items=m.prods.filter(p=>!m.op||p.op===m.op);
+  list.innerHTML='';
+  if(!items.length){list.innerHTML='<div class="empty">Tidak ada produk aktif.</div>';return}
+  items.forEach(p=>{const d=document.createElement('div');d.className='item'+(m.sel===p?' sel':'');
+    d.innerHTML='<span></span><b></b>';d.firstChild.textContent=p.nama;d.lastChild.textContent=rp(p.harga);
+    d.onclick=()=>{m.sel=p;drawList(m);sum(m)};list.appendChild(d)});
+}
+
+/* ---------- Kartu ---------- */
+function vals(m){const v={};m.f.forEach(f=>v[f.k]=($('[data-k='+f.k+']',m.el).value||'').trim());return v}
+function harga(m){return m.noprod?m.harga(vals(m)):(m.sel?m.sel.harga:0)}
+function sum(m){
+  const el=$('.sum',m.el),h=harga(m);
+  el.innerHTML=h?rp(h)+'<small>'+esc(m.noprod?'Nominal + admin':m.sel.nama)+'</small>':'<small>Pilih produk</small>';
+}
+function buatKartu(m){
+  const c=document.createElement('section');c.className='card';c.id='m-'+m.id;m.el=c;
+  let h='<h2>'+esc(m.judul)+'<em>'+esc(m.tag)+'</em></h2>';
+  m.f.forEach((f,i)=>{
+    let el;
+    if(f.opts)el='<select data-k="'+f.k+'"><option value="">'+esc(f.ph)+'</option>'+Object.keys(f.opts).map(k=>'<option value="'+k+'">'+esc(f.opts[k])+'</option>').join('')+'</select>';
+    else if(f.sn)el='<select data-k="'+f.k+'"><option value="">'+esc(f.ph)+'</option></select>';
+    else el='<input data-k="'+f.k+'" placeholder="'+esc(f.ph)+'" inputmode="numeric" maxlength="'+(f.max||20)+'" autocomplete="off">';
+    if(m.cek&&i===0)el='<div class="row">'+el+'<button class="cek" type="button">'+m.cek.label+'</button></div><div class="cekout"></div>';
+    h+=el;
+  });
+  if(!m.noprod)h+='<div class="ops"></div><div class="list"><div class="empty">Memuat produk…</div></div>';
+  h+='<div class="foot"><div class="sum"></div><button class="beli">Beli</button></div><div class="hasil"></div>';
+  c.innerHTML=h;
+  c.querySelectorAll('input[data-k]').forEach(i=>i.addEventListener('input',()=>{i.value=i.value.replace(/\D/g,'');if(m.noprod)sum(m)}));
+  c.querySelectorAll('select[data-k]').forEach(s=>s.addEventListener('change',()=>sum(m)));
+  $('.beli',c).onclick=()=>beli(m);
+  if(m.cek)$('.cek',c).onclick=()=>cekNama(m);
+  const sn=m.f.find(f=>f.sn);if(sn)muatSn(m,sn,c);
+  sum(m);return c;
+}
+function muatSn(m,f,c){
+  const sel=$('select',c);
+  db.ref(f.sn).once('value',s=>{
+    const hasil=[],tambah=v=>{if(v==null||typeof v==='object')return;const t=String(v).trim();if(t&&hasil.indexOf(t)<0)hasil.push(t)};
+    const d=s.val();
+    if(d&&typeof d==='object')Object.keys(d).forEach(k=>{const v=d[k];v&&typeof v==='object'?tambah(v.sn):tambah(v)});else tambah(d);
+    hasil.forEach(t=>{const o=document.createElement('option');o.value=o.textContent=t;sel.appendChild(o)});
+    if(hasil.length===1)sel.value=hasil[0];
+    if(!hasil.length)sel.options[0].textContent='Belum ada SN tersimpan';
+  });
+}
+async function kirim(body){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({userPhone:PH},body))});
+  return r.json();
+}
+async function cekNama(m){
+  if(!PH)return masuk();
+  const v=vals(m),out=$('#m-'+m.id+' .cekout');
+  if(!v.dest){out.className='cekout bad';out.textContent='Isi nomor tujuan dulu';return}
+  out.className='cekout';out.textContent='Memeriksa…';
+  try{const r=await kirim(m.cek.body(v)),nama=m.cek.ok(r);
+    out.className='cekout '+(nama?'ok':'bad');out.textContent=nama?'✓ '+nama:'✕ '+(r.message||'Data tidak ditemukan');
+  }catch(e){out.className='cekout bad';out.textContent='✕ Gagal menghubungi server'}
+}
+function konfirmasi(baris){
+  return new Promise(res=>{
+    $('#kbody').innerHTML=baris.map(b=>'<div class="kv"><span>'+esc(b[0])+'</span><b>'+esc(b[1])+'</b></div>').join('');
+    const d=$('#dlgKonfirm');d.showModal();
+    $('#kya').onclick=()=>{d.close();res(true)};$('#kbatal').onclick=()=>{d.close();res(false)};d.oncancel=()=>res(false);
+  });
+}
+async function beli(m){
+  if(!PH)return masuk();
+  if(sedang[m.id])return;
+  const v=vals(m),c=$('#m-'+m.id);
+  const kosong=m.f.find(f=>!v[f.k]);
+  if(kosong)return tampil(m,{status:'gagal',message:'Lengkapi: '+kosong.ph.replace('-- ','').replace(' --','')});
+  if(!m.noprod&&!m.sel)return tampil(m,{status:'gagal',message:'Pilih produk dulu'});
+  if(m.noprod&&!(Number(v.nominal)>0))return tampil(m,{status:'gagal',message:'Nominal tidak valid'});
+  const err=m.valid&&m.valid(v);if(err)return tampil(m,{status:'gagal',message:err});
+  const h=harga(m);
+  if(h>saldo)return tampil(m,{status:'gagal',message:'Saldo tidak mencukupi (butuh '+rp(h)+')'});
+  const nama=m.noprod?m.nama(v):m.sel.nama,tujuan=m.tujuan?m.tujuan(v):v.dest;
+  const ok=await konfirmasi([['Layanan',m.judul],['Produk',nama],['Tujuan',tujuan],['Total',rp(h)],['Saldo setelah',rp(saldo-h)]]);
+  if(!ok)return;
+  sedang[m.id]=true;const b=$('.beli',c);b.disabled=true;b.textContent='Memproses…';
+  try{
+    const r=await kirim(m.body(m.sel,v));
+    const info=Object.assign({product:nama,dest:tujuan,price:h},r);
+    if(r.ref_id){tampil(m,info);dengar(m,r.ref_id)}
+    else tampil(m,{status:'gagal',message:r.message||'Gagal memproses pesanan.'});
+  }catch(e){
+    tampil(m,{status:'pending',message:'Server tidak merespons. Cek riwayat di bawah sebelum mencoba lagi agar tidak terpotong dua kali.'});
+  }finally{sedang[m.id]=false;b.disabled=false;b.textContent='Beli'}
+}
+function dengar(m,ref){
+  if(m.ref)m.ref.off();
+  m.ref=db.ref('users/'+PH+'/'+m.hist+'/'+ref);
+  m.ref.on('value',s=>{if(s.exists())tampil(m,s.val())});
+}
+function tampil(m,d){
+  const el=$('#m-'+m.id+' .hasil'),st=ST[d.status]?d.status:'pending';
+  el.className='hasil '+st;
+  el.innerHTML='<b>'+ST[st]+'</b> '+esc(d.product||'')+(d.message?'<div>'+esc(d.message)+'</div>':'')+
+    ((d.trx_id||d.ref_id)?'<div>Ref '+esc(d.trx_id||d.ref_id)+(d.sn?' · SN <code>'+esc(d.sn)+'</code>':'')+'</div>':'');
+}
+
+/* ---------- Riwayat ---------- */
+let rA=[],rB=[],rRefs=[];
+function norma(x){
+  if(x.product!==undefined||x.refID!==undefined)return{n:x.product||'Transaksi',p:Number(x.price||0),d:x.dest||'-',r:x.refID||'-',s:x.status||'-',t:x.timestamp};
+  const n=x.bank?'Transfer '+(BANK[x.bank]||String(x.bank).toUpperCase()):(x.kode_produk||'Top Up DANA');
+  return{n:n,p:Number(x.total_potongan||x.nominal||0),d:x.nama_rekening?x.tujuan+' · '+x.nama_rekening:(x.tujuan||'-'),r:x.trx_id||'-',s:x.status||'-',t:x.timestamp};
+}
+function gambarRiwayat(){
+  const all=rA.concat(rB).sort((a,b)=>(b.t?new Date(b.t):0)-(a.t?new Date(a.t):0)).slice(0,40);
+  const el=$('#m-riwayat .tbl');
+  if(!all.length){el.innerHTML='<div class="empty">Belum ada transaksi.</div>';return}
+  el.innerHTML='<table><thead><tr><th>Waktu</th><th>Produk</th><th>Tujuan</th><th>Ref</th><th>Status</th><th class="n">Harga</th></tr></thead><tbody>'+
+    all.map(x=>'<tr><td>'+(x.t?esc(new Date(x.t).toLocaleString('id-ID')):'-')+'</td><td>'+esc(x.n)+'</td><td>'+esc(x.d)+'</td><td>'+esc(x.r)+'</td><td><span class="pill '+esc(x.s)+'">'+esc(String(x.s).toUpperCase())+'</span></td><td class="n">'+rp(x.p)+'</td></tr>').join('')+'</tbody></table>';
+}
+function muatRiwayat(){
+  rRefs.forEach(r=>r.off());rRefs=[];rA=[];rB=[];
+  const el=$('#m-riwayat .tbl');
+  if(!PH){el.innerHTML='<div class="empty">Masuk untuk melihat riwayat.</div>';return}
+  const ambil=(node,set)=>{const r=db.ref('users/'+PH+'/'+node).limitToLast(40);rRefs.push(r);
+    r.on('value',s=>{const a=[];s.forEach(c=>{a.push(norma(c.val()))});set(a);gambarRiwayat()})};
+  ambil('riwayat',a=>rA=a);ambil('riwayat_transfer',a=>rB=a);
+}
+
+/* ---------- Sesi ---------- */
+function gambarSaldo(){$('#saldo').textContent=!PH?'Rp --':(sembunyi?'Rp ••••••':rp(saldo))}
+function mulaiSesi(){
+  if(refSaldo)refSaldo.off();
+  $('#auth').textContent=PH?'Keluar':'Masuk';$('#who').textContent=PH?'Saldo · '+PH:'Belum masuk';
+  if(PH){refSaldo=db.ref('users/'+PH+'/saldo');refSaldo.on('value',s=>{saldo=Number(s.val())||0;gambarSaldo();MODS.forEach(sum)})}
+  else{saldo=0;gambarSaldo()}
+  muatRiwayat();muatKodeUnik();
+}
+function masuk(){$('#lerr').textContent='';$('#dlgLogin').showModal();$('#lp').focus()}
+function keluar(){localStorage.removeItem('adminPhone');PH='';MODS.forEach(m=>{if(m.ref){m.ref.off();m.ref=null}$('#m-'+m.id+' .hasil').innerHTML='';$('#m-'+m.id+' .hasil').className='hasil'});mulaiSesi()}
+$('#auth').onclick=()=>PH?keluar():masuk();
+$('#lbatal').onclick=()=>$('#dlgLogin').close();
+$('#saldo').onclick=()=>{if(!PH)return masuk();sembunyi=!sembunyi;gambarSaldo()};
+['#lp','#lk'].forEach(s=>$(s).addEventListener('input',e=>e.target.value=e.target.value.replace(/\D/g,'')));
+$('#lgo').onclick=()=>{
+  const p=$('#lp').value.trim(),k=$('#lk').value.trim(),e=$('#lerr');
+  if(!p||!k){e.textContent='Nomor dan PIN wajib diisi';return}
+  db.ref('users/'+p).once('value',s=>{
+    if(!s.exists())e.textContent='Akun tidak ditemukan. Daftar dulu lewat aplikasi.';
+    else if(String(s.val().pin)!==k)e.textContent='PIN salah';
+    else{PH=p;localStorage.setItem('adminPhone',p);$('#lk').value='';$('#dlgLogin').close();mulaiSesi()}
+  },()=>e.textContent='Gagal menghubungi database');
+};
+$('#lk').addEventListener('keydown',e=>{if(e.key==='Enter')$('#lgo').click()});
+
+/* ---------- Tambah saldo: QRIS + voucher fisik (dari saldo.html) ---------- */
+const VOUCHER_PATH='vouchers',MAKS_SALAH=5,KUNCI_MENIT=5;
+let kodeUnik=null,sedangVoucher=false;
+function buatSaldo(){
+  const c=document.createElement('section');c.className='card wide';c.id='m-saldo';
+  c.innerHTML='<h2>Tambah Saldo<em>Masuk ke akun yang sedang login</em></h2><div class="duo">'+
+    '<div class="sub"><h3>Top up via QRIS</h3>'+
+    '<img class="qris" src="https://nasuka.pro/gambar/qris.jpg" alt="Kode QRIS top up saldo">'+
+    '<div class="ku"><span>Kode unik akun</span><b id="ku">---</b></div>'+
+    '<input id="sn-nom" placeholder="Nominal top up, contoh 50000" inputmode="numeric" autocomplete="off">'+
+    '<div class="calc"><span>Transfer tepat sejumlah</span><b id="sn-tf">Rp 0</b></div>'+
+    '<p class="warn">3 digit terakhir nominal transfer harus sama dengan kode unik. Sistem mencocokkan pemilik top up dari angka itu, jadi kalau salah, saldo bisa masuk ke akun lain.</p></div>'+
+    '<div class="sub"><h3>Klaim voucher fisik</h3>'+
+    '<input id="vc" class="kode" placeholder="000000" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="Kode voucher 6 digit">'+
+    '<div class="vmsg" id="vmsg"></div>'+
+    '<button class="beli" id="vbtn" style="width:100%">Klaim voucher</button><div class="hasil" id="vres"></div></div></div>';
+  const nom=$('#sn-nom',c),vc=$('#vc',c);
+  nom.addEventListener('input',()=>{nom.value=nom.value.replace(/\D/g,'').slice(0,10);hitungTf()});
+  vc.addEventListener('input',()=>{vc.value=vc.value.replace(/\D/g,'').slice(0,6);if(vc.classList.contains('salah'))pesanV('')});
+  vc.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();klaimVoucher()}});
+  $('#vbtn',c).onclick=klaimVoucher;
+  return c;
+}
+function muatKodeUnik(){
+  kodeUnik=null;
+  if(!PH){$('#ku').textContent='---';hitungTf();return}
+  db.ref('users/'+PH+'/kodeUnik').once('value',s=>{
+    kodeUnik=s.val();
+    $('#ku').textContent=kodeUnik==null?'---':String(kodeUnik).padStart(3,'0');
+    hitungTf();
+  });
+}
+function hitungTf(){
+  const el=$('#sn-tf'),n=parseInt($('#sn-nom').value,10);
+  if(kodeUnik==null||isNaN(n)||n<=0){el.textContent='Rp 0';return}
+  if(n<1000){el.textContent='Min. Rp 1.000';return}
+  el.textContent=rp(Math.floor(n/1000)*1000+(parseInt(kodeUnik,10)%1000));
+}
+function pesanV(t){$('#vmsg').textContent=t||'';$('#vc').classList.toggle('salah',!!t)}
+function setV(a){sedangVoucher=a;$('#vbtn').disabled=a;$('#vc').disabled=a;$('#vbtn').textContent=a?'Memeriksa kode…':'Klaim voucher'}
+function bacaSalah(){try{return JSON.parse(localStorage.getItem('voucherSalah'))||{count:0,until:0}}catch(e){return{count:0,until:0}}}
+function simpanSalah(o){try{localStorage.setItem('voucherSalah',JSON.stringify(o))}catch(e){}}
+function menitTerkunci(){const g=bacaSalah();return g.until>Date.now()?Math.ceil((g.until-Date.now())/60000):0}
+function catatSalah(){
+  let g=bacaSalah();if(g.until&&g.until<=Date.now())g={count:0,until:0};
+  g.count++;if(g.count>=MAKS_SALAH){g.until=Date.now()+KUNCI_MENIT*60000;g.count=0}
+  simpanSalah(g);return g;
+}
+function nilaiVoucher(d){
+  if(!d||typeof d!=='object')return 0;
+  for(const k of ['nilai','value','nominal','saldo','jumlah']){const n=Number(d[k]);if(isFinite(n)&&n>0)return Math.round(n)}
+  return 0;
+}
+function voucherTerpakai(d){
+  if(!d||typeof d!=='object')return false;
+  if(d.terpakai===true||d.used===true)return true;
+  return ['terpakai','used','dipakai','claimed'].includes(String(d.status||'').toLowerCase());
+}
+async function klaimVoucher(){
+  if(sedangVoucher)return;
+  pesanV('');const res=$('#vres');res.className='hasil';res.innerHTML='';
+  if(!PH)return masuk();
+  const kode=$('#vc').value.trim();
+  if(!/^\d{6}$/.test(kode))return pesanV('Kode harus terdiri dari 6 digit angka.');
+  const mnt=menitTerkunci();if(mnt)return pesanV('Terlalu banyak kode salah. Coba lagi dalam '+mnt+' menit.');
+  if(navigator.onLine===false)return pesanV('Tidak ada koneksi internet. Periksa jaringan lalu coba lagi.');
+  setV(true);
+  const vRef=db.ref(VOUCHER_PATH+'/'+kode);let diklaim=false,saldoMasuk=false;
+  try{
+    const us=await db.ref('users/'+PH).once('value');
+    if(!us.exists())return pesanV('Akun tidak ditemukan. Keluar lalu masuk kembali.');
+    const snap=await vRef.once('value');
+    if(!snap.exists()){
+      const g=catatSalah(),k=menitTerkunci();
+      if(k)return pesanV('Terlalu banyak kode salah. Coba lagi dalam '+k+' menit.');
+      const sisa=MAKS_SALAH-g.count;
+      return pesanV('Kode tidak ditemukan. Periksa kembali angka pada voucher.'+(sisa<=2?' Sisa percobaan: '+sisa+'.':''));
+    }
+    const data=snap.val(),nilai=nilaiVoucher(data);
+    if(!nilai)return pesanV('Voucher ini belum bisa diklaim. Hubungi admin dan sebutkan kode '+kode+'.');
+    if(voucherTerpakai(data))return pesanV('Kode ini sudah pernah digunakan.');
+    // 1) kunci voucher secara atomik agar tidak bisa diklaim dua kali
+    const kunci=await vRef.child('terpakai').transaction(cur=>(cur===true?undefined:true));
+    if(!kunci.committed)return pesanV('Kode ini sudah pernah digunakan.');
+    diklaim=true;
+    try{await vRef.update({dipakaiOleh:PH,dipakaiPada:new Date().toISOString()})}catch(e){}
+    // 2) tambah saldo secara atomik
+    const tx=await db.ref('users/'+PH+'/saldo').transaction(cur=>(Number(cur)||0)+nilai);
+    if(!tx.committed)throw new Error('saldo-gagal');
+    saldoMasuk=true;
+    res.className='hasil sukses';
+    res.innerHTML='<b>VOUCHER DIKLAIM</b> +'+rp(nilai)+'<div>Saldo sekarang '+rp(tx.snapshot.val())+'</div>';
+    $('#vc').value='';simpanSalah({count:0,until:0});
+  }catch(err){
+    if(diklaim&&!saldoMasuk){
+      let pulih=false;
+      try{await vRef.update({terpakai:false,dipakaiOleh:null,dipakaiPada:null});pulih=true}catch(e){}
+      pesanV(pulih?'Koneksi bermasalah. Saldo belum bertambah dan kode belum terpakai, coba lagi.':'Gangguan saat memproses. Hubungi admin dan sebutkan kode '+kode+'.');
+    }else pesanV('Koneksi bermasalah. Periksa internet lalu coba lagi.');
+  }finally{setV(false)}
+}
+
+/* ---------- Mulai ---------- */
+const grid=$('#grid');
+MODS.forEach(m=>{grid.appendChild(buatKartu(m));if(!m.noprod)muatProduk(m)});
+grid.appendChild(buatSaldo());
+const rc=document.createElement('section');rc.className='card wide';rc.id='m-riwayat';
+rc.innerHTML='<h2>Riwayat transaksi<em>40 terakhir, diperbarui otomatis</em></h2><div class="tbl"></div>';grid.appendChild(rc);
+db.ref('settings/systemStatus').on('value',s=>$('#sys').classList.toggle('on',s.val()==='ON'));
+mulaiSesi();
+if(!PH)masuk();
+</script>
+</body>
+</html>
