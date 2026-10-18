@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>informasi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+
+  
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; margin: 0; background: url('https://nasuka.pro/gambar/langi.jpg') no-repeat center center fixed; background-size: cover; color: #1e293b; }
+
+  
+    
+    input { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 12px; box-sizing: border-box; background: #fff; transition: border 0.2s; }
+    input:focus { outline: none; border-color: #3b82f6; }
+    
+    button { 
+        width: 100%; padding: 14px; background-color: #0f172a; color: #fff; 
+        border: none; border-radius: 12px; font-size: 16px; font-weight: 600; 
+        cursor: pointer; transition: all 0.2s ease;
+    }
+    button:hover { background-color: #1e293b; transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    
+    .controls-wrapper { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+    .card-kategori { 
+        flex: 1; padding: 12px 5px; background: #fff; border: 1px solid #e2e8f0;
+        text-align: center; cursor: pointer; border-radius: 12px;
+        font-size: 11px; font-weight: 600; transition: all 0.2s;
+    }
+    .card-kategori:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    
+    .menu-panel { display: none; }
+    .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; padding: 20px; box-sizing: border-box; }
+    .login-box { background: #ffffff; padding: 24px; border-radius: 20px; width: 100%; max-width: 320px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+    .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem; box-sizing: border-box; }
+    .login-btn { width: 100%; padding: 12px; background-color: #0f172a; color: #fff; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; border-radius: 10px; }
+    .login-close { margin-top: 15px; background: none; border: none; font-size: 0.9rem; cursor: pointer; color: #64748b; }
+    
+    .item-row { border-bottom: 1px solid #f1f5f9; padding: 12px 0; display: flex; flex-direction: column; }
+    .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .item-name { font-weight: 600; font-size: 14px; color: #334155; }
+    .item-price { font-weight: 700; color: #0f172a; font-size: 14px; }
+    
+    .wl-image { width: 100%; border-radius: 12px; margin: 15px 0; }
+    .wl-text { font-size: 14px; line-height: 1.6; color: #475569; margin-bottom: 15px; }
+
+    .whatsapp-float {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #25d366;
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        transition: transform 0.2s ease;
+    }
+    .whatsapp-float:hover {
+        transform: scale(1.05);
+    }
+    .whatsapp-float img {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* ===== VERSI WEB: tombol kembali ke beranda ===== */
+    .web-topbar{width:100%;max-width:400px;margin:0 auto 9px auto;box-sizing:border-box}
+    .web-topbar a{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.94);color:#0f172a;font:600 13px/1 'Inter',-apple-system,'Segoe UI',sans-serif;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.14)}
+    .web-topbar a:hover{background:#fff}
+
+    .web-topbar { max-width: none; margin: 0 0 12px 0; }
+    @media (min-width: 768px) {
+        body { padding: 24px clamp(24px, 4vw, 64px); }
+        .web-topbar, .controls-wrapper, .panel-container { max-width: 960px; margin-left: auto; margin-right: auto; }
+        .card-kategori { font-size: 13px; padding: 14px 8px; }
+        .wl-image { max-width: 520px; display: block; margin: 15px auto; }
+    }
+</style>
+</head>
+<body>
+<nav class="web-topbar" aria-label="Navigasi"><a href="produk.html">&#8249; Beranda</a></nav>
+
+<div class="controls-wrapper">
+    
+    <div class="card-kategori" onclick="pilihKategori('transfer-uang')">Transfer Uang</div>
+    
+     <div class="card-kategori" onclick="pilihKategori('faq')">Faq</div>
+    <div class="card-kategori" onclick="pilihKategori('topup-digital')">Topup Digital</div>
+    
+    
+   
+</div>
+
+<div class="controls-wrapper">
+   
+   
+    <div class="card-kategori" onclick="pilihKategori('privacy')">Privacy</div>
+</div>
+
+<div class="controls-wrapper">
+    <div class="card-kategori" onclick="pilihKategori('refund')">Refund</div>
+    <div class="card-kategori" onclick="pilihKategori('kerjasama')">Kerjasama</div>
+    <div class="card-kategori" onclick="pilihKategori('tentang')">Tentang</div>
+</div>
+
+<div class="panel-container">
+   
+    <div id="panel-daftar-harga" class="menu-panel card">
+        <h3>Daftar Harga</h3>
+        <input type="text" id="searchHarga" placeholder="Cari produk (contoh: dana, kuota, pln)..." onkeyup="filterHarga()">
+        <div id="list-harga">Memuat data...</div>
+    </div>
+  
+        </div>
+      
+    </div>
+    <div id="panel-transfer-uang" class="menu-panel card">
+        <h3>Layanan Transfer Uang</h3>
+        <img src="https://nasuka.pro/gambar/tf.jpg" alt="Transfer Uang" class="wl-image">
+        <p class="wl-text">Nikmati kemudahan layanan transfer uang antar bank secara instan ke seluruh bank di Indonesia. Proses cepat, aman, dan dapat diandalkan langsung melalui sistem kami.</p>
+      
+        </div>
+        
+      
+    </div>
+    <div id="panel-topup-digital" class="menu-panel card">
+        <h3>Layanan Topup Uang Digital</h3>
+        <img src="https://nasuka.pro/gambar/topup.jpg" alt="Topup Digital" class="wl-image">
+        <p class="wl-text">Isi ulang saldo dompet digital dan uang elektronik Anda seperti DANA, OVO, GoPay, ShopeePay, dan LinkAja secara instan. Transaksi otomatis 24 jam penuh.</p>
+      
+        </div>
+      
+       
+    </div>
+  
+    <div id="panel-faq" class="menu-panel card">
+        <h3>Pertanyaan Umum (FAQ)</h3>
+        <p>Sistem memproses transaksi secara real-time otomatis. Pastikan nomor tujuan akurat guna mencegah kendala pengiriman.</p>
+    </div>
+    <div id="panel-privacy" class="menu-panel card">
+        <h3>Privacy Policy</h3>
+        <p>Kerahasiaan data pengguna dijamin sepenuhnya. PIN bersifat rahasia dan dilarang disebarluaskan kepada pihak mana pun.</p>
+    </div>
+    <div id="panel-refund" class="menu-panel card">
+        <h3>Kebijakan Refund</h3>
+        <p>Pengembalian dana diproses otomatis oleh sistem apabila transaksi dinyatakan gagal atau terjadi gangguan pada penyedia layanan.</p>
+    </div>
+    <div id="panel-kerjasama" class="menu-panel card">
+        <h3>Program Kerjasama</h3>
+        <img src="https://nasuka.pro/gambar/partnership.jpg" alt="Partnership" class="wl-image">
+        <p class="wl-text">Kami membuka peluang kerjasama strategis bagi mitra untuk mengintegrasikan layanan transaksi digital kami ke dalam konter Anda.</p>
+        <p class="wl-text">Dapatkan dukungan teknis penuh dan skema harga kompetitif untuk pengembangan bisnis jangka panjang.</p>
+       
+    </div>
+    <div id="panel-tentang" class="menu-panel card">
+        <h3>Tentang Kami</h3>
+        <img src="nasukawi.png" alt="Logo" class="wl-image">
+        <p class="wl-text">Nasuka Wireless merupakan penyedia solusi transaksi digital efisien yang berlokasi di Indramayu. Fokus utama kami adalah stabilitas sistem dan kecepatan proses transaksi untuk seluruh pelanggan.</p>
+    </div>
+</div>
+
+
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+        <h3>Masuk Akun</h3>
+        <input type="text" id="loginPhone" class="login-input" placeholder="Nomor Handphone" inputmode="numeric">
+        <input type="password" id="loginPin" class="login-input" placeholder="PIN (4 Digit)" inputmode="numeric" maxlength="4">
+        <button class="login-btn" onclick="prosesLogin()">Masuk</button>
+        <button class="login-close" onclick="hideLogin()">Batal</button>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    let semuaProduk = [];
+
+    function pilihKategori(id) {
+        if ((id === 'akun' || id === 'riwayat') && !localStorage.getItem('userPhone')) {
+            showLogin();
+            return;
+        }
+        document.querySelectorAll('.menu-panel').forEach(p => p.style.display = 'none');
+        document.getElementById('panel-' + id).style.display = 'block';
+        if (id === 'riwayat') {
+            loadRiwayat();
+        }
+    }
+
+    function showLogin() { document.getElementById('loginOverlay').style.display = 'flex'; }
+    function hideLogin() { document.getElementById('loginOverlay').style.display = 'none'; }
+
+    function prosesLogin() {
+        const phone = document.getElementById('loginPhone').value.trim();
+        const pin = document.getElementById('loginPin').value.trim();
+        if (!phone || !pin) return;
+        
+        db.ref('users/' + phone).once('value', snap => {
+            if (snap.exists() && String(snap.val().pin) === String(pin)) {
+                localStorage.setItem('userPhone', phone);
+                initUserSession(phone);
+                hideLogin();
+                pilihKategori('akun');
+            } else if (!snap.exists()) {
+                db.ref('users/' + phone).set({ pin: pin, saldo: 0, poin: 0 }).then(() => {
+                    localStorage.setItem('userPhone', phone);
+                    initUserSession(phone);
+                    hideLogin();
+                    pilihKategori('akun');
+                });
+            } else {
+                alert('PIN salah!');
+            }
+        });
+    }
+
+    function initUserSession(ph) {
+        document.getElementById('user-phone-display').innerText = ph;
+        db.ref('users/' + ph + '/saldo').on('value', s => { 
+            document.getElementById('display-saldo').innerText = "Rp " + (s.val() || 0).toLocaleString('id-ID'); 
+        });
+        db.ref('users/' + ph + '/poin').on('value', s => { 
+            document.getElementById('display-poin').innerText = Number(s.val() || 0).toLocaleString('id-ID'); 
+        });
+    }
+
+    function loadHarga() {
+        db.ref('produk_agregator').on('value', snap => {
+            semuaProduk = [];
+            if (snap.exists()) {
+                snap.forEach(kategoriSnap => {
+                    const kategori = kategoriSnap.key;
+                    const produkData = kategoriSnap.val();
+                    for (let id in produkData) {
+                        if (produkData[id].harga) {
+                            semuaProduk.push({ kategori, id, ...produkData[id] });
+                        } else {
+                            for (let subId in produkData[id]) {
+                                semuaProduk.push({ kategori, id: subId, ...produkData[id][subId] });
+                            }
+                        }
+                    }
+                });
+                renderList(semuaProduk);
+            }
+        });
+    }
+
+    function renderList(data) {
+        const container = document.getElementById('list-harga');
+        container.innerHTML = '';
+        
+        const grup = data.reduce((acc, item) => {
+            if (!acc[item.kategori]) acc[item.kategori] = [];
+            acc[item.kategori].push(item);
+            return acc;
+        }, {});
+
+        for (let kategori in grup) {
+            const card = document.createElement('div');
+            card.style.marginBottom = '20px';
+            card.innerHTML = `<h4 style="margin:10px 0 5px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">${kategori.toUpperCase()}</h4>`;
+            
+            grup[kategori].sort((a, b) => Number(a.harga || 0) - Number(b.harga || 0))
+            .forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'item-row';
+                row.innerHTML = `
+                    <div class="item-header">
+                        <span class="item-name">${item.nama || item.id}</span>
+                        <span class="item-price">Rp ${Number(item.harga || 0).toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+                card.appendChild(row);
+            });
+            container.appendChild(card);
+        }
+    }
+
+    function filterHarga() {
+        const query = document.getElementById('searchHarga').value.toLowerCase();
+        const filtered = semuaProduk.format ? [] : semuaProduk.filter(item => 
+            (item.nama && item.nama.toLowerCase().includes(query)) || 
+            (item.kategori && item.kategori.toLowerCase().includes(query))
+        );
+        renderList(filtered);
+    }
+
+    // Mapping Bank ID (dari member.tokovoucher.net/list-bank) -> Nama Bank yang enak dibaca.
+    // Kalau ada bank_id baru yang belum masuk daftar ini, tambahkan barisnya di sini.
+    const BANK_ID_TO_NAME = {
+        'MANDIRI': 'Bank Mandiri',
+        'BRI': 'Bank BRI',
+        'BNI': 'Bank BNI',
+        'BCA': 'Bank BCA',
+        'BSM': 'Bank BSI',
+        'DANAMON': 'Bank Danamon',
+        'PERMATA': 'Bank Permata',
+        'BII': 'Maybank Indonesia',
+        'PANIN': 'Bank Panin',
+        'CIMB': 'Bank CIMB Niaga',
+        'MEGA_SYR': 'Bank Mega Syariah',
+        'ARTHA': 'Bank Artha Graha Internasional',
+        'PANIN_SYR': 'Bank Panin Dubai Syariah',
+        'BUMI_ARTA': 'Bank Bumi Arta',
+        'MESTIKA_DHARMA': 'Bank Mestika Dharma',
+        'JASA_JAKARTA': 'Bank Jasa Jakarta',
+        'MASPION': 'Bank Maspion Indonesia',
+        'SHINHAN': 'Bank Shinhan Indonesia',
+        'NUSANTARA_PARAHYANGAN': 'Bank Nusantara Parahyangan',
+        'HSBC': 'Bank HSBC Indonesia',
+        'BJB': 'Bank BJB',
+        'DKI': 'Bank DKI',
+        'ACEH': 'Bank Aceh Syariah',
+        'MUAMALAT': 'Bank Muamalat Indonesia',
+        'JAWA_TIMUR': 'Bank Jatim',
+        'JAWA_TENGAH': 'Bank Jateng',
+        'BENGKULU': 'Bank Bengkulu',
+        'NUSA_TENGGARA_BARAT': 'Bank NTB Syariah',
+        'BJB_SYR': 'Bank BJB Syariah',
+        'BCA_SYR': 'Bank BCA Syariah',
+        'DAERAH_ISTIMEWA': 'BPD DIY',
+        'DBS': 'Bank DBS Indonesia',
+        'CAPITAL': 'Bank Capital Indonesia',
+        'MAYAPADA': 'Bank Mayapada',
+        'BOC': 'Bank of China (Hong Kong)',
+        'KESEJAHTERAAN_EKONOMI': 'SeaBank Indonesia',
+        'HANA': 'Bank KEB Hana',
+        'BTN': 'Bank BTN',
+        'UOB': 'Bank UOB Indonesia',
+        'ROYAL': 'Bank Digital BCA (blu)',
+        'MNC_INTERNASIONAL': 'Bank MNC Internasional',
+        'NATIONALNOBU': 'Bank Nationalnobu',
+        'BUKOPIN': 'Bank KB Bukopin',
+        'WOORI': 'Bank Woori Saudara',
+        'CITIBANK': 'Citibank',
+        'INA_PERDANA': 'Bank Ina Perdana',
+        'SAHABAT_SAMPOERNA': 'Bank Sahabat Sampoerna',
+        'QNB_KESAWAN': 'Bank QNB Indonesia'
+    };
+
+    function getBankDisplayName(bankId) {
+        if (!bankId) return '';
+        const key = String(bankId).toUpperCase();
+        if (BANK_ID_TO_NAME[key]) return BANK_ID_TO_NAME[key];
+        // Fallback kalau bank_id belum ada di daftar: tampilkan versi rapi
+        // dari ID-nya (underscore jadi spasi, tiap kata dikapital) daripada kode mentah
+        return key.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+    }
+
+    function normalizeRiwayatItem(item) {
+        // Node "riwayat" (topup pulsa/produk digital dari index.html)
+        // sudah pakai field: product, price, dest, refID, status, timestamp
+        if (item.product !== undefined || item.refID !== undefined) {
+            return {
+                name: item.product || 'Transaksi',
+                price: Number(item.price || 0),
+                dest: item.dest || '-',
+                refID: item.refID || '-',
+                status: item.status || '-',
+                timestamp: item.timestamp || null
+            };
+        }
+        // Node "riwayat_transfer" (dana.html & tf.html) pakai field beda:
+        // kode_produk/bank, nominal, total_potongan, tujuan, trx_id, tipe
+        const isTransferBank = !!item.bank;
+        const name = isTransferBank
+            ? 'Transfer Bank - ' + getBankDisplayName(item.bank)
+            : (item.kode_produk || 'Top Up DANA');
+        // total_potongan = jumlah yang benar-benar terpotong dari saldo (nominal + admin)
+        const price = Number(item.total_potongan || item.nominal || 0);
+
+        return {
+            name: name,
+            price: price,
+            dest: item.nama_rekening ? (item.tujuan + ' - ' + item.nama_rekening) : (item.tujuan || '-'),
+            refID: item.trx_id || '-',
+            status: item.status || '-',
+            timestamp: item.timestamp || null
+        };
+    }
+
+    function renderRiwayatList(items) {
+        const container = document.getElementById('list-riwayat');
+        container.innerHTML = '';
+        if (items.length === 0) {
+            container.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px;">Belum ada riwayat transaksi.</p>';
+            return;
+        }
+        items.forEach(item => {
+            const refIdStr = String(item.refID || '').toLowerCase();
+            const isWifi = refIdStr.startsWith('wifi');
+            const labelDetail = isWifi ? 'Kode Voucher' : 'Tujuan/Detail';
+
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `
+                <div class="item-header">
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-price">Rp ${item.price.toLocaleString('id-ID')}</span>
+                </div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                    ${labelDetail}: <strong style="color: #0f172a;">${item.dest}</strong><br>
+                    Ref ID: ${item.refID}<br>
+                    Status: ${item.status}<br>
+                    Waktu: ${item.timestamp ? new Date(item.timestamp).toLocaleString('id-ID') : '-'}
+                </div>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    function loadRiwayat() {
+        const ph = localStorage.getItem('userPhone');
+        const container = document.getElementById('list-riwayat');
+        if (!ph) {
+            container.innerHTML = 'Silakan login terlebih dahulu.';
+            return;
+        }
+        container.innerHTML = 'Memuat riwayat...';
+
+        Promise.all([
+            db.ref('users/' + ph + '/riwayat').once('value'),
+            db.ref('users/' + ph + '/riwayat_transfer').once('value')
+        ]).then(([snapRiwayat, snapTransfer]) => {
+            let items = [];
+
+            if (snapRiwayat.exists()) {
+                snapRiwayat.forEach(child => {
+                    items.push(normalizeRiwayatItem(child.val()));
+                });
+            }
+            if (snapTransfer.exists()) {
+                snapTransfer.forEach(child => {
+                    items.push(normalizeRiwayatItem(child.val()));
+                });
+            }
+
+            // Urutkan dari yang terbaru ke terlama
+            items.sort((a, b) => {
+                const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+                return tb - ta;
+            });
+
+            renderRiwayatList(items);
+        }).catch(err => {
+            container.innerHTML = '<p style="color: #dc2626; text-align: center; padding: 20px;">Gagal memuat riwayat: ' + err.message + '</p>';
+        });
+    }
+
+    window.onload = () => {
+        const ph = localStorage.getItem('userPhone');
+        if (ph) initUserSession(ph);
+        loadHarga();
+    };
+</script>
+</body>
+</html>
