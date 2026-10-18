@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+    :root{
+        --brblue-1:#2f80f0;
+        --brblue-2:#1a5fd0;
+        --brblue-dark:#0d3f9e;
+        --ink:#1c2430;
+        --muted:#7a8598;
+        --bg:#f2f4f8;
+        --card:#ffffff;
+        --line:#eaedf3;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        padding: 0 0 78px 0;
+        font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+        background: var(--bg);
+        min-height: 100vh;
+        color: var(--ink);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .app-shell{ width:100%; max-width: 460px; position: relative; }
+
+    /* ===== Header ===== */
+    .app-header{
+        background: linear-gradient(150deg, var(--brblue-1), var(--brblue-2) 65%, var(--brblue-dark));
+        padding: 18px 16px 56px 16px;
+        border-radius: 0 0 26px 26px;
+        color: #fff;
+    }
+    .app-header-top{
+        display:flex; align-items:center; justify-content: space-between;
+        margin-bottom: 18px;
+    }
+    .brand{ display:flex; align-items:baseline; gap:2px; }
+    .brand b{ font-size: 21px; font-weight: 800; letter-spacing: -0.3px; }
+    .brand span{ font-size: 15px; font-weight: 500; opacity: .92; }
+    .notif-btn{
+        display:flex; align-items:center; gap:6px;
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.35);
+        color:#fff; border-radius: 999px;
+        padding: 7px 14px 7px 10px;
+        font-size: 12.5px; font-weight: 600;
+        cursor:pointer;
+    }
+    .notif-dot{ width:6px; height:6px; border-radius:50%; background:#ff5470; }
+
+    /* ===== Saldo card ===== */
+    .saldo-card{
+        background: var(--card);
+        border-radius: 18px;
+        padding: 18px 18px 14px 18px;
+        box-shadow: 0 14px 30px rgba(13,63,158,0.18);
+        margin-top: 4px;
+    }
+    .saldo-hi{ font-size: 14.5px; font-weight: 700; color: var(--ink); margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .saldo-label-row{ display:flex; align-items:center; gap:6px; font-size: 11.5px; color: var(--muted); font-weight:600; }
+    .eye-toggle{ background:none; border:none; padding:0; cursor:pointer; color:var(--muted); font-size: 13px; line-height:1; }
+    .saldo-value{
+        font-size: 17px; font-weight: 700; color: var(--brblue-2);
+        margin: 3px 0 14px 0; cursor:pointer; letter-spacing: .2px;
+    }
+    .saldo-actions{ display:flex; gap: 10px; }
+    .saldo-btn{
+        flex:1; border:none; border-radius: 999px; padding: 12px 8px;
+        font-size: 13px; font-weight: 700; cursor:pointer;
+        background: var(--brblue-2); color:#fff;
+    }
+    .saldo-btn.outline{
+        background: #eef4ff; color: var(--brblue-2);
+    }
+
+    /* ===== Search ===== */
+    .search-wrap{ width:100%; max-width: 460px; padding: 0 16px; margin-top: -28px; z-index: 2; }
+    .search-box{
+        display:flex; align-items:center; gap:10px;
+        background: var(--card); border:1px solid var(--line);
+        border-radius: 14px; padding: 12px 14px;
+        box-shadow: 0 6px 16px rgba(20,30,60,0.06);
+    }
+    .search-box svg{ flex-shrink:0; color: var(--muted); }
+    .search-box input{
+        border:none; outline:none; width:100%; font-size: 13.5px;
+        font-family: inherit; font-weight: 500; color: var(--ink); background:transparent;
+    }
+    .search-box input::placeholder{ color:#a7b0bf; }
+
+    /* ===== Category pills ===== */
+    .pill-row{
+        display:flex; gap:8px; overflow-x:auto; padding: 16px 16px 4px 16px;
+        scrollbar-width:none;
+    }
+    .pill-row::-webkit-scrollbar{ display:none; }
+    .pill{
+        flex-shrink:0; border:1px solid var(--line); background:#fff;
+        color: var(--muted); font-size:12.5px; font-weight:700;
+        border-radius: 999px; padding: 9px 16px; cursor:pointer;
+        transition: .15s;
+    }
+    .pill.active{ background: var(--brblue-2); border-color: var(--brblue-2); color:#fff; }
+
+    /* ===== Section ===== */
+    .section-wrap{ width:100%; max-width: 460px; padding: 10px 16px 4px 16px; }
+    .section-title{ font-size: 15.5px; font-weight: 800; color: var(--ink); margin: 10px 2px 12px 2px; }
+
+    .layanan-grid{
+        display:grid; grid-template-columns: repeat(5, 1fr);
+        gap: 12px 6px;
+    }
+    .card-kategori-item{ display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; }
+    .card-kategori{
+        width: 100%; aspect-ratio: 1/1; border-radius: 13px;
+        display:flex; align-items:center; justify-content:center;
+        overflow:hidden; transition: transform .15s;
+        box-shadow: 0 4px 10px rgba(20,30,60,0.08);
+    }
+    .card-kategori-item:active .card-kategori{ transform: scale(0.93); }
+    .card-kategori img{ width: 100%; height: 100%; object-fit: cover; display:block; }
+    .card-kategori-label{
+        font-size: 10px; font-weight: 700; color: var(--ink);
+        text-align:center; line-height: 1.2; word-break: break-word;
+    }
+
+    /* ===== Promo slider ===== */
+    .promo-slider-wrapper{ width:100%; max-width: 460px; padding: 6px 16px 0 16px; box-sizing:border-box; }
+    .promo-slider{
+        position: relative; width: 100%; aspect-ratio: 6/1.7; overflow:hidden;
+        border-radius: 16px; box-shadow: 0 6px 16px rgba(20,30,60,0.1); background:#dbe3f0;
+    }
+    .promo-slider-track{ display:flex; width:100%; height:100%; transition: transform .6s ease-in-out; }
+    .promo-slider-track img{ width:100%; height:100%; object-fit:cover; flex-shrink:0; }
+    .promo-slider-dots{ position:absolute; bottom:8px; left:0; right:0; display:flex; justify-content:center; gap:5px; }
+    .promo-slider-dots span{ width:6px; height:6px; border-radius:50%; background: rgba(255,255,255,0.55); }
+    .promo-slider-dots span.active{ background:#fff; }
+
+    /* ===== Bottom nav ===== */
+    .bottom-nav{
+        position: fixed; bottom:0; left:0; right:0;
+        background:#fff; border-top: 1px solid var(--line);
+        display:flex; justify-content:space-around; align-items:center;
+        padding: 9px 4px calc(9px + env(safe-area-inset-bottom,0px)) 4px;
+        z-index: 500;
+    }
+    .nav-item{
+        display:flex; flex-direction:column; align-items:center; gap:3px;
+        background:none; border:none; cursor:pointer;
+        color: var(--muted); font-size: 10.5px; font-weight:700;
+        font-family: inherit; padding: 2px 6px;
+    }
+    .nav-item svg{ width:21px; height:21px; }
+    .nav-item.active{ color: var(--brblue-2); }
+
+    #floating-status-btn{
+        position: fixed; top: 12px; right: 12px; width: 9px; height: 9px;
+        border-radius: 50%; background:#9ca3af; z-index: 600;
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.4);
+    }
+
+    /* Naga di atas tombol Klaim Voucher: biru = sistem ON, merah = sistem OFF */
+    .saldo-actions{ position: relative; }
+    #floating-naga{
+        position: absolute; bottom: calc(100% - 2px);
+        right: calc(25% - 2.5px); transform: translateX(50%);
+        width: 84px; height: auto; z-index: 3;
+        pointer-events: none; /* tombol tetap bisa diklik */
+        display: none;
+    }
+
+    .panel-container{ width:100%; max-width:460px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 10000; } .modal-content { background: #ffffff; padding: 24px; border: none; border-radius: 16px; width: 90%; max-width: 350px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); font-family: 'Inter', sans-serif; font-size: 14px; box-sizing: border-box; } .modal-close-btn { background: #1e293b; border: none; color: white; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 20px; transition: background 0.2s; } .modal-close-btn:hover { background: #334155; } 
+
+    /* TikTok Style Fullscreen Login */
+    .login-overlay { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: #ffffff; 
+        display: none; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: space-between; 
+        z-index: 20000; 
+        font-family: 'Inter', -apple-system, sans-serif; 
+        box-sizing: border-box; 
+        padding: 40px 20px; 
+    } 
+    .login-container-inner {
+        width: 100%;
+        max-width: 380px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-grow: 1;
+        justify-content: center;
+    }
+    .login-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: #161823;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+    .login-subtitle {
+        font-size: 14px;
+        color: #757575;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    .login-input-group {
+        position: relative;
+        width: 100%;
+        margin-bottom: 12px;
+    }
+    .login-input { 
+        width: 100%; 
+        padding: 14px 16px; 
+        border: 1px solid #e1e1e1; 
+        border-radius: 8px; 
+        font-size: 1rem; 
+        box-sizing: border-box; 
+        outline: none; 
+        background: #f8f8f8; 
+        color: #161823;
+        font-weight: 500;
+        transition: background 0.2s, border-color 0.2s;
+    } 
+    .login-input:focus { 
+        border-color: #1a5fd0; 
+        background: #fff; 
+    } 
+    .login-btn { 
+        width: 100%; 
+        padding: 14px; 
+        background-color: #1a5fd0; 
+        color: white; 
+        border: none; 
+        border-radius: 8px; 
+        font-size: 1rem; 
+        font-weight: bold; 
+        cursor: pointer; 
+        margin-top: 10px; 
+        transition: background-color 0.2s; 
+    } 
+    .login-btn:hover { 
+        background-color: #0d3f9e; 
+    } 
+    .login-close-x {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #161823;
+        font-weight: bold;
+    }
+    .login-footer-text {
+        font-size: 12px;
+        color: #86878b;
+        text-align: center;
+        margin-top: 20px;
+    }
+    .login-footer-text span {
+        color: #1a5fd0;
+        cursor: pointer;
+    }
+
+    /* Slider Foto Promo */
+    .promo-slider-wrapper {
+        width: 100%;
+        max-width: 405px;
+        margin: 0 auto 9px auto;
+        padding: 0 4.5px;
+        box-sizing: border-box;
+    }
+    .promo-slider {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 6 / 1;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        background: #ccc;
+    }
+    .promo-slider-track {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.6s ease-in-out;
+    }
+    .promo-slider-track img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        flex-shrink: 0;
+        aspect-ratio: 6 / 1;
+    }
+    .promo-slider-dots {
+        position: absolute;
+        bottom: 6px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+    }
+    .promo-slider-dots span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.5);
+        transition: background 0.3s;
+    }
+    .promo-slider-dots span.active {
+        background: #ffffff;
+    }
+
+    /* =====================================================
+       RESPONSIF — ponsel (default di atas), tablet, desktop
+       ===================================================== */
+    html { -webkit-text-size-adjust: 100%; }
+    .app-shell, .panel-container { margin-left: auto; margin-right: auto; }
+
+    /* Ponsel sangat kecil */
+    @media (max-width: 360px) {
+        .layanan-grid { grid-template-columns: repeat(4, 1fr); }
+        .saldo-btn { font-size: 12px; padding: 11px 6px; }
+        .app-header { padding-left: 12px; padding-right: 12px; }
+    }
+
+    /* Tablet & desktop: isi layar penuh (konten dibatasi 1500px di monitor sangat lebar) */
+    @media (min-width: 768px) {
+        :root { --pad: max(clamp(24px, 4vw, 72px), calc((100vw - 1500px) / 2)); }
+
+        body { padding-bottom: 88px; }
+        .app-shell { max-width: none; }
+        .panel-container { max-width: none; }
+
+        .app-header {
+            padding: 26px var(--pad) 70px var(--pad);
+            border-radius: 0 0 34px 34px;
+        }
+        .app-header-top { margin-bottom: 22px; }
+        .brand b { font-size: 27px; }
+        .brand span { font-size: 18px; }
+        .notif-btn { font-size: 14px; padding: 9px 18px 9px 14px; }
+
+        .saldo-card { padding: 22px 26px 18px 26px; border-radius: 20px; }
+        .saldo-hi { font-size: 16.5px; }
+        .saldo-label-row { font-size: 13px; }
+        .saldo-value { font-size: 23px; }
+        .saldo-btn { font-size: 14.5px; padding: 14px 10px; }
+        #floating-naga { width: 96px; }
+
+        .search-wrap { max-width: none; padding: 0 var(--pad); margin-top: -32px; }
+        .search-box { padding: 15px 18px; border-radius: 16px; }
+        .search-box input { font-size: 15px; }
+
+        .section-wrap { max-width: none; padding: 16px var(--pad) 8px var(--pad); }
+        .section-title { font-size: 20px; margin: 12px 2px 16px 2px; }
+        .layanan-grid {
+            grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+            gap: 24px 16px;
+        }
+        .card-kategori { max-width: 112px; margin: 0 auto; border-radius: 16px; }
+        .card-kategori-label { font-size: 12.5px; }
+
+        .promo-slider-wrapper { max-width: none; margin: 0 auto 14px auto; padding: 8px var(--pad) 0 var(--pad); }
+        .promo-slider { aspect-ratio: 6 / 1; max-height: 300px; border-radius: 18px; }
+        .promo-slider-dots span { width: 8px; height: 8px; }
+
+        .bottom-nav { justify-content: center; gap: clamp(24px, 7vw, 110px); }
+        .nav-item { font-size: 12px; padding: 4px 14px; }
+        .nav-item svg { width: 24px; height: 24px; }
+    }
+
+    /* Desktop: kartu saldo melebar — info di kiri, tombol di kanan */
+    @media (min-width: 1024px) {
+        .saldo-card {
+            display: grid;
+            grid-template-columns: 1fr minmax(380px, 460px);
+            grid-template-areas: "hi actions" "label actions" "value actions";
+            column-gap: 40px;
+            align-items: center;
+        }
+        .saldo-hi { grid-area: hi; }
+        .saldo-label-row { grid-area: label; }
+        .saldo-value { grid-area: value; margin-bottom: 0; }
+        .saldo-actions { grid-area: actions; }
+        .layanan-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 28px 20px; }
+        .card-kategori { max-width: 124px; }
+        .card-kategori-label { font-size: 13.5px; }
+    }
+
+    /* Efek hover hanya di perangkat yang punya mouse */
+    @media (hover: hover) {
+        .card-kategori-item:hover .card-kategori { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(20,30,60,0.14); }
+        .saldo-btn:hover { filter: brightness(1.06); }
+        .nav-item:hover { color: var(--brblue-2); }
+        .notif-btn:hover { background: rgba(255,255,255,0.24); }
+    }
+</style>
+</head>
+<body>
+<div id="floating-status-btn" title="Status Sistem"></div>
+
+<div class="app-shell">
+    <div class="app-header">
+        <div class="app-header-top">
+            <div class="brand"><b>Nasuka</b><span>Digital</span></div>
+            <button class="notif-btn" onclick="bukaInfo()">
+                <span class="notif-dot"></span> Info
+            </button>
+        </div>
+
+        <div class="saldo-card">
+            <div class="saldo-hi" id="saldo-hi">Hi, Sahabat Nasuka Wireless</div>
+            <div class="saldo-label-row">
+                <span>Total Saldo</span>
+                <button class="eye-toggle" onclick="event.stopPropagation(); toggleSaldoMask()">👁</button>
+            </div>
+            <div class="saldo-value" id="display-saldo" onclick="toggleAuthPanel()">Tap untuk Masuk</div>
+            <div class="saldo-actions">
+             
+             
+                <button class="saldo-btn" onclick="bukaSaldo()">Tambah Saldo</button>
+                
+                
+                <img id="floating-naga" alt="" draggable="false">
+                <button class="saldo-btn outline" id="btn-akun-outline" onclick="bukaMobil()">Mobil Mobilan</button>
+                
+                
+                
+                
+                
+                
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="search-wrap">
+        <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" placeholder="Cari Layanan Nasuka Wireless" oninput="filterLayanan(this.value)">
+        </div>
+    </div>
+
+  
+
+    <div class="section-wrap">
+        <div class="section-title">Layanan</div>
+        <div class="layanan-grid">
+            <div class="card-kategori-item" data-label="paket data internet" onclick="bukaPaketData()">
+                <div class="card-kategori" style="background:#e6f4ea;"><img src="paketdata.png"></div>
+                <div class="card-kategori-label">Paket Data</div>
+                
+                
+                
+                
+            </div>
+            
+            <div class="card-kategori-item" data-label="pulsa" onclick="bukaVoucher()">
+                <div class="card-kategori" style="background:#fdece0;"><img src="voucher.png"></div>
+                <div class="card-kategori-label">Voucher Kuota</div>              
+            </div>
+            
+      <div class="card-kategori-item" data-label="pulsa" onclick="bukaAktivasi()">
+                <div class="card-kategori" style="background:#fdece0;"><img src="voucheraxis.png"></div>
+                <div class="card-kategori-label">Aktivasi Axis</div>              
+            </div>          
+            
+            
+            <div class="card-kategori-item" data-label="pulsa" onclick="bukaPulsa()">
+                <div class="card-kategori" style="background:#fdece0;"><img src="pulsa.png"></div>
+                <div class="card-kategori-label">Pulsa</div>              
+            </div>
+            
+            
+            
+            
+            
+            <div class="card-kategori-item" data-label="transfer bank" onclick="bukaTransferBank()">
+                <div class="card-kategori" style="background:#fdeaea;"><img src="tf.jpg"></div>
+                <div class="card-kategori-label">Transfer Bank</div>
+            </div>
+            
+            
+            <div class="card-kategori-item" data-label="dana e-wallet" onclick="bukaDana()">
+                <div class="card-kategori" style="background:#e7edfc;"><img src="dana.jpg"></div>
+                <div class="card-kategori-label">Topup DANA</div>
+            </div>
+            
+        <div class="card-kategori-item" data-label="dana e-wallet" onclick="bukaVocdana()">
+                <div class="card-kategori" style="background:#e7edfc;"><img src="vocdana.png"></div>
+                <div class="card-kategori-label">Voucher DANA</div>
+            </div>     
+            
+            
+            <div class="card-kategori-item" data-label="free fire game topup" onclick="bukaFreefire()">
+                <div class="card-kategori" style="background:#fbe6f0;"><img src="freefire.jpg"></div>
+                <div class="card-kategori-label">Free Fire</div>
+            </div>
+            
+            <div class="card-kategori-item" data-label="qris scan" onclick="bukaToken()">
+                <div class="card-kategori" style="background:#e6f2fd;"><img src="token.png"></div>
+                <div class="card-kategori-label">Token Listrik</div>
+            </div>
+            
+            
+            
+             
+            </div>
+        </div>
+
+    <div class="promo-slider-wrapper">
+        <div class="promo-slider" id="promoSlider">
+            <div class="promo-slider-track" id="promoSliderTrack">
+                <img src="promovoucher.png" alt="promo 1">
+                <img src="promodana.png" alt="promo 2">
+                <img src="promotf.png" alt="promo 3">
+                <img src="promoqris.png" alt="promo 4">
+            </div>
+            <div class="promo-slider-dots" id="promoSliderDots">
+                <span class="active"></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-container"></div>
+</div>
+
+<div class="bottom-nav">
+    <button class="nav-item active" onclick="void(0)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+        Beranda
+    </button>
+    
+    
+  
+    
+    
+    
+    <button class="nav-item" onclick="bukaRiwayat()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19h16"></path><path d="M7 15v4"></path><path d="M12 10v9"></path><path d="M17 5v14"></path></svg>
+    Riwayat
+</button>
+
+    
+    
+    
+    <button class="nav-item" onclick="showAlert('Fitur Nasuka Paylater segera hadir')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg>
+        Paylater
+    </button>
+  
+    
+    
+    <button class="nav-item" onclick="bukaAdmin()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"></path><circle cx="10" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    Kontak Admin
+</button>
+
+    
+  
+<button class="nav-item" onclick="bukaProfil()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    Akun
+</button>
+
+    
+    
+</div>
+
+<div id="customAlert" class="modal-overlay">
+    <div class="modal-content">
+        <div id="alertMessage" style="margin-bottom:15px; padding: 10px;"></div>
+        <button class="modal-close-btn" onclick="tutupCustomAlert()">OK</button>
+    </div>
+</div>
+
+<div id="apiModal" class="modal-overlay">
+    <div class="modal-content" id="modalContent">
+        <div id="modalBody" style="padding: 10px;"></div>
+        <button class="modal-close-btn" onclick="tutupModal()">Tutup</button>
+    </div>
+</div>
+
+<div id="loginOverlay" class="login-overlay">
+    <button type="button" class="login-close-x" onclick="hideLogin()">✕</button>
+    <div class="login-container-inner">
+        <div class="login-title">Masuk ke Akun</div>
+        <div class="login-subtitle">Gunakan nomor handphone dan PIN Anda<p>Apabila Belum punya akun, Mengisi nomor handphone, 4 digit pin dan klik masuk, Maka Daftar & Login otomatis</p></div>
+        
+        
+        <div class="login-input-group">
+            <input type="text" id="loginPhone" class="login-input" placeholder="Nomor Handphone" inputmode="numeric" pattern="[0-9]*" maxlength="13">
+        </div>
+        <div class="login-input-group">
+            <input type="password" id="loginPin" class="login-input" placeholder="PIN (4 Digit)" inputmode="numeric" pattern="[0-9]*" maxlength="4">
+        </div>
+        <button id="btnLoginAction" class="login-btn" onclick="prosesLogin()">Masuk</button>
+        <div class="login-footer-text">Dengan melanjutkan, Anda menyetujui syarat & ketentuan yang berlaku.</div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    
+    let userSaldo = 0;
+
+    db.ref('settings/systemStatus').on('value', snap => {
+        const status = snap.val();
+        const floatBtn = document.getElementById('floating-status-btn');
+        const naga = document.getElementById('floating-naga');
+        if (naga) {
+            const src = (status === 'ON')
+                ? 'https://nasuka.pro/gambar/nagabiru.gif'
+                : 'https://nasuka.pro/gambar/nagamerah.gif';
+            if (naga.getAttribute('src') !== src) naga.src = src;
+            naga.style.display = 'block';
+        }
+        if (floatBtn) {
+            if (status === 'ON') {
+                floatBtn.style.backgroundColor = '#10b981';
+            } else {
+                floatBtn.style.backgroundColor = '#9ca3af';
+            }
+        }
+    });
+
+    function showAlert(msg) { document.getElementById('alertMessage').innerText = msg; document.getElementById('customAlert').style.display = 'flex'; }
+    function tutupCustomAlert() { document.getElementById('customAlert').style.display = 'none'; }
+    function batasiInputAngka(elementId, maxLength) { const inputEl = document.getElementById(elementId); if(inputEl) { inputEl.addEventListener('input', function() { this.value = this.value.replace(/[^0-9]/g, ''); if (this.value.length > maxLength) this.value = this.value.slice(0, maxLength); }); } }
+
+    function tutupModal() { 
+        document.getElementById('apiModal').style.display = 'none'; 
+    }
+    
+    function showLogin() { document.getElementById('loginOverlay').style.display = 'flex'; }
+    function hideLogin() { document.getElementById('loginOverlay').style.display = 'none'; }
+    
+    function prosesLogin() {
+        const phone = document.getElementById('loginPhone').value.trim();
+        const pin = document.getElementById('loginPin').value.trim();
+        if (!phone || !pin) return showAlert('Data wajib diisi!');
+        db.ref('users/' + phone).once('value', snap => {
+            if (snap.exists()) {
+                if (String(snap.val().pin) === String(pin)) { localStorage.getItem('userPhone') ? null : localStorage.setItem('userPhone', phone); hideLogin(); saldoHidden = false; initUserSession(phone); } else { showAlert('PIN salah!'); }
+            } else {
+                db.ref('settings/userCounter').transaction(current => { return (current || 0) + 1; }, (error, committed, snapshot) => {
+                    if (error) { showAlert('Gagal membuat akun: ' + error.message); } else if (committed) {
+                        const newId = snapshot.val();
+                        db.ref('users/' + phone).set({ pin: pin, saldo: 0, poin: 0, kodeUnik: newId, created_at: new Date().toISOString() }).then(() => { localStorage.setItem('userPhone', phone); hideLogin(); saldoHidden = false; initUserSession(phone); });
+                    }
+                });
+            }
+        });
+    }
+
+    let saldoHidden = true;
+
+    function renderSaldo() {
+        const el = document.getElementById('display-saldo');
+        if (!el) return;
+        if (!localStorage.getItem('userPhone')) {
+            el.innerText = "Tap untuk Masuk";
+            return;
+        }
+        el.innerText = saldoHidden ? "Rp ••••••" : "Rp " + userSaldo.toLocaleString('id-ID');
+    }
+
+    function toggleSaldoMask() {
+        if (!localStorage.getItem('userPhone')) { showLogin(); return; }
+        saldoHidden = !saldoHidden;
+        renderSaldo();
+    }
+
+    // ===== Sapaan: "Hi, <nama user>" jika login & punya nama di RTDB =====
+    const SAPAAN_DEFAULT = 'Hi, Sahabat Nasuka Wireless';
+    let namaRef = null, namaHandler = null;
+
+    function renderSapaan(nama) {
+        const el = document.getElementById('saldo-hi');
+        if (!el) return;
+        const n = nama ? String(nama).replace(/\s+/g, ' ').trim() : '';
+        // textContent (bukan innerHTML) supaya nama dari user aman dari injeksi HTML
+        el.textContent = (localStorage.getItem('userPhone') && n) ? 'Hi, ' + n : SAPAAN_DEFAULT;
+    }
+
+    function pantauNama(ph) {
+        if (namaRef && namaHandler) namaRef.off('value', namaHandler); // hindari listener ganda
+        namaRef = db.ref('users/' + ph + '/nama');
+        namaHandler = snap => renderSapaan(snap.val());
+        namaRef.on('value', namaHandler);
+    }
+
+    function initUserSession(ph) {
+        if (ph) {
+            db.ref('users/' + ph + '/saldo').on('value', snap => { userSaldo = snap.val() || 0; renderSaldo(); });
+            pantauNama(ph);
+        }
+    }
+
+    window.onload = () => {
+        const savedPh = localStorage.getItem('userPhone');
+        if (savedPh) initUserSession(savedPh);
+        renderSaldo();
+        renderSapaan('');
+        batasiInputAngka('loginPhone', 13); 
+        batasiInputAngka('loginPin', 4); 
+        initPromoSlider();
+    };
+    
+    function toggleAuthPanel() {
+        if (!localStorage.getItem('userPhone')) {
+            showLogin();
+        }
+    }
+
+    function filterLayanan(q) {
+        q = q.trim().toLowerCase();
+        document.querySelectorAll('.card-kategori-item').forEach(item => {
+            const label = (item.dataset.label || '').toLowerCase();
+            item.style.display = label.includes(q) ? '' : 'none';
+        });
+    }
+
+    function setActivePill(el) {
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function bukaInfo() {
+        window.location.href = "info.html";
+    }
+
+    function bukaDana() {
+        window.location.href = "dana.html";
+    }
+
+function bukaVocdana() {
+        window.location.href = "vocdana.html";
+    }
+
+
+    function bukaTransferBank() {
+        window.location.href = "tf.html";
+    }
+    
+    function bukaQris() {
+        window.location.href = "qris.html";
+    }
+    
+    function bukaPulsa() {
+        window.location.href = "pulsa.html";
+    }
+    
+    function bukaPaketData() {
+        window.location.href = "paketdata.html";
+    }
+
+    function bukaFreefire() {
+        window.location.href = "freefire.html";
+    }
+
+function bukaToken() {
+        window.location.href = "token.html";
+    }
+
+function bukaRiwayat() {
+        window.location.href = "riwayat.html";
+    }
+
+
+function bukaVoucher() {
+        window.location.href = "voucher.html";
+    }
+    
+    
+    function bukaAktivasi() {
+        window.location.href = "aktivasi.html";
+    }
+    
+    
+    function bukaPenguji() {
+        window.location.href = "penguji.html";
+    }
+    
+    function bukaMobil() {
+        window.location.href = "mobil.html";
+    }
+    
+    
+    function bukaSaldo() {
+        window.location.href = "saldo.html";
+    }
+    
+    function bukaKlaimvoucher() {
+        window.location.href = "klaimvoucher.html";
+    }
+    
+
+function bukaProfil() {
+    if (!localStorage.getItem('userPhone')) {
+        showLogin();
+        return;
+    }
+    
+    window.location.href = "profil.html";
+}
+
+
+
+function bukaAdmin() {
+    const nomorWa = "62859109819017";
+    const pesan = encodeURIComponent("Halo Admin, saya ingin bertanya.");
+    const urlWa = `https://wa.me/${nomorWa}?text=${pesan}`;
+    
+    // Membuka tautan WhatsApp di tab baru atau aplikasi WhatsApp
+    window.open(urlWa, '_blank');
+}
+
+
+    /* ===== Slider Foto Promo (auto-geser) ===== */
+    function initPromoSlider() {
+        const track = document.getElementById('promoSliderTrack');
+        const dotsWrap = document.getElementById('promoSliderDots');
+        if (!track) return;
+        const slides = track.querySelectorAll('img');
+        const dots = dotsWrap.querySelectorAll('span');
+        const total = slides.length;
+        let current = 0;
+
+        function goTo(index) {
+            current = (index + total) % total;
+            track.style.transform = 'translateX(-' + (current * 100) + '%)';
+            dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        }
+
+        goTo(0);
+        setInterval(() => goTo(current + 1), 3000);
+    }
+</script>
+</body>
+</html>
