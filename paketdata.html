@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+   *, *::before, *::after { box-sizing: border-box; }
+   body { margin: 0; padding: 9px 9px 90px 9px; display: flex; flex-direction: column; align-items: center; font-family: 'Inter', -apple-system, sans-serif; background-image: url('https://nasuka.pro/gambar/langit.jpg'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat; min-height: 100vh; font-size: 80%; font-weight: bold; }
+
+   .panel-container { width: 100%; max-width: 400px; flex-grow: 1; overflow-y: auto; padding-bottom: 20px; }
+   .card h2 { font-size: 1.8468em; }
+   .card { background: #ffffff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+   .card input, .card select, .card button { width: 100% !important; height: 36px !important; padding: 6px !important; font-size: 1.2312em !important; margin: 6px 0 !important; border-radius: 4.56px !important; border: 0.6px solid #ccc !important; }
+
+   .operator-row { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 8px 0; }
+   .operator-chip { flex-shrink: 0; padding: 8px 14px; border: 1.5px solid #ccc; border-radius: 20px; background: #fafafa; cursor: pointer; font-size: 0.95em; white-space: nowrap; }
+   .operator-chip.selected { border-color: #1877f2; background: #1877f2; color: #fff; }
+
+   .produk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0; }
+   .produk-item { border: 1.5px solid #ccc; border-radius: 8px; padding: 10px 6px; text-align: center; cursor: pointer; background: #fafafa; }
+   .produk-item.selected { border-color: #1877f2; background: #eaf2ff; }
+   .produk-item .nominal { font-size: 0.92em; color: #0f172a; line-height: 1.25; }
+   .produk-item .harga { font-size: 0.85em; font-weight: normal; color: #16a34a; margin-top: 4px; }
+
+   /* Modal Struk Bergaya Perbankan */
+   .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 10000; padding: 16px; }
+   .modal-content { background: #ffffff; padding: 20px; border: none; border-radius: 16px; width: 100%; max-width: 340px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #000; position: relative; }
+   .modal-close-btn { background: #1e293b; border: none; color: white; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 15px; font-family: 'Inter', sans-serif; font-size: 14px; }
+   .modal-close-btn:hover { background: #334155; }
+
+   .receipt-header { text-align: center; font-weight: bold; font-size: 1.15em; margin-bottom: 12px; border-bottom: 2px dashed #000; padding-bottom: 8px; }
+   .receipt-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-family: 'Courier New', Courier, monospace; }
+   .receipt-label { color: #333; font-weight: normal; }
+   .receipt-value { font-weight: bold; text-align: right; color: #000; word-break: break-all; max-width: 60%; }
+
+   /* TikTok Style Fullscreen Login (mengikuti gaya index.html) */
+   .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; display: none; flex-direction: column; align-items: center; justify-content: space-between; z-index: 20000; font-family: 'Inter', -apple-system, sans-serif; box-sizing: border-box; padding: 40px 20px; }
+   .login-container-inner { width: 100%; max-width: 380px; display: flex; flex-direction: column; align-items: center; flex-grow: 1; justify-content: center; }
+   .login-title { font-size: 24px; font-weight: 800; color: #161823; margin-bottom: 8px; text-align: center; }
+   .login-subtitle { font-size: 14px; color: #757575; margin-bottom: 30px; text-align: center; }
+   .login-input-group { position: relative; width: 100%; margin-bottom: 12px; }
+   .login-input { width: 100%; padding: 14px 16px; border: 1px solid #e1e1e1; border-radius: 8px; font-size: 1rem; box-sizing: border-box; outline: none; background: #f8f8f8; color: #161823; font-weight: 500; transition: background 0.2s, border-color 0.2s; }
+   .login-input:focus { border-color: #fe2c55; background: #fff; }
+   .login-btn { width: 100%; padding: 14px; background-color: #fe2c55; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background-color 0.2s; }
+   .login-btn:hover { background-color: #e61e44; }
+   .login-btn:disabled { background-color: #f9a5b7; cursor: not-allowed; }
+   .login-close-x { position: absolute; top: 20px; left: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #161823; font-weight: bold; }
+   .login-footer-text { font-size: 12px; color: #86878b; text-align: center; margin-top: 20px; }
+   .login-footer-text span { color: #fe2c55; cursor: pointer; }
+   #globalLoader { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99999; display: none; width: 200px; height: auto; }
+   .nav-bar-retro { display: flex; justify-content: space-between; width: 100%; max-width: 400px; margin-bottom: 9px; gap: 4px; }
+   .btn-retro { background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff; padding: 6px 2px; font-size: 11px; font-weight: bold; cursor: pointer; flex: 1; text-align: center; }
+   .btn-retro:active { border-color: #808080 #ffffff #ffffff #808080; }
+   .floating-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px); padding: 10px 16px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: center; z-index: 9999; }
+   .floating-footer-content { width: 100%; max-width: 400px; }
+   #btn-submit-paket { background-color: #1877f2; color: white; font-size: 16px !important; height: 44px !important; width: 100% !important; border-radius: 8px !important; border: none !important; cursor: pointer; font-weight: bold; margin: 0 !important; }
+   #btn-submit-paket:disabled { background-color: #a8a8a8; cursor: not-allowed; }
+
+    /* ===== VERSI WEB: tombol kembali ke beranda ===== */
+    .web-topbar{width:100%;max-width:400px;margin:0 auto 9px auto;box-sizing:border-box}
+    .web-topbar a{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.94);color:#0f172a;font:600 13px/1 'Inter',-apple-system,'Segoe UI',sans-serif;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.14)}
+    .web-topbar a:hover{background:#fff}
+
+    /* ===== RESPONSIF: tablet & desktop ===== */
+    @media (min-width: 768px) {
+        body { font-size: 92%; padding: 18px 24px 110px 24px; }
+        .web-topbar, .nav-bar-retro, .panel-container, .floating-footer-content { max-width: 760px; }
+        .produk-grid { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; }
+        .card { padding: 22px; }
+        .card input, .card select, .card button { height: 42px !important; }
+        .btn-retro { font-size: 13px; padding: 9px 6px; }
+        .produk-item { padding: 14px 8px; }
+    }
+    @media (hover: hover) { .produk-item:hover { border-color: #1877f2; } }
+</style>
+</head>
+<body>
+<nav class="web-topbar" aria-label="Navigasi"><a href="produk.html">&#8249; Beranda</a></nav>
+<img id="globalLoader" src="https://nasuka.pro/gambar/loading3.gif">
+
+<div class="nav-bar-retro" style="flex-direction: column; align-items: flex-end;">
+    <div style="display: flex; gap: 4px; width: 100%;">
+     
+        <button class="btn-retro" id="btn-saldo" onclick="toggleAuthPanel()"><span id="display-saldo">Rp --</span></button>
+    </div>
+    <div id="auth-dropdown" style="display: none; width: 100%; margin-top: 4px; flex-direction: column; gap: 4px;">
+       
+    </div>
+</div>
+
+<div class="panel-container">
+    <div class="card">
+        <h2>Paket Data</h2>
+
+        <input type="text" id="paket-tujuan" placeholder="Nomor HP Tujuan" inputmode="numeric" pattern="[0-9]*">
+
+        <div class="operator-row" id="operator-row"></div>
+
+        <select id="input-filter-durasi" onchange="renderProdukGrid()">
+            <option value="">Semua Durasi</option>
+            <option value="1">1 Hari</option>
+            <option value="2">2 Hari</option>
+            <option value="3">3 Hari</option>
+            <option value="4">4 Hari</option>
+            <option value="5">5 Hari</option>
+            <option value="7">7 Hari</option>
+            <option value="14">14 Hari</option>
+            <option value="28">28 Hari</option>
+            <option value="30">30 Hari</option>
+            <option value="60">60 Hari</option>
+            <option value="90">90 Hari</option>
+            <option value="360">360 Hari</option>
+            <option value="365">365 Hari</option>
+        </select>
+
+        <div class="produk-grid" id="produk-grid"></div>
+    </div>
+</div>
+
+<div class="floating-footer">
+    <div class="floating-footer-content">
+        <button id="btn-submit-paket" onclick="eksekusiBeliPaket()">Beli Sekarang</button>
+    </div>
+</div>
+
+<div id="customAlert" class="modal-overlay">
+    <div class="modal-content">
+        <div id="receiptContent"></div>
+        <button class="modal-close-btn" onclick="tutupCustomAlert()">OK</button>
+    </div>
+</div>
+
+<div id="loginOverlay" class="login-overlay">
+    <button type="button" class="login-close-x" onclick="hideLogin()">✕</button>
+    <div class="login-container-inner">
+        <div class="login-title">Masuk ke Akun</div>
+        <div class="login-subtitle">Gunakan nomor handphone dan PIN Anda<p>Apabila Belum punya akun maka mengisi nomor handphone dan 4 digit pin dan klik masuk maka otomatis tercipta akun baru</p></div>
+
+        <div class="login-input-group">
+            <input type="text" id="loginPhone" class="login-input" placeholder="Nomor Handphone" inputmode="numeric" pattern="[0-9]*" maxlength="13">
+        </div>
+        <div class="login-input-group">
+            <input type="password" id="loginPin" class="login-input" placeholder="PIN (4 Digit)" inputmode="numeric" pattern="[0-9]*" maxlength="4">
+        </div>
+        <button id="btnLoginAction" class="login-btn" onclick="prosesLogin()">Masuk</button>
+        <div class="login-footer-text">Dengan melanjutkan, Anda menyetujui syarat & ketentuan yang berlaku.</div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Sama persis dengan API_URL yang dipakai tf.html, dana.html & pulsa.html (satu backend tokovoucher.gs).
+    const API_URL_PAKET = 'https://script.google.com/macros/s/AKfycbyCz8o5opNRSQs5qLgbA6ORyTMkCW3sp4zOF-da2RnSpSd85u2ZeffQ1L9qJvlWXeWh/exec';
+
+    let userSaldo = 0;
+    let activeRefListener = null;
+    let produkTerpilih = null;
+    let semuaProdukPaket = [];
+    let operatorAktif = null;
+
+    function showAlert(msg) {
+        document.getElementById('receiptContent').innerHTML = `<div style="text-align: center; padding: 20px; font-family: 'Inter', sans-serif;">${msg}</div>`;
+        document.getElementById('customAlert').style.display = 'flex';
+    }
+
+    function tutupCustomAlert() {
+        document.getElementById('customAlert').style.display = 'none';
+    }
+
+    function batasiInputAngka(elementId, maxLength) {
+        const inputEl = document.getElementById(elementId);
+        if (inputEl) {
+            inputEl.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value.length > maxLength) this.value = this.value.slice(0, maxLength);
+            });
+        }
+    }
+
+    function kembaliKeApp() {
+        window.location.href = "produk.html";
+    }
+
+    function showLogin() { document.getElementById('loginOverlay').style.display = 'flex'; }
+    function hideLogin() {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('auth-dropdown').style.display = 'none';
+    }
+
+    function prosesLogin() {
+        const phone = document.getElementById('loginPhone').value.trim();
+        const pin = document.getElementById('loginPin').value.trim();
+        if (!phone || !pin) return showAlert('Data wajib diisi!');
+        db.ref('users/' + phone).once('value', snap => {
+            if (snap.exists()) {
+                if (String(snap.val().pin) === String(pin)) {
+                    localStorage.getItem('userPhone') ? null : localStorage.setItem('userPhone', phone);
+                    hideLogin();
+                    initUserSession(phone);
+                } else {
+                    showAlert('PIN salah!');
+                }
+            } else {
+                db.ref('settings/userCounter').transaction(current => { return (current || 0) + 1; }, (error, committed, snapshot) => {
+                    if (error) { showAlert('Gagal membuat akun: ' + error.message); }
+                    else if (committed) {
+                        const newId = snapshot.val();
+                        db.ref('users/' + phone).set({ pin: pin, saldo: 0, poin: 0, kodeUnik: newId, created_at: new Date().toISOString() })
+                            .then(() => { localStorage.setItem('userPhone', phone); hideLogin(); initUserSession(phone); });
+                    }
+                });
+            }
+        });
+    }
+
+    function initUserSession(ph) {
+        if (ph) {
+            db.ref('users/' + ph + '/saldo').on('value', snap => {
+                userSaldo = snap.val() || 0;
+                document.getElementById('display-saldo').innerText = "Rp " + userSaldo.toLocaleString('id-ID');
+            });
+        }
+    }
+
+    function toggleAuthPanel() {
+        if (!localStorage.getItem('userPhone')) {
+            showLogin();
+        } else {
+            const dropdown = document.getElementById('auth-dropdown');
+            dropdown.style.display = (dropdown.style.display === 'none' || dropdown.style.display === '') ? 'flex' : 'none';
+        }
+    }
+
+    function prosesLogout() {
+        stopListenStatusPaket();
+        localStorage.clear();
+        document.getElementById('display-saldo').innerText = "Rp --";
+        document.getElementById('auth-dropdown').style.display = 'none';
+        window.location.reload();
+    }
+
+    // ==== Produk Paket Data (baca produk_agregator/paket, bisa flat atau nested per operator) ====
+
+    function muatProdukDariRTDB() {
+        const grid = document.getElementById('produk-grid');
+        grid.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #64748b; padding: 10px;">Memuat produk...</div>';
+
+        db.ref('produk_agregator/paket').once('value', snapshot => {
+            semuaProdukPaket = [];
+            if (!snapshot.exists()) {
+                grid.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #ef4444; padding: 10px;">Produk kosong</div>';
+                return;
+            }
+
+            snapshot.forEach(child => {
+                const nodeData = child.val();
+                if (nodeData && nodeData.harga !== undefined) {
+                    // flat: langsung produk
+                    if (Number(nodeData.status) === 1) {
+                        semuaProdukPaket.push({
+                            kode: nodeData.val || child.key,
+                            nama: nodeData.nama || child.key,
+                            harga: Number(nodeData.harga || 0),
+                            op: nodeData.op || 'LAINNYA'
+                        });
+                    }
+                } else {
+                    // nested per operator
+                    child.forEach(subChild => {
+                        const subData = subChild.val();
+                        if (subData && Number(subData.status) === 1) {
+                            semuaProdukPaket.push({
+                                kode: subData.val || subChild.key,
+                                nama: subData.nama || subChild.key,
+                                harga: Number(subData.harga || 0),
+                                op: subData.op || child.key || 'LAINNYA'
+                            });
+                        }
+                    });
+                }
+            });
+
+            renderOperatorRow();
+            renderProdukGrid();
+        });
+    }
+
+    function renderOperatorRow() {
+        const row = document.getElementById('operator-row');
+        const daftarOp = [...new Set(semuaProdukPaket.map(p => p.op))].sort();
+        if (!operatorAktif || !daftarOp.includes(operatorAktif)) {
+            operatorAktif = daftarOp[0] || null;
+        }
+
+        row.innerHTML = '';
+        daftarOp.forEach(op => {
+            const chip = document.createElement('div');
+            chip.className = 'operator-chip' + (op === operatorAktif ? ' selected' : '');
+            chip.innerText = op;
+            chip.onclick = () => { operatorAktif = op; produkTerpilih = null; renderOperatorRow(); renderProdukGrid(); };
+            row.appendChild(chip);
+        });
+    }
+
+    // Membaca durasi (dalam hari) dari nama produk, toleran terhadap spasi & singkatan:
+    // "7 Hari", "7Hari", "7hari", "7 hr", "7hr", "7 days", "7d", "1 Bulan", "1bln"
+    function ambilHariDariNama(nama) {
+        const s = String(nama || '').toLowerCase().replace(/\u00a0/g, ' ');
+        let m = s.match(/(\d+)\s*(hari|hr|days|day|d)(?![a-z])/);
+        if (m) return parseInt(m[1], 10);
+        m = s.match(/(\d+)\s*(bulan|bln)(?![a-z])/);
+        if (m) return parseInt(m[1], 10) * 30;
+        return null;
+    }
+
+    function renderProdukGrid() {
+        const grid = document.getElementById('produk-grid');
+        grid.innerHTML = '';
+
+        const filterDurasi = document.getElementById('input-filter-durasi').value;
+        const hariFilter = filterDurasi ? parseInt(filterDurasi, 10) : null;
+
+        const produkFiltered = semuaProdukPaket
+            .filter(p => p.op === operatorAktif)
+            .filter(p => hariFilter === null || ambilHariDariNama(p.nama) === hariFilter)
+            .sort((a, b) => a.harga - b.harga);
+
+        if (produkFiltered.length === 0) {
+            grid.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #64748b; padding: 10px;">Tidak ada produk yang cocok</div>';
+            return;
+        }
+
+        produkFiltered.forEach(p => {
+            const el = document.createElement('div');
+            el.className = 'produk-item';
+            el.innerHTML = `<div class="nominal">${p.nama}</div><div class="harga">Rp ${p.harga.toLocaleString('id-ID')}</div>`;
+            el.onclick = () => pilihProduk(p, el);
+            grid.appendChild(el);
+        });
+    }
+
+    function pilihProduk(p, el) {
+        produkTerpilih = p;
+        document.querySelectorAll('.produk-item').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    window.onload = () => {
+        muatProdukDariRTDB();
+        const savedPh = localStorage.getItem('userPhone');
+        if (savedPh) {
+            initUserSession(savedPh);
+        } else {
+            showLogin();
+        }
+        batasiInputAngka('loginPhone', 13);
+        batasiInputAngka('loginPin', 4);
+        batasiInputAngka('paket-tujuan', 13);
+    };
+
+    // ==== Struk & status real-time (pola sama dgn dana.html/tf.html/pulsa.html — WAJIB sama supaya transaksi tidak menggantung) ====
+
+    function tampilkanHasilPaket(data) {
+        const receiptBox = document.getElementById('receiptContent');
+
+        let statusSymbol = '⏳';
+        let statusText = 'PENDING';
+        if (data.status === 'sukses') {
+            statusSymbol = '✅';
+            statusText = 'SUKSES';
+        } else if (data.status === 'gagal') {
+            statusSymbol = '❌';
+            statusText = 'GAGAL';
+        } else if (data.status === 'pending') {
+            statusSymbol = '⏳';
+            statusText = 'PENDING';
+        } else if (data.status === 'processing') {
+            statusSymbol = '🔄';
+            statusText = 'MEMPROSES';
+        }
+
+        const trxId = data.trx_id || data.ref_id || '-';
+        const tujuanPaket = data.dest || document.getElementById('paket-tujuan').value || '-';
+        const namaProduk = teksAman(data.product, produkTerpilih ? produkTerpilih.nama : '-');
+        const hargaBayar = Number(data.price !== undefined ? data.price : (produkTerpilih ? produkTerpilih.harga : 0));
+        const waktuTrx = data.timestamp ? new Date(data.timestamp).toLocaleString('id-ID') : new Date().toLocaleString('id-ID');
+
+        // Paket Data tidak menampilkan kode SN (beda dengan voucherdata.html nanti).
+
+        receiptBox.innerHTML = `
+            <div class="receipt-header">${statusSymbol} PAKET DATA ${statusText}</div>
+            <div class="receipt-row"><span class="receipt-label">Status Transaksi</span><span class="receipt-value">${statusText}</span></div>
+            <div class="receipt-row"><span class="receipt-label">ID Transaksi</span><span class="receipt-value">${escHtml(trxId)}</span></div>
+            <div class="receipt-row"><span class="receipt-label">Nomor Tujuan</span><span class="receipt-value">${escHtml(tujuanPaket)}</span></div>
+            <div class="receipt-row"><span class="receipt-label">Produk</span><span class="receipt-value">${escHtml(namaProduk)}</span></div>
+            <div class="receipt-row"><span class="receipt-label">Total Dibayar</span><span class="receipt-value">Rp ${hargaBayar.toLocaleString('id-ID')}</span></div>
+            <div class="receipt-row"><span class="receipt-label">Sisa Saldo</span><span class="receipt-value">Rp ${userSaldo.toLocaleString('id-ID')}</span></div>
+            <div class="receipt-row"><span class="receipt-label">Waktu</span><span class="receipt-value">${waktuTrx}</span></div>
+        `;
+
+
+        document.getElementById('customAlert').style.display = 'flex';
+    }
+
+    // ===== PENYARING TAMPILAN =====
+    function escHtml(t) {
+        return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    const POLA_CURIGA = /(saldo|harga|trxid|refid)/i;   // kata yang tidak boleh ikut tampil/tercetak
+    // Teks bebas dari agregator: tolak yang terlihat seperti respon mentah
+    function teksAman(t, cadangan) {
+        t = String(t == null ? '' : t).trim();
+        if (!t || t.length > 80 || POLA_CURIGA.test(t)) return cadangan || '-';
+        return t;
+    }
+
+    function stopListenStatusPaket() {
+        if (activeRefListener) {
+            try { activeRefListener.ref.off('value', activeRefListener.cb); } catch (e) {}
+            if (activeRefListener.poll) clearInterval(activeRefListener.poll);
+            activeRefListener = null;
+        }
+    }
+
+    function listenStatusPaket(ph, refId) {
+        stopListenStatusPaket();
+
+        const cb = snap => {
+            // Query (fallback limitToLast) mengembalikan {key: data}, ref langsung mengembalikan data
+            let data = snap.val();
+            if (!data) return;
+            if (!data.status && typeof data === 'object') {
+                const keys = Object.keys(data);
+                if (keys.length) data = data[keys[keys.length - 1]];
+            }
+            if (!data || !data.status) return;
+            console.log('[paket] status realtime:', data.status, data);
+            tampilkanHasilPaket(data);
+            // Sudah final -> berhenti mendengarkan
+            if (data.status === 'sukses' || data.status === 'gagal') stopListenStatusPaket();
+        };
+        const errCb = err => console.error('[paket] listener ditolak/error:', err.code, err.message);
+
+        const base = db.ref('users/' + ph + '/riwayat');
+        const target = refId
+            ? base.child(refId)
+            : base.orderByChild('timestamp').limitToLast(1); // fallback jika response tidak membawa ref_id
+
+        target.on('value', cb, errCb);
+
+        // Pengaman: polling tiap 4 detik (maks 10 menit) kalau event realtime tidak sampai di WebView
+        let tick = 0;
+        const poll = setInterval(() => {
+            tick++;
+            if (tick > 150) { clearInterval(poll); return; }
+            target.once('value').then(cb).catch(errCb);
+        }, 4000);
+
+        activeRefListener = { ref: target, cb: cb, poll: poll };
+    }
+
+    async function eksekusiBeliPaket() {
+        const ph = localStorage.getItem('userPhone');
+        if (!ph) return showLogin();
+
+        const tujuan = document.getElementById('paket-tujuan').value.trim();
+
+        if (!tujuan) return showAlert('Nomor HP tujuan belum diisi!');
+        if (!produkTerpilih) return showAlert('Pilih paket data dulu!');
+        if (produkTerpilih.harga > userSaldo) return showAlert('Saldo Tidak Mencukupi!');
+
+        const btn = document.getElementById('btn-submit-paket');
+        const loader = document.getElementById('globalLoader');
+        btn.disabled = true;
+        loader.style.display = 'block';
+
+        try {
+            const response = await fetch(API_URL_PAKET, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'orderPaket',
+                    userPhone: ph,
+                    product: produkTerpilih.kode,
+                    dest: tujuan
+                })
+            });
+            const result = await response.json();
+
+            console.log('[paket] response GAS:', result);
+            tampilkanHasilPaket(result);
+
+            const refId = result.ref_id || result.refId || result.refid || (result.data && result.data.ref_id) || null;
+            listenStatusPaket(ph, refId);
+        } catch (err) {
+            showAlert('Terjadi kesalahan saat menghubungi server.');
+        } finally {
+            btn.disabled = false;
+            loader.style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
