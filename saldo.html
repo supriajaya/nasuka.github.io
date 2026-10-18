@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Tambah Saldo - Nasuka Wireless</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<!--
+  HALAMAN TAMBAH SALDO (SPA) - 3 tab, navigasi lewat hash:
+    tambah-saldo.html#qris      -> Tambah saldo via QRIS
+    tambah-saldo.html#voucher   -> Tambah saldo via voucher fisik
+    tambah-saldo.html#info      -> Info / tata cara tambah saldo
+
+  STRUKTUR VOUCHER DI RTDB (path bisa diubah lewat VOUCHER_PATH):
+    vouchers / 123456 / { nilai: 50000, terpakai: false }
+  Nama field nominal yang dikenali: nilai, value, nominal, saldo, jumlah.
+-->
+
+<style>
+    :root{
+        --brblue-1:#2f80f0;
+        --brblue-2:#1a5fd0;
+        --brblue-dark:#0d3f9e;
+        --ink:#1c2430;
+        --muted:#7a8598;
+        --bg:#f2f4f8;
+        --card:#ffffff;
+        --line:#e3e8f1;
+        --ok:#12915a;
+        --ok-bg:#e6f6ee;
+        --err:#c62f3e;
+        --err-bg:#fdecee;
+        --warn:#8a4b08;
+        --warn-bg:#fff6e6;
+        --warn-line:#f2c26b;
+        --tab-h:64px;
+    }
+    * { box-sizing:border-box; }
+    body{
+        margin:0; min-height:100vh;
+        font-family:'Inter', -apple-system, 'Segoe UI', sans-serif;
+        background:var(--bg); color:var(--ink);
+        display:flex; flex-direction:column; align-items:center;
+    }
+    .shell{ width:100%; max-width:460px; padding-bottom:calc(var(--tab-h) + 24px + env(safe-area-inset-bottom, 0px)); }
+    .sembunyi{ display:none !important; }
+    button{ font-family:inherit; }
+
+    /* ===== Header ===== */
+    .header{
+        background:linear-gradient(150deg, var(--brblue-1), var(--brblue-2) 65%, var(--brblue-dark));
+        padding:calc(16px + env(safe-area-inset-top, 0px)) 16px 70px 16px;
+        border-radius:0 0 26px 26px; color:#fff;
+        display:flex; align-items:center; gap:12px;
+    }
+    .btn-kembali{
+        width:40px; height:40px; flex-shrink:0; padding:0; cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+        background:rgba(255,255,255,0.16); color:#fff;
+        border:1px solid rgba(255,255,255,0.35); border-radius:50%;
+        -webkit-tap-highlight-color:transparent;
+    }
+    .btn-kembali:active{ background:rgba(255,255,255,0.28); }
+    .btn-kembali:focus-visible{ outline:3px solid #fff; outline-offset:2px; }
+    .btn-kembali svg{ width:20px; height:20px; }
+    .header h1{ margin:0; font-size:19px; font-weight:800; letter-spacing:-0.2px; }
+    .header p{ margin:2px 0 0 0; font-size:12.5px; opacity:.88; }
+
+    .isi{ padding:0 16px; margin-top:-46px; }
+
+    /* ===== Kartu dasar ===== */
+    .kartu{
+        background:var(--card); border-radius:20px; padding:20px; margin-bottom:14px;
+        box-shadow:0 10px 24px rgba(13,63,158,0.12);
+    }
+    .kartu h2{ margin:0 0 4px 0; font-size:16px; font-weight:800; }
+    .kartu h3{ margin:0 0 8px 0; font-size:14.5px; font-weight:800; }
+    .kartu p{ margin:0; font-size:13px; line-height:1.5; color:var(--muted); }
+    .label-kecil{ font-size:12.5px; font-weight:600; color:var(--muted); }
+
+    /* ===== Saldo (dipakai semua tab) ===== */
+    .saldo-kartu{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .saldo-nilai{
+        margin-top:4px; font-size:26px; font-weight:800; letter-spacing:-0.5px;
+        font-variant-numeric:tabular-nums;
+    }
+    .btn-akun{
+        flex-shrink:0; padding:9px 16px; cursor:pointer;
+        font-size:13px; font-weight:700; color:var(--brblue-2);
+        background:#eef4fe; border:1px solid #d3e2fb; border-radius:999px;
+        -webkit-tap-highlight-color:transparent;
+    }
+    .btn-akun:active{ background:#dde9fc; }
+    .btn-akun:focus-visible{ outline:3px solid #93c5fd; outline-offset:2px; }
+
+    /* ===== Tombol & input umum ===== */
+    .btn-utama, .btn-sekunder{
+        display:block; width:100%; margin-top:14px; padding:14px;
+        font-size:15px; font-weight:800; cursor:pointer;
+        border-radius:14px; -webkit-tap-highlight-color:transparent;
+        transition:transform .12s, opacity .15s;
+    }
+    .btn-utama{
+        border:none; color:#fff;
+        background:linear-gradient(150deg, var(--brblue-1), var(--brblue-2));
+        box-shadow:0 8px 18px rgba(26,95,208,0.28);
+    }
+    .btn-sekunder{ background:transparent; color:var(--brblue-2); border:2px solid var(--line); }
+    .btn-utama:active, .btn-sekunder:active{ transform:scale(0.98); }
+    .btn-utama:disabled{ opacity:.6; cursor:default; transform:none; }
+    .btn-utama:focus-visible, .btn-sekunder:focus-visible{ outline:3px solid #93c5fd; outline-offset:2px; }
+
+    .input-teks{
+        display:block; width:100%; margin-top:8px; padding:13px 14px;
+        font:inherit; font-size:16px; font-weight:700; color:var(--ink);
+        background:#f7f9fc; border:2px solid var(--line); border-radius:14px;
+        outline:none; transition:border-color .15s, box-shadow .15s, background .15s;
+    }
+    .input-teks:focus{ background:#fff; border-color:var(--brblue-1); box-shadow:0 0 0 4px rgba(47,128,240,0.16); }
+
+    /* ===== Tab QRIS ===== */
+    .qris-gambar{
+        display:block; width:100%; max-width:280px; margin:14px auto 12px auto;
+        border-radius:12px; border:1px solid var(--line);
+    }
+    .tengah{ text-align:center; }
+    .link-info{
+        display:inline-block; margin-top:12px; padding:0; background:none; border:none; cursor:pointer;
+        font-size:13px; font-weight:700; color:var(--brblue-2); text-decoration:underline; text-underline-offset:3px;
+    }
+    .kode-unik{
+        margin:12px 0 0 0; padding:16px; text-align:center;
+        background:#eef4fe; border:2px dashed #9dc0f7; border-radius:14px;
+    }
+    .kode-unik .nilai{
+        margin-top:2px; font-size:34px; font-weight:800; letter-spacing:0.18em; padding-left:0.18em;
+        color:var(--brblue-2); font-variant-numeric:tabular-nums;
+    }
+    .hasil-hitung{
+        margin-top:14px; padding:14px; text-align:center;
+        background:var(--ok-bg); border:2px solid #9ad8bb; border-radius:14px;
+    }
+    .hasil-hitung .nilai{
+        margin-top:2px; font-size:26px; font-weight:800; color:var(--ok);
+        letter-spacing:-0.4px; font-variant-numeric:tabular-nums;
+    }
+    .perhatian{
+        margin-top:0; padding:14px; border-radius:14px;
+        background:var(--warn-bg); border:1.5px solid var(--warn-line); color:var(--warn);
+        font-size:13px; line-height:1.55;
+    }
+    .perhatian ul{ margin:8px 0; padding-left:20px; }
+    .perhatian li{ margin-bottom:4px; }
+
+    /* ===== Tab Voucher (tiket) ===== */
+    .tiket{ background:var(--card); border-radius:20px; box-shadow:0 10px 24px rgba(13,63,158,0.12); margin-bottom:14px; }
+    .tiket-atas{ padding:20px 20px 18px 20px; }
+    .tiket-atas h2{ margin:0 0 4px 0; font-size:16px; font-weight:800; }
+    .tiket-atas p{ margin:0; font-size:13px; line-height:1.5; color:var(--muted); }
+    .tiket-garis{ position:relative; height:0; margin:0 16px; border-top:2px dashed var(--line); }
+    .tiket-garis::before, .tiket-garis::after{
+        content:""; position:absolute; top:-12px;
+        width:22px; height:22px; border-radius:50%; background:var(--bg);
+    }
+    .tiket-garis::before{ left:-27px; }
+    .tiket-garis::after{ right:-27px; }
+    .tiket-bawah{ padding:6px 20px 20px 20px; }
+
+    .input-kode{
+        display:block; width:100%; margin-top:12px; padding:14px 8px 14px 20px;
+        font:inherit; font-size:30px; font-weight:800; text-align:center;
+        letter-spacing:0.5em; font-variant-numeric:tabular-nums; color:var(--ink);
+        background:#f7f9fc; border:2px solid var(--line); border-radius:14px;
+        outline:none; transition:border-color .15s, box-shadow .15s, background .15s;
+    }
+    .input-kode::placeholder{ color:#c3cad8; letter-spacing:0.5em; }
+    .input-kode:focus{ background:#fff; border-color:var(--brblue-1); box-shadow:0 0 0 4px rgba(47,128,240,0.16); }
+    .input-kode.salah{ border-color:var(--err); box-shadow:0 0 0 4px rgba(198,47,62,0.12); }
+    .input-kode:disabled{ opacity:.65; }
+    .pesan{
+        margin-top:12px; padding:11px 13px; border-radius:12px;
+        font-size:13px; font-weight:600; line-height:1.4;
+        background:var(--err-bg); color:var(--err);
+    }
+    .hasil{ text-align:center; }
+    .centang{
+        width:64px; height:64px; margin:0 auto 12px auto; border-radius:50%;
+        background:var(--ok-bg); color:var(--ok);
+        display:flex; align-items:center; justify-content:center;
+    }
+    .centang svg{ width:34px; height:34px; }
+    .centang path{ stroke-dasharray:30; stroke-dashoffset:30; animation:gambar-centang .45s .1s ease-out forwards; }
+    @keyframes gambar-centang{ to{ stroke-dashoffset:0; } }
+    .hasil h2{ margin:0; font-size:18px; font-weight:800; }
+    .tambah-nilai{
+        margin:8px 0 4px 0; font-size:30px; font-weight:800; color:var(--ok);
+        letter-spacing:-0.5px; font-variant-numeric:tabular-nums;
+    }
+    .hasil p{ margin:0; font-size:13px; color:var(--muted); }
+    .hasil p b{ color:var(--ink); }
+    .butuh-login{ text-align:center; padding-top:14px; }
+    .butuh-login h2{ margin:0 0 6px 0; font-size:16px; font-weight:800; }
+    .butuh-login p{ margin:0; font-size:13px; line-height:1.5; color:var(--muted); }
+
+    /* ===== Tab Info (artikel) ===== */
+    .artikel h2{ font-size:19px; letter-spacing:-0.2px; margin-bottom:6px; }
+    .artikel .pembuka{ margin-bottom:6px; }
+    .artikel h3{ margin:22px 0 8px 0; font-size:15px; }
+    .artikel ol, .artikel ul{ margin:8px 0 0 0; padding-left:22px; }
+    .artikel li{ margin-bottom:8px; font-size:13.5px; line-height:1.6; color:#3b4658; }
+    .artikel li::marker{ font-weight:800; color:var(--brblue-2); }
+    .artikel strong{ color:var(--ink); }
+    .artikel .contoh{
+        margin:10px 0 0 0; padding:12px 14px; border-radius:12px;
+        background:#eef4fe; font-size:13px; line-height:1.55; color:#26456f;
+    }
+    .artikel .perhatian{ margin-top:10px; }
+    .lompat{ display:flex; gap:8px; margin-top:14px; }
+    .lompat button{
+        flex:1; padding:10px 12px; cursor:pointer; font-size:13px; font-weight:700;
+        color:var(--brblue-2); background:#eef4fe; border:1px solid #d3e2fb; border-radius:12px;
+    }
+    .lompat button:focus-visible{ outline:3px solid #93c5fd; outline-offset:2px; }
+
+    /* ===== Navigasi bawah ===== */
+    .tab-bar{
+        position:fixed; left:0; right:0; bottom:0; z-index:100;
+        display:flex; justify-content:center;
+        background:#fff; border-top:1px solid var(--line);
+        padding-bottom:env(safe-area-inset-bottom, 0px);
+        box-shadow:0 -6px 18px rgba(20,30,60,0.06);
+    }
+    .tab-bar-isi{ width:100%; max-width:460px; display:flex; }
+    .tab{
+        flex:1; height:var(--tab-h);
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+        text-decoration:none; color:var(--muted); font-size:11.5px; font-weight:700;
+        -webkit-tap-highlight-color:transparent; position:relative;
+    }
+    .tab svg{ width:23px; height:23px; }
+    .tab[aria-current="page"]{ color:var(--brblue-2); }
+    .tab[aria-current="page"]::before{
+        content:""; position:absolute; top:0; left:28%; right:28%; height:3px;
+        background:var(--brblue-2); border-radius:0 0 4px 4px;
+    }
+    .tab:focus-visible{ outline:3px solid #93c5fd; outline-offset:-4px; border-radius:10px; }
+
+    /* ===== Login (gaya sama dengan index.html) ===== */
+    .login-overlay{ position:fixed; top:0; left:0; width:100%; height:100%; background:#ffffff; display:none; flex-direction:column; align-items:center; justify-content:space-between; z-index:20000; padding:40px 20px; overflow-y:auto; }
+    .login-container-inner{ width:100%; max-width:380px; display:flex; flex-direction:column; align-items:center; flex-grow:1; justify-content:center; }
+    .login-title{ font-size:24px; font-weight:800; color:#161823; margin-bottom:8px; text-align:center; }
+    .login-subtitle{ font-size:14px; color:#757575; margin-bottom:30px; text-align:center; }
+    .login-input-group{ position:relative; width:100%; margin-bottom:12px; }
+    .login-input{ width:100%; padding:14px 16px; border:1px solid #e1e1e1; border-radius:8px; font-size:1rem; outline:none; background:#f8f8f8; color:#161823; font-weight:500; transition:background .2s, border-color .2s; }
+    .login-input:focus{ border-color:#fe2c55; background:#fff; }
+    .login-btn{ width:100%; padding:14px; background-color:#fe2c55; color:white; border:none; border-radius:8px; font-size:1rem; font-weight:bold; cursor:pointer; margin-top:10px; transition:background-color .2s; }
+    .login-btn:hover{ background-color:#e61e44; }
+    .login-btn:disabled{ background-color:#f9a5b7; cursor:not-allowed; }
+    .login-close-x{ position:absolute; top:20px; left:20px; background:none; border:none; font-size:20px; cursor:pointer; color:#161823; font-weight:bold; }
+    .login-footer-text{ font-size:12px; color:#86878b; text-align:center; margin-top:20px; }
+
+    /* ===== Modal ===== */
+    .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:30000; padding:16px; }
+    .modal-content{ background:#fff; padding:20px; border-radius:16px; width:100%; max-width:340px; box-shadow:0 10px 25px rgba(0,0,0,0.2); font-size:14px; color:#000; }
+    .modal-teks{ text-align:center; padding:14px 6px 4px 6px; line-height:1.5; font-weight:600; }
+    .modal-tombol{ display:flex; gap:10px; margin-top:16px; }
+    .modal-tombol button{ flex:1; padding:11px; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; }
+    .modal-ok{ background:#1e293b; color:#fff; }
+    .modal-batal{ background:#eef1f6; color:#334155; }
+    .modal-bahaya{ background:#dc2626; color:#fff; }
+
+    @media (prefers-reduced-motion: reduce){
+        .centang path{ animation:none; stroke-dashoffset:0; }
+        .input-kode, .input-teks, .btn-utama, .btn-sekunder{ transition:none; }
+    }
+
+    /* ===== RESPONSIF: tablet & desktop ===== */
+    .btn-kembali { text-decoration: none; }
+    @media (min-width: 768px) {
+        .shell { max-width: none; }
+        .header { padding-left: max(24px, calc((100vw - 760px) / 2 + 24px)); padding-right: max(24px, calc((100vw - 760px) / 2 + 24px)); }
+        .isi { max-width: 760px; margin-left: auto; margin-right: auto; padding: 0 24px; }
+        .tab-bar-isi { max-width: 760px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="shell">
+    <div class="header">
+        <a class="btn-kembali" href="produk.html" aria-label="Kembali ke beranda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg></a>
+        <div>
+            <h1>Tambah Saldo</h1>
+            <p id="sub-halaman">Isi saldo lewat QRIS</p>
+        </div>
+    </div>
+
+    <div class="isi">
+
+        <!-- Saldo: tampil di semua tab -->
+        <div class="kartu saldo-kartu">
+            <div>
+                <div class="label-kecil">Saldo Anda</div>
+                <div class="saldo-nilai" id="saldo">Rp --</div>
+            </div>
+            <button type="button" class="btn-akun" id="btn-akun" onclick="klikAkun()">Masuk</button>
+        </div>
+
+        <main>
+
+            <!-- ================= TAB QRIS ================= -->
+            
+            
+               <div class="kartu">
+                    <h3>Kode unik Anda</h3>
+                    <div class="kode-unik">
+                        <div class="label-kecil">Wajib ada di 3 digit terakhir nominal transfer</div>
+                        <div class="nilai" id="display-kodeunik">---</div>
+                    </div>
+
+                    <div style="margin-top:16px;">
+                        <label class="label-kecil" for="input-nominal">Mau top up berapa? Kode unik ditambahkan otomatis.</label>
+                        <input type="text" class="input-teks" id="input-nominal" placeholder="Contoh: 50000"
+                               inputmode="numeric" pattern="[0-9]*" autocomplete="off" oninput="hitungNominalTransfer()">
+                    </div>
+
+                    <div class="hasil-hitung sembunyi" id="hasil-kalkulator" aria-live="polite">
+                        <div class="label-kecil">Transfer tepat sejumlah</div>
+                        <div class="nilai" id="hasil-nominal-transfer">Rp 0</div>
+                    </div>
+                </div>
+                
+            
+            
+            
+            
+            <section id="hal-qris" class="halaman" aria-labelledby="jdl-qris">
+                <div class="kartu tengah">
+                 
+                    <img class="qris-gambar" src="https://nasuka.pro/gambar/qris.jpg" alt="Kode QRIS untuk top up saldo">
+                    <p>Scan pakai aplikasi e-wallet atau m-banking apa saja yang mendukung QRIS.</p>
+                    <button type="button" class="link-info" onclick="buka('info')">Lihat cara lengkapnya</button>
+                </div>
+
+
+
+
+
+             
+                
+                
+                
+                
+                
+                
+                
+                
+
+                <div class="kartu">
+                    <h3>Periksa 3 digit terakhir sebelum membayar</h3>
+                    <div class="perhatian">
+                        <strong>Sistem mencocokkan pemilik top up dari 3 digit terakhir nominal transfer</strong>, bukan dari nomor HP atau nama Anda.
+                        <br><br>
+                        Kalau 3 digit terakhir <strong>salah</strong> atau tidak sesuai kode unik Anda, ada dua kemungkinan:
+                        <ul>
+                            <li>Kebetulan cocok dengan kode unik pengguna lain, sehingga saldo bisa masuk ke akun orang lain.</li>
+                            <li>Tidak cocok dengan kode unik siapa pun, sehingga saldo tidak bertambah otomatis dan perlu diverifikasi manual oleh admin.</li>
+                        </ul>
+                        Uang yang terlanjur masuk ke akun yang salah karena kesalahan kode unik <strong>bukan tanggung jawab sistem</strong>, dan pemulihannya bisa memakan waktu. Pastikan nominal yang dibayar persis sama dengan angka di kolom "Transfer tepat sejumlah".
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB VOUCHER ================= -->
+            <section id="hal-voucher" class="halaman sembunyi" aria-labelledby="jdl-voucher">
+                <div class="tiket">
+                    <div class="tiket-atas">
+                        <h2 id="jdl-voucher">Klaim voucher fisik</h2>
+                        <p>Ketik 6 digit angka yang tercetak pada voucher Anda. Nilainya langsung masuk ke saldo.</p>
+                    </div>
+
+                    <div class="tiket-garis"></div>
+
+                    <div class="tiket-bawah">
+                        <!-- Belum login -->
+                        <div class="butuh-login sembunyi" id="area-login">
+                            <h2>Masuk dulu untuk klaim voucher</h2>
+                            <p>Saldo voucher akan masuk ke akun Anda, jadi Anda perlu masuk terlebih dahulu.</p>
+                            <button type="button" class="btn-utama" onclick="showLogin()">Masuk</button>
+                        </div>
+
+                        <!-- Form kode -->
+                        <div id="area-form">
+                            <input type="text" class="input-kode" id="kode" inputmode="numeric" pattern="[0-9]*"
+                                   maxlength="6" autocomplete="off" placeholder="000000"
+                                   aria-label="Kode voucher 6 digit" aria-describedby="pesan">
+                            <div class="pesan sembunyi" id="pesan" role="alert"></div>
+                            <button type="button" class="btn-utama" id="btn-klaim" onclick="klaim()">Klaim voucher</button>
+                        </div>
+
+                        <!-- Berhasil -->
+                        <div class="hasil sembunyi" id="area-hasil" aria-live="polite">
+                            <div class="centang">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+                            </div>
+                            <h2>Voucher berhasil diklaim</h2>
+                            <div class="tambah-nilai" id="hasil-tambah">+Rp 0</div>
+                            <p>Saldo Anda sekarang <b id="hasil-saldo">Rp 0</b></p>
+                         
+                            <button type="button" class="btn-sekunder" onclick="klaimLagi()">Klaim voucher lain</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB INFO ================= -->
+            <section id="hal-info" class="halaman sembunyi" aria-labelledby="jdl-info">
+                <article class="kartu artikel">
+                    <h2 id="jdl-info">Cara menambah saldo</h2>
+                    <p class="pembuka">Ada dua cara mengisi saldo: lewat QRIS atau dengan voucher fisik. Pilih yang paling nyaman untuk Anda.</p>
+                    <div class="lompat">
+                        <button type="button" onclick="document.getElementById('info-qris').scrollIntoView({behavior:'smooth'})">Via QRIS</button>
+                        <button type="button" onclick="document.getElementById('info-voucher').scrollIntoView({behavior:'smooth'})">Via voucher</button>
+                    </div>
+
+                    <h3 id="info-qris">Top up lewat QRIS</h3>
+                    <ol>
+                        <li>Masuk ke akun Anda, lalu buka tab <strong>QRIS</strong>.</li>
+                        <li>Buka aplikasi e-wallet atau m-banking yang mendukung QRIS di HP Anda, lalu scan gambar QRIS.</li>
+                        <li>Ketik nominal top up yang Anda inginkan di kolom kalkulator. Angka di bawah tulisan <strong>"Transfer tepat sejumlah"</strong> adalah yang harus Anda bayar, bukan nominal awal yang Anda ketik.</li>
+                        <li>Selesaikan pembayaran sesuai angka tersebut sampai muncul notifikasi sukses di aplikasi Anda.</li>
+                        <li>Saldo bertambah otomatis dalam beberapa saat setelah pembayaran diterima. Anda tidak perlu konfirmasi manual atau mengisi formulir apa pun.</li>
+                    </ol>
+                    <p class="contoh"><strong>Contoh:</strong> jika kode unik Anda 123 dan Anda mengetik 50000, angka transfer yang muncul adalah Rp 50.123. Tiga digit terakhir (123) harus tetap sama saat Anda membayar.</p>
+                    <div class="perhatian">
+                        <strong>Periksa ulang 3 digit terakhir sebelum membayar.</strong> Sistem mengenali pemilik top up dari 3 digit itu. Kalau salah, saldo bisa masuk ke akun lain atau menunggu verifikasi manual admin.
+                    </div>
+
+                    <h3 id="info-voucher">Top up dengan voucher fisik</h3>
+                    <ol>
+                        <li>Siapkan voucher fisik Anda dan cari kode 6 digit yang tercetak di sana.</li>
+                        <li>Masuk ke akun Anda, lalu buka tab <strong>Voucher</strong>.</li>
+                        <li>Ketik 6 digit kode tersebut, lalu tekan <strong>Klaim voucher</strong>.</li>
+                        <li>Jika kode benar, saldo langsung bertambah sesuai nilai voucher dan muncul tanda berhasil.</li>
+                    </ol>
+                    <ul>
+                        <li>Satu kode hanya bisa diklaim satu kali.</li>
+                        <li>Jika salah memasukkan kode 5 kali berturut-turut, kolom klaim terkunci selama 5 menit. Tunggu sebentar, lalu coba lagi dengan teliti.</li>
+                    </ul>
+
+                    <h3>Saldo belum bertambah?</h3>
+                    <ul>
+                        <li><strong>QRIS:</strong> tunggu beberapa menit. Jika saldo tetap belum masuk, hubungi admin lewat menu <strong>Kontak Admin</strong> di beranda dan sertakan bukti transfer.</li>
+                        <li><strong>Voucher:</strong> jika kode benar tetapi saldo tidak bertambah, hubungi admin lewat menu <strong>Kontak Admin</strong> di beranda dan sebutkan kode voucher Anda.</li>
+                    </ul>
+                 
+                </article>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- Navigasi bawah -->
+<nav class="tab-bar" aria-label="Menu tambah saldo">
+    <div class="tab-bar-isi">
+        <a class="tab" id="tab-qris" href="#qris">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v1M14 20h1M18 18h3v3h-3z"/></svg>
+            <span>QRIS</span>
+        </a>
+        <a class="tab" id="tab-voucher" href="#voucher">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a2 2 0 0 0 0 4v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3a2 2 0 0 1 0-4V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z"/><path d="M13 6v2M13 11v2M13 16v2"/></svg>
+            <span>Voucher</span>
+        </a>
+        <a class="tab" id="tab-info" href="#info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg>
+            <span>Info</span>
+        </a>
+    </div>
+</nav>
+
+<!-- Modal pesan -->
+<div id="customAlert" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-content">
+        <div class="modal-teks" id="alertTeks"></div>
+        <div class="modal-tombol" id="alertTombol"></div>
+    </div>
+</div>
+
+<!-- Login -->
+<div id="loginOverlay" class="login-overlay">
+    <button type="button" class="login-close-x" aria-label="Tutup" onclick="hideLogin()">✕</button>
+    <div class="login-container-inner">
+        <div class="login-title">Masuk ke Akun</div>
+        <div class="login-subtitle">Gunakan nomor handphone dan PIN Anda<p>Apabila Belum punya akun maka mengisi nomor handphone dan 4 digit pin dan klik masuk maka otomatis tercipta akun baru</p></div>
+        <div class="login-input-group">
+            <input type="text" id="loginPhone" class="login-input" placeholder="Nomor Handphone" inputmode="numeric" pattern="[0-9]*" maxlength="13">
+        </div>
+        <div class="login-input-group">
+            <input type="password" id="loginPin" class="login-input" placeholder="PIN (4 Digit)" inputmode="numeric" pattern="[0-9]*" maxlength="4">
+        </div>
+        <button id="btnLoginAction" class="login-btn" onclick="prosesLogin()">Masuk</button>
+        <div class="login-footer-text">Dengan melanjutkan, Anda menyetujui syarat &amp; ketentuan yang berlaku.</div>
+    </div>
+</div>
+
+<script>
+    // ===== Konfigurasi =====
+    const VOUCHER_PATH = 'vouchers';   // lokasi data voucher di RTDB
+    const MAKS_SALAH   = 5;            // jumlah kode salah sebelum dikunci sementara
+    const KUNCI_MENIT  = 5;            // lama penguncian (menit)
+
+    const firebaseConfig = { databaseURL: "https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const $ = id => document.getElementById(id);
+    const nomorHp = () => localStorage.getItem('userPhone');
+    function rupiah(n) { return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID'); }
+
+    let userKodeUnik = null;
+    let sedangProses = false;
+
+    // ===== Navigasi antar tab (hash) =====
+    const HALAMAN = {
+        qris:    'Isi saldo lewat QRIS',
+        voucher: 'Isi saldo dengan voucher fisik',
+        info:    'Tata cara tambah saldo'
+    };
+
+    function buka(nama) {
+        if (location.hash === '#' + nama) tampilkan(nama); else location.hash = nama;
+    }
+
+    function tampilkan(nama) {
+        if (!HALAMAN[nama]) nama = 'qris';
+        Object.keys(HALAMAN).forEach(h => {
+            $('hal-' + h).classList.toggle('sembunyi', h !== nama);
+            const tab = $('tab-' + h);
+            if (h === nama) tab.setAttribute('aria-current', 'page'); else tab.removeAttribute('aria-current');
+        });
+        $('sub-halaman').textContent = HALAMAN[nama];
+        window.scrollTo(0, 0);
+    }
+
+    window.addEventListener('hashchange', () => tampilkan(location.hash.replace('#', '')));
+
+  
+    // ===== Modal =====
+    function tutupCustomAlert() { $('customAlert').style.display = 'none'; }
+
+    function showAlert(msg) {
+        $('alertTeks').textContent = msg;
+        $('alertTombol').innerHTML = '<button type="button" class="modal-ok" onclick="tutupCustomAlert()">OK</button>';
+        $('customAlert').style.display = 'flex';
+    }
+
+    function konfirmasi(msg, labelYa, aksiYa) {
+        $('alertTeks').textContent = msg;
+        $('alertTombol').innerHTML =
+            '<button type="button" class="modal-batal" onclick="tutupCustomAlert()">Batal</button>' +
+            '<button type="button" class="modal-bahaya" id="btnKonfirmasiYa"></button>';
+        $('btnKonfirmasiYa').textContent = labelYa;
+        $('btnKonfirmasiYa').onclick = () => { tutupCustomAlert(); aksiYa(); };
+        $('customAlert').style.display = 'flex';
+    }
+
+    // ===== Login / sesi =====
+    function batasiInputAngka(elementId, maxLength) {
+        const el = $(elementId);
+        if (!el) return;
+        el.addEventListener('input', function () {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > maxLength) this.value = this.value.slice(0, maxLength);
+        });
+    }
+
+    function showLogin() { $('loginOverlay').style.display = 'flex'; }
+    function hideLogin() { $('loginOverlay').style.display = 'none'; }
+
+    function prosesLogin() {
+        const phone = $('loginPhone').value.trim();
+        const pin = $('loginPin').value.trim();
+        if (!phone || !pin) return showAlert('Data wajib diisi!');
+        db.ref('users/' + phone).once('value', snap => {
+            if (snap.exists()) {
+                if (String(snap.val().pin) === String(pin)) {
+                    if (!localStorage.getItem('userPhone')) localStorage.setItem('userPhone', phone);
+                    hideLogin();
+                    initUserSession(nomorHp());
+                } else {
+                    showAlert('PIN salah!');
+                }
+            } else {
+                db.ref('settings/userCounter').transaction(current => (current || 0) + 1, (error, committed, snapshot) => {
+                    if (error) { showAlert('Gagal membuat akun: ' + error.message); }
+                    else if (committed) {
+                        const newId = snapshot.val();
+                        db.ref('users/' + phone).set({ pin: pin, saldo: 0, poin: 0, kodeUnik: newId, created_at: new Date().toISOString() })
+                            .then(() => { localStorage.setItem('userPhone', phone); hideLogin(); initUserSession(phone); });
+                    }
+                });
+            }
+        });
+    }
+
+    let refSaldo = null, hSaldo = null;
+
+    function initUserSession(ph) {
+        if (!ph) return;
+        if (refSaldo && hSaldo) refSaldo.off('value', hSaldo);   // hindari listener ganda
+        refSaldo = db.ref('users/' + ph + '/saldo');
+        hSaldo = snap => { $('saldo').textContent = rupiah(snap.val()); };
+        refSaldo.on('value', hSaldo);
+
+        db.ref('users/' + ph + '/kodeUnik').once('value', snap => {
+            userKodeUnik = snap.val();
+            const kodeStr = String(userKodeUnik !== null && userKodeUnik !== undefined ? userKodeUnik : '---').padStart(3, '0');
+            $('display-kodeunik').textContent = kodeStr;
+            hitungNominalTransfer();
+        });
+        perbaruiStatusLogin();
+    }
+
+    function perbaruiStatusLogin() {
+        const masuk = !!nomorHp();
+        $('btn-akun').textContent = masuk ? 'Keluar' : 'Masuk';
+        if (!masuk) {
+            $('saldo').textContent = 'Rp --';
+            $('display-kodeunik').textContent = '---';
+        }
+        // Area voucher: form jika login, ajakan masuk jika belum
+        const hasilTampil = !$('area-hasil').classList.contains('sembunyi');
+        $('area-login').classList.toggle('sembunyi', masuk);
+        $('area-form').classList.toggle('sembunyi', !masuk || hasilTampil);
+    }
+
+    function klikAkun() {
+        if (!nomorHp()) { showLogin(); return; }
+        konfirmasi('Keluar dari akun ini?', 'Keluar', prosesLogout);
+    }
+
+    function prosesLogout() {
+        // Hapus sesi tanpa reload/redirect agar tetap di dalam WebView Kodular
+        localStorage.removeItem('userPhone');
+
+        // Lepas listener saldo milik user sebelumnya
+        if (refSaldo && hSaldo) refSaldo.off('value', hSaldo);
+        refSaldo = null; hSaldo = null;
+        userKodeUnik = null;
+
+        // Reset tampilan QRIS
+        $('input-nominal').value = '';
+        $('hasil-kalkulator').classList.add('sembunyi');
+
+        // Reset tampilan voucher (batas percobaan salah per-perangkat sengaja tidak dihapus)
+        $('kode').value = '';
+        tampilPesan('');
+        $('area-hasil').classList.add('sembunyi');
+
+        // Reset form login
+        $('loginPhone').value = '';
+        $('loginPin').value = '';
+
+        perbaruiStatusLogin();   // saldo -> "Rp --", kode unik -> "---", tombol -> "Masuk"
+        showLogin();
+    }
+
+    // ===== QRIS: kalkulator nominal transfer =====
+    function hitungNominalTransfer() {
+        const input = $('input-nominal').value.trim();
+        const box = $('hasil-kalkulator');
+        if (!input || userKodeUnik === null || userKodeUnik === undefined) { box.classList.add('sembunyi'); return; }
+
+        const nominalInput = parseInt(input, 10);
+        if (isNaN(nominalInput) || nominalInput <= 0) { box.classList.add('sembunyi'); return; }
+
+        const kode = parseInt(userKodeUnik, 10) % 1000;
+        // Bulatkan ke ribuan terdekat ke bawah, lalu tempelkan kode unik di 3 digit terakhir
+        const dasarRibuan = Math.floor(nominalInput / 1000) * 1000;
+        $('hasil-nominal-transfer').textContent = rupiah(dasarRibuan + kode);
+        box.classList.remove('sembunyi');
+    }
+
+    // ===== Voucher: pesan & tampilan =====
+    function tampilPesan(teks) {
+        const el = $('pesan');
+        el.textContent = teks || '';
+        el.classList.toggle('sembunyi', !teks);
+        $('kode').classList.toggle('salah', !!teks);
+    }
+
+    function setProses(aktif) {
+        sedangProses = aktif;
+        $('btn-klaim').disabled = aktif;
+        $('kode').disabled = aktif;
+        $('btn-klaim').textContent = aktif ? 'Memeriksa kode…' : 'Klaim voucher';
+    }
+
+    function klaimLagi() {
+        $('area-hasil').classList.add('sembunyi');
+        $('area-form').classList.remove('sembunyi');
+        $('kode').value = '';
+        tampilPesan('');
+        $('kode').focus();
+    }
+
+    // ===== Voucher: pembatasan percobaan (di perangkat ini) =====
+    function bacaSalah() {
+        try { return JSON.parse(localStorage.getItem('voucherSalah')) || { count: 0, until: 0 }; }
+        catch (e) { return { count: 0, until: 0 }; }
+    }
+    function simpanSalah(o) { try { localStorage.setItem('voucherSalah', JSON.stringify(o)); } catch (e) {} }
+    function menitTerkunci() {
+        const g = bacaSalah();
+        return g.until > Date.now() ? Math.ceil((g.until - Date.now()) / 60000) : 0;
+    }
+    function catatSalah() {
+        let g = bacaSalah();
+        if (g.until && g.until <= Date.now()) g = { count: 0, until: 0 };
+        g.count++;
+        if (g.count >= MAKS_SALAH) { g.until = Date.now() + KUNCI_MENIT * 60000; g.count = 0; }
+        simpanSalah(g);
+        return g;
+    }
+
+    // ===== Voucher: membaca data =====
+    function ambilNilai(data) {
+        if (!data || typeof data !== 'object') return 0;
+        for (const k of ['nilai', 'value', 'nominal', 'saldo', 'jumlah']) {
+            const n = Number(data[k]);
+            if (isFinite(n) && n > 0) return Math.round(n);
+        }
+        return 0;
+    }
+    function sudahDipakai(data) {
+        if (!data || typeof data !== 'object') return false;
+        if (data.terpakai === true || data.used === true) return true;
+        return ['terpakai', 'used', 'dipakai', 'claimed'].includes(String(data.status || '').toLowerCase());
+    }
+
+    // ===== Voucher: proses klaim =====
+    async function klaim() {
+        if (sedangProses) return;
+        tampilPesan('');
+
+        const phone = nomorHp();
+        if (!phone) { showLogin(); return; }
+
+        const kode = $('kode').value.trim();
+        if (!/^\d{6}$/.test(kode)) return tampilPesan('Kode harus terdiri dari 6 digit angka.');
+
+        const menit = menitTerkunci();
+        if (menit) return tampilPesan('Terlalu banyak kode salah. Coba lagi dalam ' + menit + ' menit.');
+
+        if (navigator.onLine === false) return tampilPesan('Tidak ada koneksi internet. Periksa jaringan Anda lalu coba lagi.');
+
+        setProses(true);
+        const vRef = db.ref(VOUCHER_PATH + '/' + kode);
+        let diklaim = false, saldoMasuk = false;
+
+        try {
+            const userSnap = await db.ref('users/' + phone).once('value');
+            if (!userSnap.exists()) return tampilPesan('Akun tidak ditemukan. Silakan keluar lalu masuk kembali.');
+
+            const snap = await vRef.once('value');
+            if (!snap.exists()) {
+                const g = catatSalah();
+                const menitKunci = menitTerkunci();
+                if (menitKunci) return tampilPesan('Terlalu banyak kode salah. Coba lagi dalam ' + menitKunci + ' menit.');
+                const sisa = MAKS_SALAH - g.count;
+                return tampilPesan('Kode tidak ditemukan. Periksa kembali angka pada voucher Anda.' + (sisa <= 2 ? ' Sisa percobaan: ' + sisa + '.' : ''));
+            }
+
+            const data = snap.val();
+            const nilai = ambilNilai(data);
+            if (!nilai) return tampilPesan('Voucher ini belum bisa diklaim. Hubungi admin dan sebutkan kode ' + kode + '.');
+            if (sudahDipakai(data)) return tampilPesan('Kode ini sudah pernah digunakan.');
+
+            // 1) Kunci voucher secara atomik agar tidak bisa diklaim dua kali
+            const kunci = await vRef.child('terpakai').transaction(cur => (cur === true ? undefined : true));
+            if (!kunci.committed) return tampilPesan('Kode ini sudah pernah digunakan.');
+            diklaim = true;
+
+            // Catat siapa & kapan (membantu admin melacak jika ada gangguan)
+            try { await vRef.update({ dipakaiOleh: phone, dipakaiPada: new Date().toISOString() }); } catch (e) {}
+
+            // 2) Tambah saldo user secara atomik
+            const tx = await db.ref('users/' + phone + '/saldo').transaction(cur => (Number(cur) || 0) + nilai);
+            if (!tx.committed) throw new Error('saldo-gagal');
+            saldoMasuk = true;
+
+            // 3) Tampilkan hasil
+            $('hasil-tambah').textContent = '+' + rupiah(nilai);
+            $('hasil-saldo').textContent = rupiah(tx.snapshot.val());
+            $('area-form').classList.add('sembunyi');
+            $('area-hasil').classList.remove('sembunyi');
+            simpanSalah({ count: 0, until: 0 });
+
+        } catch (err) {
+            // Saldo belum masuk tapi voucher sempat terkunci: kembalikan agar bisa dicoba lagi
+            if (diklaim && !saldoMasuk) {
+                let pulih = false;
+                try { await vRef.update({ terpakai: false, dipakaiOleh: null, dipakaiPada: null }); pulih = true; } catch (e) {}
+                tampilPesan(pulih
+                    ? 'Koneksi bermasalah. Saldo belum bertambah dan kode belum terpakai, silakan coba lagi.'
+                    : 'Terjadi gangguan saat memproses. Hubungi admin dan sebutkan kode ' + kode + '.');
+            } else {
+                tampilPesan('Koneksi bermasalah. Periksa internet Anda lalu coba lagi.');
+            }
+        } finally {
+            setProses(false);
+        }
+    }
+
+    // ===== Inisialisasi =====
+    window.onload = () => {
+        batasiInputAngka('loginPhone', 13);
+        batasiInputAngka('loginPin', 4);
+        batasiInputAngka('input-nominal', 10);
+
+        const input = $('kode');
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/\D/g, '').slice(0, 6);
+            if (input.classList.contains('salah')) tampilPesan('');
+        });
+        input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); klaim(); } });
+
+        const savedPh = nomorHp();
+        if (savedPh) initUserSession(savedPh);
+        else { perbaruiStatusLogin(); showLogin(); }
+
+        tampilkan(location.hash.replace('#', ''));
+    };
+</script>
+
+</body>
+</html>
