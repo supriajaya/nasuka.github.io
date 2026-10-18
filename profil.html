@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Profil Pengguna - Nasuka Wireless</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+  body { 
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+    padding: 20px; 
+    margin: 0; 
+    background: url('https://nasuka.pro/gambar/langit.jpg') no-repeat center center fixed; 
+    background-size: cover; 
+    color: #1e293b; 
+  }
+
+  .container {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  }
+
+  .profile-header {
+    text-align: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .profile-avatar {
+    width: 70px;
+    height: 70px;
+    background: #0f172a;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 auto 10px auto;
+  }
+
+  .profile-avatar {
+    position: relative;
+    width: 84px;
+    height: 84px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .profile-avatar:focus-visible { outline: 3px solid #93c5fd; outline-offset: 3px; }
+  .profile-avatar img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: none;
+  }
+  .profile-avatar.has-photo img { display: block; }
+  .profile-avatar.has-photo #avatar-icon { visibility: hidden; }
+  .avatar-edit {
+    position: absolute; right: -2px; bottom: -2px;
+    width: 28px; height: 28px;
+    background: #2563eb; color: #fff;
+    border: 2px solid #fff; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-sizing: border-box;
+  }
+  .avatar-edit svg { width: 14px; height: 14px; }
+  .avatar-loading {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.6);
+    display: none; align-items: center; justify-content: center;
+  }
+  .avatar-loading.show { display: flex; }
+  .avatar-loading::after {
+    content: ''; width: 26px; height: 26px;
+    border: 3px solid rgba(255,255,255,0.35);
+    border-top-color: #fff; border-radius: 50%;
+    animation: avatar-spin 0.8s linear infinite;
+  }
+  @keyframes avatar-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .avatar-loading::after { animation-duration: 2.4s; } }
+
+  .profile-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    word-break: break-word;
+  }
+
+  .profile-phone {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    margin: 2px 0 0 0;
+  }
+
+  .field-hint {
+    font-size: 12px;
+    color: #64748b;
+    margin: -6px 0 12px 2px;
+  }
+
+  .badge-status {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 20px;
+    margin-top: 5px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .stat-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .stat-box-wide { grid-column: 1 / -1; }
+
+  .stat-title {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  input { 
+    width: 100%; 
+    padding: 12px 14px; 
+    margin-bottom: 12px; 
+    border: 1px solid #cbd5e1; 
+    border-radius: 10px; 
+    box-sizing: border-box; 
+    background: #fff; 
+    font-size: 14px;
+    transition: border 0.2s; 
+  }
+  input:focus { outline: none; border-color: #3b82f6; }
+
+  button { 
+    width: 100%; 
+    padding: 12px; 
+    background-color: #0f172a; 
+    color: #fff; 
+    border: none; 
+    border-radius: 10px; 
+    font-size: 14px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    transition: all 0.2s ease;
+  }
+  button:hover { background-color: #1e293b; transform: translateY(-1px); }
+  button:active { transform: translateY(0); }
+
+  .btn-danger {
+    background-color: #ef4444;
+  }
+  .btn-danger:hover {
+    background-color: #dc2626;
+  }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    color: #0f172a;
+  }
+
+  .item-row { border-bottom: 1px solid #f1f5f9; padding: 12px 0; display: flex; flex-direction: column; }
+  .item-row:last-child { border-bottom: none; }
+  .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .item-name { font-weight: 600; font-size: 14px; color: #334155; }
+  .item-price { font-weight: 700; color: #0f172a; font-size: 14px; }
+
+  .login-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); 
+    display: none; flex-direction: column; align-items: center; justify-content: center; 
+    z-index: 20000; padding: 20px; box-sizing: border-box; 
+  }
+  .login-box { 
+    background: #ffffff; padding: 24px; border-radius: 20px; 
+    width: 100%; max-width: 320px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+    text-align: center; 
+  }
+
+  .whatsapp-float {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25d366;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    transition: transform 0.2s ease;
+  }
+  .whatsapp-float:hover { transform: scale(1.05); }
+  .whatsapp-float img { width: 24px; height: 24px; }
+
+  /* ===== Dialog Kustom (pengganti alert & confirm bawaan browser) ===== */
+  .dlg-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; box-sizing: border-box;
+    z-index: 30000; /* di atas login overlay */
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+  }
+  .dlg-overlay.show { opacity: 1; visibility: visible; }
+
+  .dlg-box {
+    background: #ffffff;
+    width: 100%; max-width: 340px;
+    border-radius: 20px;
+    padding: 26px 22px 20px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    transform: translateY(12px) scale(0.96);
+    transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  }
+  .dlg-overlay.show .dlg-box { transform: translateY(0) scale(1); }
+
+  .dlg-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .dlg-icon svg { width: 28px; height: 28px; }
+  .dlg-icon.success { background: #dcfce7; color: #16a34a; }
+  .dlg-icon.error   { background: #fee2e2; color: #dc2626; }
+  .dlg-icon.warning { background: #fef3c7; color: #d97706; }
+  .dlg-icon.info    { background: #dbeafe; color: #2563eb; }
+
+  .dlg-title {
+    font-size: 17px; font-weight: 700; color: #0f172a;
+    margin: 0 0 6px 0;
+  }
+  .dlg-message {
+    font-size: 14px; line-height: 1.5; color: #64748b;
+    margin: 0 0 20px 0;
+    white-space: pre-line;
+    word-break: break-word;
+  }
+
+  .dlg-actions { display: flex; gap: 10px; }
+  .dlg-actions button { flex: 1; }
+  .dlg-btn-secondary { background-color: #f1f5f9; color: #334155; }
+  .dlg-btn-secondary:hover { background-color: #e2e8f0; }
+  .dlg-btn-danger { background-color: #ef4444; }
+  .dlg-btn-danger:hover { background-color: #dc2626; }
+  .dlg-actions button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dlg-overlay, .dlg-box { transition: none; }
+  }
+
+  /* ===== Menu Titik Tiga ===== */
+  .card-profil { position: relative; }
+  .menu-wrap { position: absolute; top: 10px; right: 10px; z-index: 50; }
+
+  .menu-btn {
+    width: 38px; height: 38px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; color: #64748b;
+    border-radius: 50%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .menu-btn:hover { background: #f1f5f9; color: #0f172a; transform: none; }
+  .menu-btn:active { background: #e2e8f0; }
+  .menu-btn:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+  .menu-btn svg { width: 20px; height: 20px; }
+
+  .menu-dropdown {
+    display: none;
+    position: absolute; top: 44px; right: 0;
+    min-width: 200px; padding: 6px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 4px 10px -4px rgba(0, 0, 0, 0.08);
+  }
+  .menu-dropdown.show { display: block; }
+
+  .menu-item {
+    width: 100%; padding: 11px 12px;
+    display: flex; align-items: center; gap: 10px;
+    background: transparent; color: #334155;
+    border-radius: 9px;
+    font-size: 14px; font-weight: 600; text-align: left;
+  }
+  .menu-item:hover { background: #f1f5f9; transform: none; }
+  .menu-item:focus-visible { outline: 3px solid #93c5fd; outline-offset: -2px; }
+  .menu-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .menu-item-danger { color: #dc2626; }
+  .menu-item-danger:hover { background: #fee2e2; }
+
+  /* ===== Pengaturan Akun (tersembunyi secara default) ===== */
+  #pengaturan-akun { display: none; }
+  #pengaturan-akun.show { display: block; }
+
+
+    /* ===== VERSI WEB: tombol kembali ke beranda ===== */
+    .web-topbar{width:100%;max-width:400px;margin:0 auto 9px auto;box-sizing:border-box}
+    .web-topbar a{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.94);color:#0f172a;font:600 13px/1 'Inter',-apple-system,'Segoe UI',sans-serif;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.14)}
+    .web-topbar a:hover{background:#fff}
+
+    .web-topbar { max-width: 500px; margin: 0 auto 12px auto; }
+    @media (min-width: 768px) {
+        body { padding: 24px clamp(24px, 4vw, 64px); }
+        .container, .web-topbar { max-width: 720px; }
+    }
+</style>
+</head>
+<body>
+<nav class="web-topbar" aria-label="Navigasi"><a href="produk.html">&#8249; Beranda</a></nav>
+
+<div class="container">
+  
+  <!-- Card Header & Status Akun -->
+  <div class="card card-profil">
+
+    <!-- Menu titik tiga (sudut kanan atas) -->
+    <div class="menu-wrap">
+      <button type="button" class="menu-btn" id="menuBtn" aria-label="Menu akun" aria-haspopup="true" aria-expanded="false" aria-controls="menuDropdown" onclick="toggleMenu(event)">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg>
+      </button>
+      <div class="menu-dropdown" id="menuDropdown" role="menu">
+        <button type="button" class="menu-item" role="menuitem" onclick="bukaPengaturan()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span id="menuPengaturanLabel">Pengaturan Akun</span>
+        </button>
+        <button type="button" class="menu-item menu-item-danger" role="menuitem" onclick="menuLogout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="profile-header">
+      <div class="profile-avatar" id="avatar-wrap" role="button" tabindex="0" aria-label="Ganti foto profil">
+        <span id="avatar-icon">U</span>
+        <img id="avatar-img" alt="Foto profil">
+        <div class="avatar-loading" id="avatar-loading"></div>
+        <span class="avatar-edit" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </span>
+      </div>
+      <input type="file" id="inputFoto" accept="image/*" hidden>
+      <p class="profile-name" id="user-name">Pengguna</p>
+      <p class="profile-phone" id="user-phone">-</p>
+      <span class="badge-status">Reguler</span>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-title">Saldo</div>
+        <div class="stat-value" id="display-saldo">Rp 0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-title">Poin Reward</div>
+        <div class="stat-value" id="display-poin">0</div>
+      </div>
+      <div class="stat-box stat-box-wide">
+        <div class="stat-title">Kode Unik</div>
+        <div class="stat-value" id="display-kodeunik">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pengaturan Akun: tersembunyi, muncul lewat menu titik tiga -->
+  <div id="pengaturan-akun">
+
+  <!-- Card Ubah Nama -->
+  <div class="card">
+    <h4 class="section-title">Nama Tampilan</h4>
+    <input type="text" id="inputNama" placeholder="Nama Anda" maxlength="30" autocomplete="name">
+    <p class="field-hint">2–30 karakter. Nama ini tampil di profil Anda.</p>
+    <button onclick="prosesUbahNama()">Simpan Nama</button>
+  </div>
+
+  <!-- Card Pengaturan PIN -->
+  <div class="card">
+    <h4 class="section-title">Ubah PIN Keamanan</h4>
+    <input type="password" id="pinLama" placeholder="PIN Lama (4 Digit)" inputmode="numeric" maxlength="4">
+    <input type="password" id="pinBaru" placeholder="PIN Baru (4 Digit)" inputmode="numeric" maxlength="4">
+    <button onclick="prosesUbahPin()">Simpan PIN Baru</button>
+  </div>
+
+  </div><!-- /#pengaturan-akun -->
+
+</div>
+
+<!-- Dialog Kustom -->
+<div id="dlgOverlay" class="dlg-overlay" aria-hidden="true">
+  <div class="dlg-box" role="alertdialog" aria-modal="true" aria-labelledby="dlgTitle" aria-describedby="dlgMessage">
+    <div id="dlgIcon" class="dlg-icon info"></div>
+    <h4 id="dlgTitle" class="dlg-title"></h4>
+    <p id="dlgMessage" class="dlg-message"></p>
+    <div class="dlg-actions">
+      <button type="button" id="dlgCancel" class="dlg-btn-secondary">Batal</button>
+      <button type="button" id="dlgOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== Dialog Kustom =====
+  const DLG_ICONS = {
+    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/></svg>',
+    info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="11" x2="12" y2="17"/><circle cx="12" cy="7.5" r="0.6" fill="currentColor"/></svg>'
+  };
+  const DLG_DEFAULT_TITLE = {
+    success: 'Berhasil',
+    error: 'Terjadi Kesalahan',
+    warning: 'Perhatian',
+    info: 'Informasi'
+  };
+
+  let dlgResolve = null;
+  let dlgLastFocus = null;
+
+  function dlgClose(result) {
+    const overlay = document.getElementById('dlgOverlay');
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+    if (dlgLastFocus && dlgLastFocus.focus) dlgLastFocus.focus();
+    if (dlgResolve) {
+      const r = dlgResolve;
+      dlgResolve = null;
+      r(result);
+    }
+  }
+
+  function dlgOpen(opts) {
+    // Jika ada dialog lain yang masih terbuka, tutup dulu
+    if (dlgResolve) dlgClose(false);
+
+    return new Promise(resolve => {
+      dlgResolve = resolve;
+      dlgLastFocus = document.activeElement;
+
+      const type = opts.type || 'info';
+      const iconEl = document.getElementById('dlgIcon');
+      iconEl.className = 'dlg-icon ' + type;
+      iconEl.innerHTML = DLG_ICONS[type] || DLG_ICONS.info;
+
+      document.getElementById('dlgTitle').textContent = opts.title || DLG_DEFAULT_TITLE[type] || '';
+      document.getElementById('dlgMessage').textContent = opts.message || '';
+
+      const okBtn = document.getElementById('dlgOk');
+      const cancelBtn = document.getElementById('dlgCancel');
+      okBtn.textContent = opts.okText || 'OK';
+      okBtn.className = opts.danger ? 'dlg-btn-danger' : '';
+      cancelBtn.textContent = opts.cancelText || 'Batal';
+      cancelBtn.style.display = opts.confirm ? '' : 'none';
+
+      const overlay = document.getElementById('dlgOverlay');
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden', 'false');
+      setTimeout(() => okBtn.focus(), 50);
+    });
+  }
+
+  // Pengganti alert(): showAlert('pesan', 'success' | 'error' | 'warning' | 'info', 'Judul opsional')
+  function showAlert(message, type, title) {
+    return dlgOpen({ message: message, type: type || 'info', title: title });
+  }
+
+  // Pengganti confirm(): hasilnya Promise<boolean>
+  function showConfirm(message, opts) {
+    opts = opts || {};
+    return dlgOpen({
+      message: message,
+      confirm: true,
+      type: opts.type || 'warning',
+      title: opts.title || 'Konfirmasi',
+      okText: opts.okText || 'Ya',
+      cancelText: opts.cancelText || 'Batal',
+      danger: !!opts.danger
+    });
+  }
+
+  document.getElementById('dlgOk').addEventListener('click', () => dlgClose(true));
+  document.getElementById('dlgCancel').addEventListener('click', () => dlgClose(false));
+  document.getElementById('dlgOverlay').addEventListener('click', e => {
+    if (e.target.id === 'dlgOverlay') dlgClose(false); // klik area gelap = batal
+  });
+  document.addEventListener('keydown', e => {
+    if (!dlgResolve) return;
+    if (e.key === 'Escape') { e.preventDefault(); dlgClose(false); }
+  });
+
+  // ===== Firebase =====
+  const firebaseConfig = { databaseURL: "https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  const BANK_ID_TO_NAME = {
+    'MANDIRI': 'Bank Mandiri', 'BRI': 'Bank BRI', 'BNI': 'Bank BNI', 'BCA': 'Bank BCA',
+    'BSM': 'Bank BSI', 'DANAMON': 'Bank Danamon', 'PERMATA': 'Bank Permata', 'CIMB': 'Bank CIMB Niaga',
+    'KESEJAHTERAAN_EKONOMI': 'SeaBank Indonesia', 'BTN': 'Bank BTN', 'ROYAL': 'Bank Digital BCA (blu)'
+  };
+
+  function getBankDisplayName(bankId) {
+    if (!bankId) return '';
+    const key = String(bankId).toUpperCase();
+    if (BANK_ID_TO_NAME[key]) return BANK_ID_TO_NAME[key];
+    return key.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+  }
+
+  // Halaman ini tidak punya login/daftar dan tidak berpindah halaman.
+  // Kalau aksi butuh sesi, cukup beri tahu user (login dilakukan dari alur utama aplikasi).
+  function perluLogin() {
+    showAlert('Silakan login terlebih dahulu dari halaman utama aplikasi.', 'info', 'Belum login');
+  }
+
+  function initUserSession(ph) {
+    document.getElementById('user-phone').innerText = ph;
+    tampilkanNama('', ph);
+
+    db.ref('users/' + ph + '/nama').on('value', s => {
+      namaSaatIni = s.val() ? String(s.val()) : '';
+      tampilkanNama(namaSaatIni, ph);
+      const input = document.getElementById('inputNama');
+      if (input && document.activeElement !== input) input.value = namaSaatIni;
+    });
+
+    db.ref('users/' + ph + '/foto').on('value', s => {
+      tampilkanFoto(s.val() ? String(s.val()) : '');
+    });
+
+    db.ref('users/' + ph + '/saldo').on('value', s => { 
+      document.getElementById('display-saldo').innerText = "Rp " + (s.val() || 0).toLocaleString('id-ID'); 
+    });
+    db.ref('users/' + ph + '/poin').on('value', s => { 
+      document.getElementById('display-poin').innerText = Number(s.val() || 0).toLocaleString('id-ID'); 
+    });
+
+    db.ref('users/' + ph + '/kodeUnik').on('value', s => {
+      const v = s.val();
+      document.getElementById('display-kodeunik').innerText = (v === null || v === undefined || v === '') ? '-' : String(v);
+    });
+
+    loadRiwayat(ph);
+  }
+
+  function normalizeRiwayatItem(item) {
+    if (item.product !== undefined || item.refID !== undefined) {
+      return {
+        name: item.product || 'Transaksi',
+        price: Number(item.price || 0),
+        dest: item.dest || '-',
+        refID: item.refID || '-',
+        status: item.status || '-',
+        timestamp: item.timestamp || null
+      };
+    }
+    const isTransferBank = !!item.bank;
+    const name = isTransferBank
+      ? 'Transfer Bank - ' + getBankDisplayName(item.bank)
+      : (item.kode_produk || 'Top Up Digital');
+    const price = Number(item.total_potongan || item.nominal || 0);
+
+    return {
+      name: name,
+      price: price,
+      dest: item.nama_rekening ? (item.tujuan + ' - ' + item.nama_rekening) : (item.tujuan || '-'),
+      refID: item.trx_id || '-',
+      status: item.status || '-',
+      timestamp: item.timestamp || null
+    };
+  }
+
+  function loadRiwayat(ph) {
+    const container = document.getElementById('list-riwayat');
+    if (!container) return; // halaman ini belum punya card riwayat
+    container.innerHTML = 'Memuat riwayat...';
+
+    Promise.all([
+      db.ref('users/' + ph + '/riwayat').once('value'),
+      db.ref('users/' + ph + '/riwayat_transfer').once('value')
+    ]).then(([snapRiwayat, snapTransfer]) => {
+      let items = [];
+
+      if (snapRiwayat.exists()) {
+        snapRiwayat.forEach(child => { items.push(normalizeRiwayatItem(child.val())); });
+      }
+      if (snapTransfer.exists()) {
+        snapTransfer.forEach(child => { items.push(normalizeRiwayatItem(child.val())); });
+      }
+
+      items.sort((a, b) => {
+        const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+        const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        return tb - ta;
+      });
+
+      renderRiwayat(items.slice(0, 5)); // Menampilkan 5 transaksi terakhir
+    }).catch(err => {
+      container.innerHTML = '<p style="color: #dc2626; text-align: center;">Gagal memuat riwayat.</p>';
+    });
+  }
+
+  function renderRiwayat(items) {
+    const container = document.getElementById('list-riwayat');
+    if (!container) return;
+    container.innerHTML = '';
+    if (items.length === 0) {
+      container.innerHTML = '<p style="color: #64748b; text-align: center; margin: 10px 0;">Belum ada riwayat transaksi.</p>';
+      return;
+    }
+    items.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <div class="item-header">
+          <span class="item-name">${item.name}</span>
+          <span class="item-price">Rp ${item.price.toLocaleString('id-ID')}</span>
+        </div>
+        <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+          Detail: <strong style="color: #0f172a;">${item.dest}</strong> | Status: ${item.status}<br>
+          Waktu: ${item.timestamp ? new Date(item.timestamp).toLocaleString('id-ID') : '-'}
+        </div>
+      `;
+      container.appendChild(row);
+    });
+  }
+
+  // ===== Foto Profil (Cloudinary, unsigned upload) =====
+  const CLOUDINARY_CLOUD  = 'do3bvyn05';
+  const CLOUDINARY_PRESET = 'nasuka_digital'; // harus sama persis dengan nama upload preset di Cloudinary
+  const FOTO_MAKS_MB = 10;
+  const FOTO_SISI_PX = 400;
+
+  function tampilkanFoto(url) {
+    const wrap = document.getElementById('avatar-wrap');
+    const img = document.getElementById('avatar-img');
+    if (!url) {
+      wrap.classList.remove('has-photo');
+      img.removeAttribute('src');
+      return;
+    }
+    img.onload = () => wrap.classList.add('has-photo');
+    img.onerror = () => wrap.classList.remove('has-photo'); // gagal muat: kembali ke inisial
+    img.src = url;
+  }
+
+  function pilihFoto() {
+    if (!localStorage.getItem('userPhone')) { perluLogin(); return; }
+    document.getElementById('inputFoto').click();
+  }
+
+  // Potong persegi dari tengah, kecilkan ke 400x400, simpan sebagai JPEG
+  function kompresFoto(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const sisi = Math.min(img.width, img.height);
+        const sx = (img.width - sisi) / 2;
+        const sy = (img.height - sisi) / 2;
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = FOTO_SISI_PX;
+        canvas.getContext('2d').drawImage(img, sx, sy, sisi, sisi, 0, 0, FOTO_SISI_PX, FOTO_SISI_PX);
+        canvas.toBlob(b => b ? resolve(b) : reject(new Error('Gagal memproses gambar')), 'image/jpeg', 0.85);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('File bukan gambar yang valid')); };
+      img.src = url;
+    });
+  }
+
+  async function prosesUbahFoto(file) {
+    const ph = localStorage.getItem('userPhone');
+    if (!ph) { perluLogin(); return; }
+
+    if (!file.type.startsWith('image/')) {
+      showAlert('Pilih file gambar (JPG, PNG, atau WebP).', 'warning', 'Format tidak didukung');
+      return;
+    }
+    if (file.size > FOTO_MAKS_MB * 1024 * 1024) {
+      showAlert('Ukuran foto maksimal ' + FOTO_MAKS_MB + ' MB.', 'warning', 'Foto terlalu besar');
+      return;
+    }
+
+    const loading = document.getElementById('avatar-loading');
+    loading.classList.add('show');
+    try {
+      const blob = await kompresFoto(file);
+      const fd = new FormData();
+      fd.append('file', blob, 'profil.jpg');
+      fd.append('upload_preset', CLOUDINARY_PRESET);
+
+      const res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload', {
+        method: 'POST',
+        body: fd
+      });
+      const data = await res.json();
+      if (!res.ok || !data.secure_url) {
+        throw new Error((data.error && data.error.message) || 'Upload ditolak');
+      }
+
+      await db.ref('users/' + ph + '/foto').set(data.secure_url);
+      showAlert('Foto profil Anda sudah diperbarui.', 'success', 'Foto berhasil disimpan');
+    } catch (err) {
+      showAlert('Foto belum tersimpan. Periksa koneksi internet lalu coba lagi.', 'error', 'Gagal mengunggah');
+      console.error('Upload foto gagal:', err);
+    } finally {
+      loading.classList.remove('show');
+      document.getElementById('inputFoto').value = '';
+    }
+  }
+
+  document.getElementById('avatar-wrap').addEventListener('click', pilihFoto);
+  document.getElementById('avatar-wrap').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pilihFoto(); }
+  });
+  document.getElementById('inputFoto').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (f) prosesUbahFoto(f);
+  });
+
+  // ===== Nama Tampilan =====
+  let namaSaatIni = '';
+
+  function getInisial(nama, ph) {
+    if (!nama) return ph.slice(-2);
+    const kata = nama.split(' ').filter(Boolean);
+    const inisial = kata.slice(0, 2).map(k => Array.from(k)[0]).join('');
+    return inisial.toUpperCase();
+  }
+
+  function tampilkanNama(nama, ph) {
+    document.getElementById('user-name').textContent = nama || 'Pengguna';
+    document.getElementById('avatar-icon').textContent = getInisial(nama, ph);
+  }
+
+  function prosesUbahNama() {
+    const ph = localStorage.getItem('userPhone');
+    if (!ph) {
+      perluLogin();
+      return;
+    }
+
+    // rapikan: buang spasi berlebih di awal, akhir, dan tengah
+    const nama = document.getElementById('inputNama').value.replace(/\s+/g, ' ').trim();
+
+    if (nama.length < 2) {
+      showAlert('Nama minimal 2 karakter.', 'warning', 'Nama terlalu pendek');
+      return;
+    }
+    if (nama.length > 30) {
+      showAlert('Nama maksimal 30 karakter.', 'warning', 'Nama terlalu panjang');
+      return;
+    }
+    if (!/^[\p{L}\p{N} .,'-]+$/u.test(nama)) {
+      showAlert('Gunakan huruf, angka, spasi, atau tanda . , \' - saja.', 'warning', 'Karakter tidak diizinkan');
+      return;
+    }
+    if (nama === namaSaatIni) {
+      showAlert('Nama yang Anda masukkan sama dengan nama saat ini.', 'info', 'Tidak ada perubahan');
+      return;
+    }
+
+    db.ref('users/' + ph + '/nama').set(nama).then(() => {
+      showAlert('Halo, ' + nama + '! Nama Anda sudah diperbarui.', 'success', 'Nama berhasil disimpan');
+    }).catch(() => {
+      showAlert('Nama belum tersimpan. Periksa koneksi internet lalu coba lagi.', 'error', 'Gagal menyimpan');
+    });
+  }
+
+  function prosesUbahPin() {
+    const ph = localStorage.getItem('userPhone');
+    const pinLama = document.getElementById('pinLama').value.trim();
+    const pinBaru = document.getElementById('pinBaru').value.trim();
+
+    if (!ph) {
+      perluLogin();
+      return;
+    }
+    if (!pinLama || !pinBaru) {
+      showAlert('Isi PIN lama dan PIN baru terlebih dahulu.', 'warning', 'Data belum lengkap');
+      return;
+    }
+    if (pinBaru.length !== 4) {
+      showAlert('PIN baru harus terdiri dari 4 digit.', 'warning', 'PIN tidak valid');
+      return;
+    }
+
+    db.ref('users/' + ph + '/pin').once('value', snap => {
+      if (String(snap.val()) === String(pinLama)) {
+        db.ref('users/' + ph + '/pin').set(pinBaru).then(() => {
+          showAlert('PIN keamanan Anda sudah diperbarui.', 'success', 'PIN berhasil diubah');
+          document.getElementById('pinLama').value = '';
+          document.getElementById('pinBaru').value = '';
+        });
+      } else {
+        showAlert('PIN lama yang Anda masukkan tidak sesuai.', 'error', 'PIN lama salah');
+      }
+    });
+  }
+
+  async function prosesLogout() {
+    const yakin = await showConfirm('Anda akan keluar dari akun ini di perangkat ini.', {
+      title: 'Keluar dari akun?',
+      okText: 'Keluar',
+      cancelText: 'Batal',
+      danger: true
+    });
+    if (!yakin) return;
+
+    // Lepas listener Firebase milik user yang sedang login
+    const ph = localStorage.getItem('userPhone');
+    if (ph) {
+      ['nama', 'foto', 'saldo', 'poin', 'kodeUnik'].forEach(k => db.ref('users/' + ph + '/' + k).off());
+    }
+
+    // Hapus semua data lokal (tanpa reload/redirect, aplikasi tetap berjalan normal)
+    try { localStorage.clear(); sessionStorage.clear(); } catch (e) {}
+    namaSaatIni = '';
+
+    // Reset tampilan ke kondisi belum login
+    document.getElementById('user-phone').innerText = '-';
+    tampilkanNama('', '');
+    tampilkanFoto('');
+    document.getElementById('display-saldo').innerText = 'Rp 0';
+    document.getElementById('display-poin').innerText = '0';
+    document.getElementById('display-kodeunik').innerText = '-';
+    const listRiwayat = document.getElementById('list-riwayat');
+    if (listRiwayat) listRiwayat.innerHTML = '';
+
+    // Tutup & bersihkan panel pengaturan akun
+    document.getElementById('pengaturan-akun').classList.remove('show');
+    document.getElementById('menuPengaturanLabel').textContent = 'Pengaturan Akun';
+    ['inputNama', 'pinLama', 'pinBaru'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+
+  }
+
+  // ===== Menu Titik Tiga =====
+  function tutupMenu() {
+    document.getElementById('menuDropdown').classList.remove('show');
+    document.getElementById('menuBtn').setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleMenu(e) {
+    e.stopPropagation();
+    const dd = document.getElementById('menuDropdown');
+    const terbuka = dd.classList.toggle('show');
+    document.getElementById('menuBtn').setAttribute('aria-expanded', terbuka ? 'true' : 'false');
+  }
+
+  function bukaPengaturan() {
+    const box = document.getElementById('pengaturan-akun');
+    const terbuka = box.classList.toggle('show');
+    document.getElementById('menuPengaturanLabel').textContent = terbuka ? 'Tutup Pengaturan' : 'Pengaturan Akun';
+    tutupMenu();
+    if (terbuka) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function menuLogout() {
+    tutupMenu();
+    prosesLogout();
+  }
+
+  // Klik di luar menu = tutup menu
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.menu-wrap')) tutupMenu();
+  });
+  // Tombol Esc menutup menu (jika dialog sedang tidak terbuka)
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !dlgResolve) tutupMenu();
+  });
+
+  window.onload = () => {
+    const ph = localStorage.getItem('userPhone');
+    if (ph) {
+      initUserSession(ph);
+    }
+  };
+</script>
+</body>
+</html>
