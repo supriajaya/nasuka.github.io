@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Riwayat Transaksi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; margin: 0; background: url('https://nasuka.pro/gambar/langit.jpg') no-repeat center center fixed; background-size: cover; color: #1e293b; }
+
+  .card { background: rgba(255,255,255,0.95); border-radius: 16px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+  input { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #cbd5e1; border-radius: 12px; box-sizing: border-box; background: #fff; transition: border 0.2s; }
+  input:focus { outline: none; border-color: #3b82f6; }
+
+  .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 20000; padding: 20px; box-sizing: border-box; }
+  .login-box { background: #ffffff; padding: 24px; border-radius: 20px; width: 100%; max-width: 320px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+  .login-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem; box-sizing: border-box; }
+  .login-btn { width: 100%; padding: 12px; background-color: #0f172a; color: #fff; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; border-radius: 10px; }
+  .login-close { margin-top: 15px; background: none; border: none; font-size: 0.9rem; cursor: pointer; color: #64748b; }
+
+  .item-row { border-bottom: 1px solid #f1f5f9; padding: 12px 0; display: flex; flex-direction: column; }
+  .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .item-name { font-weight: 600; font-size: 14px; color: #334155; }
+  .item-price { font-weight: 700; color: #0f172a; font-size: 14px; }
+
+  .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #25d366;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 10000;
+      transition: transform 0.2s ease;
+  }
+  .whatsapp-float:hover { transform: scale(1.05); }
+
+  .item-row { cursor: pointer; }
+  .item-row:active { background: #f8fafc; }
+
+  /* Popup detail transaksi */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 15000; padding: 16px; box-sizing: border-box; }
+  .modal-content { background: #ffffff; padding: 20px; border-radius: 16px; width: 100%; max-width: 340px; max-height: 88vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #000; box-sizing: border-box; }
+  .modal-btn { background: #1e293b; border: none; color: white; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px; font-family: 'Inter', sans-serif; font-size: 14px; }
+  .detail-header { text-align: center; font-weight: bold; font-size: 1.15em; margin-bottom: 12px; border-bottom: 2px dashed #000; padding-bottom: 8px; }
+  .detail-row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .detail-label { color: #333; font-weight: normal; }
+  .detail-value { font-weight: bold; text-align: right; color: #000; word-break: break-all; max-width: 60%; }
+  .kode-box { background: #0f172a; color: #fff; border-radius: 8px; padding: 12px; text-align: center; margin: 10px 0; }
+  .kode-box .lbl { font-size: 11px; color: #94a3b8; font-weight: normal; }
+  .kode-box .kode { font-size: 1.25em; letter-spacing: 1px; word-break: break-all; margin: 6px 0; user-select: all; }
+  .kode-box .info { font-size: 11px; color: #cbd5e1; font-weight: normal; margin-top: 4px; }
+  .whatsapp-float img { width: 24px; height: 24px; }
+
+    /* ===== VERSI WEB: tombol kembali ke beranda ===== */
+    .web-topbar{width:100%;max-width:400px;margin:0 auto 9px auto;box-sizing:border-box}
+    .web-topbar a{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.94);color:#0f172a;font:600 13px/1 'Inter',-apple-system,'Segoe UI',sans-serif;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.14)}
+    .web-topbar a:hover{background:#fff}
+
+    .web-topbar { max-width: none; margin: 0 0 12px 0; }
+    @media (min-width: 768px) {
+        body { padding: 24px clamp(24px, 4vw, 64px); }
+        .web-topbar, body > .card { max-width: 960px; margin-left: auto; margin-right: auto; }
+        body > .card { padding: 22px; }
+    }
+</style>
+</head>
+<body>
+<nav class="web-topbar" aria-label="Navigasi"><a href="produk.html">&#8249; Beranda</a></nav>
+
+<div class="card">
+    <h3>Riwayat Transaksi</h3>
+    <div id="list-riwayat">Memuat riwayat...</div>
+</div>
+
+
+
+<div id="detailModal" class="modal-overlay" onclick="if (event.target === this) tutupDetail()">
+    <div class="modal-content">
+        <div id="detailContent"></div>
+        <button class="modal-btn" onclick="tutupDetail()">Tutup</button>
+    </div>
+</div>
+
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+        <h3>Masuk Akun</h3>
+        <input type="text" id="loginPhone" class="login-input" placeholder="Nomor Handphone" inputmode="numeric">
+        <input type="password" id="loginPin" class="login-input" placeholder="PIN (4 Digit)" inputmode="numeric" maxlength="4">
+        <button class="login-btn" onclick="prosesLogin()">Masuk</button>
+        <button class="login-close" onclick="hideLogin()">Batal</button>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = { databaseURL: "https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app/" };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function showLogin() { document.getElementById('loginOverlay').style.display = 'flex'; }
+    function hideLogin() { document.getElementById('loginOverlay').style.display = 'none'; }
+
+    function prosesLogin() {
+        const phone = document.getElementById('loginPhone').value.trim();
+        const pin = document.getElementById('loginPin').value.trim();
+        if (!phone || !pin) return;
+
+        db.ref('users/' + phone).once('value', snap => {
+            if (snap.exists() && String(snap.val().pin) === String(pin)) {
+                localStorage.setItem('userPhone', phone);
+                hideLogin();
+                loadRiwayat();
+            } else if (!snap.exists()) {
+                db.ref('users/' + phone).set({ pin: pin, saldo: 0, poin: 0 }).then(() => {
+                    localStorage.setItem('userPhone', phone);
+                    hideLogin();
+                    loadRiwayat();
+                });
+            } else {
+                alert('PIN salah!');
+            }
+        });
+    }
+
+    // Mapping Bank ID (dari member.tokovoucher.net/list-bank) -> Nama Bank yang enak dibaca.
+    // Kalau ada bank_id baru yang belum masuk daftar ini, tambahkan barisnya di sini.
+    const BANK_ID_TO_NAME = {
+        'MANDIRI': 'Bank Mandiri',
+        'BRI': 'Bank BRI',
+        'BNI': 'Bank BNI',
+        'BCA': 'Bank BCA',
+        'BSM': 'Bank BSI',
+        'DANAMON': 'Bank Danamon',
+        'PERMATA': 'Bank Permata',
+        'BII': 'Maybank Indonesia',
+        'PANIN': 'Bank Panin',
+        'CIMB': 'Bank CIMB Niaga',
+        'MEGA_SYR': 'Bank Mega Syariah',
+        'ARTHA': 'Bank Artha Graha Internasional',
+        'PANIN_SYR': 'Bank Panin Dubai Syariah',
+        'BUMI_ARTA': 'Bank Bumi Arta',
+        'MESTIKA_DHARMA': 'Bank Mestika Dharma',
+        'JASA_JAKARTA': 'Bank Jasa Jakarta',
+        'MASPION': 'Bank Maspion Indonesia',
+        'SHINHAN': 'Bank Shinhan Indonesia',
+        'NUSANTARA_PARAHYANGAN': 'Bank Nusantara Parahyangan',
+        'HSBC': 'Bank HSBC Indonesia',
+        'BJB': 'Bank BJB',
+        'DKI': 'Bank DKI',
+        'ACEH': 'Bank Aceh Syariah',
+        'MUAMALAT': 'Bank Muamalat Indonesia',
+        'JAWA_TIMUR': 'Bank Jatim',
+        'JAWA_TENGAH': 'Bank Jateng',
+        'BENGKULU': 'Bank Bengkulu',
+        'NUSA_TENGGARA_BARAT': 'Bank NTB Syariah',
+        'BJB_SYR': 'Bank BJB Syariah',
+        'BCA_SYR': 'Bank BCA Syariah',
+        'DAERAH_ISTIMEWA': 'BPD DIY',
+        'DBS': 'Bank DBS Indonesia',
+        'CAPITAL': 'Bank Capital Indonesia',
+        'MAYAPADA': 'Bank Mayapada',
+        'BOC': 'Bank of China (Hong Kong)',
+        'KESEJAHTERAAN_EKONOMI': 'SeaBank Indonesia',
+        'HANA': 'Bank KEB Hana',
+        'BTN': 'Bank BTN',
+        'UOB': 'Bank UOB Indonesia',
+        'ROYAL': 'Bank Digital BCA (blu)',
+        'MNC_INTERNASIONAL': 'Bank MNC Internasional',
+        'NATIONALNOBU': 'Bank Nationalnobu',
+        'BUKOPIN': 'Bank KB Bukopin',
+        'WOORI': 'Bank Woori Saudara',
+        'CITIBANK': 'Citibank',
+        'INA_PERDANA': 'Bank Ina Perdana',
+        'SAHABAT_SAMPOERNA': 'Bank Sahabat Sampoerna',
+        'QNB_KESAWAN': 'Bank QNB Indonesia'
+    };
+
+    function getBankDisplayName(bankId) {
+        if (!bankId) return '';
+        const key = String(bankId).toUpperCase();
+        if (BANK_ID_TO_NAME[key]) return BANK_ID_TO_NAME[key];
+        // Fallback kalau bank_id belum ada di daftar: tampilkan versi rapi
+        // dari ID-nya (underscore jadi spasi, tiap kata dikapital) daripada kode mentah
+        return key.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+    }
+
+    function normalizeRiwayatItem(item) {
+        // Node "riwayat" (topup pulsa/produk digital dari index.html)
+        // sudah pakai field: product, price, dest, refID, status, timestamp
+        if (item.product !== undefined || item.refID !== undefined) {
+            return {
+                sumber: 'riwayat',
+                name: item.product || 'Transaksi',
+                price: Number(item.price || 0),
+                dest: item.dest || '-',
+                refID: item.refID || item.trx_id || item.ref_id || '-',
+                status: item.status || '-',
+                timestamp: item.timestamp || null,
+                sn: item.sn || ''
+            };
+        }
+        // Node "riwayat_transfer" (dana.html & tf.html) pakai field beda:
+        // kode_produk/bank, nominal, total_potongan, tujuan, trx_id, tipe
+        const isTransferBank = !!item.bank;
+        const name = isTransferBank
+            ? 'Transfer Bank - ' + getBankDisplayName(item.bank)
+            : (item.kode_produk || 'Top Up DANA');
+        // total_potongan = jumlah yang benar-benar terpotong dari saldo (nominal + admin)
+        const price = Number(item.total_potongan || item.nominal || 0);
+
+        return {
+            sumber: 'transfer',
+            name: name,
+            price: price,
+            dest: item.nama_rekening ? (item.tujuan + ' - ' + item.nama_rekening) : (item.tujuan || '-'),
+            refID: item.trx_id || '-',
+            status: item.status || '-',
+            timestamp: item.timestamp || null,
+            sn: '',
+            tujuan: item.tujuan || '',
+            namaRek: item.nama_rekening || '',
+            bank: isTransferBank ? getBankDisplayName(item.bank) : '',
+            nominal: Number(item.nominal || 0)
+        };
+    }
+
+    function renderRiwayatList(items) {
+        const container = document.getElementById('list-riwayat');
+        container.innerHTML = '';
+        if (items.length === 0) {
+            container.innerHTML = '<p style="color: #64748b; text-align: center; padding: 20px;">Belum ada riwayat transaksi.</p>';
+            return;
+        }
+        items.forEach(item => {
+            const refIdStr = String(item.refID || '').toLowerCase();
+            const isWifi = refIdStr.startsWith('wifi');
+            const labelDetail = isWifi ? 'Kode Voucher' : 'Tujuan/Detail';
+
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `
+                <div class="item-header">
+                    <span class="item-name">${escHtml(item.name)}</span>
+                    <span class="item-price">Rp ${item.price.toLocaleString('id-ID')}</span>
+                </div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                    ${labelDetail}: <strong style="color: #0f172a;">${escHtml(item.dest)}</strong><br>
+                    Ref ID: ${escHtml(item.refID)}<br>
+                    Status: ${escHtml(item.status)}<br>
+                    Waktu: ${item.timestamp ? new Date(item.timestamp).toLocaleString('id-ID') : '-'}
+                </div>
+            `;
+            row.onclick = () => bukaDetail(item);
+            container.appendChild(row);
+        });
+    }
+
+    // ===== PENYARING TAMPILAN =====
+    function escHtml(t) {
+        return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    const POLA_CURIGA = /(saldo|harga|trxid|refid)/i;   // kata yang tidak boleh ikut tampil/tercetak
+    // Teks bebas dari agregator: tolak yang terlihat seperti respon mentah
+    function teksAman(t, cadangan) {
+        t = String(t == null ? '' : t).trim();
+        if (!t || t.length > 80 || POLA_CURIGA.test(t)) return cadangan || '-';
+        return t;
+    }
+
+    // ===== TEKS BANTU (kode token / voucher) =====
+    const LEBAR_STRUK = 32;            // panjang maks. satu baris kode voucher di layar
+    function bersihkanTeks(t) {
+        // buang karakter non-ASCII (emoji/simbol) dari teks kode
+        return String(t == null ? '' : t).replace(/[^\x20-\x7E]/g, ' ').trim();
+    }
+
+    // Token 20 digit dari SN, ditulis per 4 digit: 1234 5678 9012 3456 7890
+    const POLA_TOKEN = /(\d{4})[\s-]?(\d{4})[\s-]?(\d{4})[\s-]?(\d{4})[\s-]?(\d{4})/;
+    function ambilTokenPln(sn) {
+        const m = String(sn || '').match(POLA_TOKEN);
+        return m ? m.slice(1).join(' ') : '';
+    }
+    // Bagian SN selain token (nama, tarif/daya, kWh) yang dipisah garis miring
+    function ambilDetailPln(sn) {
+        return String(sn || '').split('/')
+            .map(bersihkanTeks)
+            .filter(b => b && !POLA_TOKEN.test(b) && !POLA_CURIGA.test(b))
+            .slice(0, 5)
+            .map(b => b.slice(0, LEBAR_STRUK));
+    }
+    // Kode voucher dari SN: bagian yang mengandung kata curiga dibuang,
+    // lalu dipotong per baris selebar kertas (maks 6 baris).
+    function ambilBarisKode(sn) {
+        const baris = [];
+        String(sn || '').split('/')
+            .map(bersihkanTeks)
+            .filter(b => b && !POLA_CURIGA.test(b))
+            .forEach(b => {
+                for (let i = 0; i < b.length; i += LEBAR_STRUK) baris.push(b.slice(i, i + LEBAR_STRUK));
+            });
+        return baris.slice(0, 6);
+    }
+
+    // ===== JENIS TRANSAKSI =====
+    // Hanya PLN dan voucher yang membawa SN/kode untuk user. Item lain (pulsa, paket data, DANA,
+    // transfer) TIDAK pernah mencetak SN. Bila ada voucher yang tidak terdeteksi, ubah aturan di sini.
+    function jenisItem(it) {
+        if (it.sumber === 'transfer') return it.bank ? 'transfer' : 'dana';
+        if (String(it.refID || '').toLowerCase().startsWith('wifi')) return 'wifi';
+        if (it.sn) {
+            if (/pln|token|listrik/i.test(it.name) && ambilTokenPln(it.sn)) return 'pln';
+            if (/voucher|vcr/i.test(it.name)) return 'voucher';
+        }
+        return 'umum';
+    }
+
+    // ===== POPUP DETAIL TRANSAKSI =====
+    function barisDetail(label, nilai) {
+        return '<div class="detail-row"><span class="detail-label">' + escHtml(label) + '</span><span class="detail-value">' + escHtml(nilai) + '</span></div>';
+    }
+
+    function bukaDetail(it) {
+        const jenis = jenisItem(it);
+        const st = String(it.status || '').toLowerCase();
+        const sukses = /^(sukses|success|berhasil)$/.test(st);
+
+        let simbol = '⏳', statusText = String(it.status || '-').toUpperCase();
+        if (sukses) { simbol = '✅'; statusText = 'SUKSES'; }
+        else if (st === 'gagal') { simbol = '❌'; statusText = 'GAGAL'; }
+        else if (st === 'pending') { simbol = '⏳'; statusText = 'PENDING'; }
+        else if (st === 'processing') { simbol = '🔄'; statusText = 'MEMPROSES'; }
+
+        const namaProduk = teksAman(it.name, 'Transaksi');
+        const trxId = teksAman(it.refID, '-');
+        const waktuTrx = it.timestamp ? new Date(it.timestamp).toLocaleString('id-ID') : '-';
+        const tujuan = teksAman((jenis === 'dana' || jenis === 'transfer') ? it.tujuan : it.dest, '-');
+        const nominal = Number(it.nominal || 0);
+        const admin = nominal && it.price > nominal ? it.price - nominal : 0;
+
+        let token = '', detail = [], kodeBaris = [];
+        if (jenis === 'pln') { token = ambilTokenPln(it.sn); detail = ambilDetailPln(it.sn); }
+        else if (jenis === 'voucher') { kodeBaris = ambilBarisKode(it.sn); }
+        else if (jenis === 'wifi') { kodeBaris = ambilBarisKode(it.dest); }
+
+        // ---- isi popup ----
+        let html = '<div class="detail-header">' + simbol + ' DETAIL TRANSAKSI</div>';
+        if (jenis === 'pln' && token) {
+            html += '<div class="kode-box"><div class="lbl">KODE TOKEN (20 digit)</div><div class="kode">' + escHtml(token) + '</div>' +
+                    detail.map(x => '<div class="info">' + escHtml(x) + '</div>').join('') + '</div>';
+        } else if ((jenis === 'voucher' || jenis === 'wifi') && kodeBaris.length) {
+            html += '<div class="kode-box"><div class="lbl">KODE VOUCHER</div><div class="kode">' + kodeBaris.map(escHtml).join('<br>') + '</div></div>';
+        }
+        html += barisDetail('Status', statusText);
+        html += barisDetail('Produk', namaProduk);
+        if (jenis === 'pln') html += barisDetail('No. Meter', tujuan);
+        else if (jenis === 'umum' || jenis === 'dana') html += barisDetail('Nomor Tujuan', tujuan);
+        else if (jenis === 'transfer') {
+            html += barisDetail('Bank', it.bank);
+            html += barisDetail('No. Rekening', tujuan);
+            if (it.namaRek) html += barisDetail('Nama Rekening', teksAman(it.namaRek, '-'));
+        }
+        if (nominal && admin > 0) {
+            html += barisDetail('Nominal', 'Rp ' + nominal.toLocaleString('id-ID'));
+            html += barisDetail('Biaya Admin', 'Rp ' + admin.toLocaleString('id-ID'));
+        }
+        html += barisDetail('Total Dibayar', 'Rp ' + it.price.toLocaleString('id-ID'));
+        html += barisDetail('ID Transaksi', trxId);
+        html += barisDetail('Waktu', waktuTrx);
+        document.getElementById('detailContent').innerHTML = html;
+
+
+        document.getElementById('detailModal').style.display = 'flex';
+    }
+
+    function tutupDetail() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+
+    function loadRiwayat() {
+        const ph = localStorage.getItem('userPhone');
+        const container = document.getElementById('list-riwayat');
+        if (!ph) {
+            container.innerHTML = 'Silakan login terlebih dahulu.';
+            showLogin();
+            return;
+        }
+        container.innerHTML = 'Memuat riwayat...';
+
+        Promise.all([
+            db.ref('users/' + ph + '/riwayat').once('value'),
+            db.ref('users/' + ph + '/riwayat_transfer').once('value')
+        ]).then(([snapRiwayat, snapTransfer]) => {
+            let items = [];
+
+            if (snapRiwayat.exists()) {
+                snapRiwayat.forEach(child => {
+                    items.push(normalizeRiwayatItem(child.val()));
+                });
+            }
+            if (snapTransfer.exists()) {
+                snapTransfer.forEach(child => {
+                    items.push(normalizeRiwayatItem(child.val()));
+                });
+            }
+
+            // Urutkan dari yang terbaru ke terlama
+            items.sort((a, b) => {
+                const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+                return tb - ta;
+            });
+
+            renderRiwayatList(items);
+        }).catch(err => {
+            container.innerHTML = '<p style="color: #dc2626; text-align: center; padding: 20px;">Gagal memuat riwayat: ' + err.message + '</p>';
+        });
+    }
+
+    window.onload = () => {
+        loadRiwayat();
+    };
+</script>
+</body>
+</html>
