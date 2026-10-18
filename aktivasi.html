@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aktivasi Voucher Axis</title>
+<style>
+  :root{
+    --bg:#f5f3fa; --card:#ffffff; --ink:#1d1533; --muted:#6b6485; --line:#e1dcee;
+    --brand:#6a1fb0; --brand-soft:#efe6fa; --ok:#12805c; --bad:#c22f3d; --warn:#9a6700;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:16px 16px 120px;max-width:560px;margin:0 auto}
+  h1{font-size:22px;margin:8px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 20px;line-height:1.45}
+  h2{font-size:15px;margin:22px 0 10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .sn-list{display:flex;flex-direction:column;gap:8px}
+  .sn,.paket{width:100%;text-align:left;font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer}
+  .sn{font-size:17px;font-weight:600;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+  .sn.on,.paket.on{border-color:var(--brand);background:var(--brand-soft)}
+  .paket{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}
+  .paket .nm{font-weight:600}
+  .paket .kd{font-size:12px;color:var(--muted);margin-top:2px}
+  .paket .hg{font-weight:700;white-space:nowrap}
+  button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+  .note{color:var(--muted);font-size:14px;padding:12px 2px}
+  .note.err{color:var(--bad)}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+  .bar-in{max-width:560px;margin:0 auto}
+  .ringkas{font-size:13px;color:var(--muted);margin-bottom:8px;min-height:18px}
+  .ringkas b{color:var(--ink)}
+  .go{width:100%;border:0;border-radius:12px;background:var(--brand);color:#fff;font:inherit;font-weight:700;font-size:16px;padding:14px;cursor:pointer}
+  .go:disabled{background:#c9c2d9;cursor:not-allowed}
+  .hasil{margin-top:16px;border-radius:12px;padding:14px;font-size:14px;line-height:1.5;display:none}
+  .hasil.show{display:block}
+  .hasil.ok{background:#e4f5ee;color:var(--ok)}
+  .hasil.bad{background:#fbe8ea;color:var(--bad)}
+  .hasil.wait{background:#fff4d6;color:var(--warn)}
+  .hasil strong{display:block;font-size:15px;margin-bottom:2px}
+  .konfirm{position:fixed;inset:0;background:rgba(29,21,51,.5);display:none;align-items:flex-end;justify-content:center;padding:16px}
+  .konfirm.show{display:flex}
+  .konfirm .box{background:var(--card);border-radius:16px;padding:18px;width:100%;max-width:560px}
+  .konfirm p{margin:0 0 6px;line-height:1.5}
+  .baris{display:flex;gap:10px;margin-top:14px}
+  .baris button{flex:1;border-radius:12px;font:inherit;font-weight:700;padding:13px;cursor:pointer}
+  .batal{background:var(--card);border:1.5px solid var(--line);color:var(--ink)}
+  .lanjut{background:var(--brand);border:0;color:#fff}
+    .cari{width:100%;font:inherit;padding:11px 14px;border:1.5px solid var(--line);border-radius:12px;margin-bottom:8px;background:var(--card);color:var(--ink)}
+  .konfirm{z-index:10}
+  @media (prefers-reduced-motion:no-preference){.sn,.paket{transition:border-color .15s,background .15s}}
+
+    /* ===== VERSI WEB: tombol kembali ke beranda ===== */
+    .web-topbar{width:100%;max-width:400px;margin:0 auto 9px auto;box-sizing:border-box}
+    .web-topbar a{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.94);color:#0f172a;font:600 13px/1 'Inter',-apple-system,'Segoe UI',sans-serif;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.14)}
+    .web-topbar a:hover{background:#fff}
+
+    .web-topbar { max-width: none; margin: 0 0 8px 0; }
+    @media (min-width: 768px) {
+        body { max-width: 900px; padding-left: 24px; padding-right: 24px; }
+        .sn-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+        #paketList { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+        #paketList .paket { margin-bottom: 0; }
+        .sn-list .note, #paketList .note { grid-column: 1 / -1; }
+        .bar-in { max-width: 900px; }
+        .konfirm { align-items: center; }
+        .konfirm .box { max-width: 480px; }
+    }
+</style>
+</head>
+<body>
+<nav class="web-topbar" aria-label="Navigasi"><a href="produk.html">&#8249; Beranda</a></nav>
+
+<h1>Aktivasi voucher Axis</h1>
+<p class="sub">Pilih SN voucher kosong, pilih paket, lalu tekan Aktivasi. Saldo terpotong sesuai harga paket.</p>
+
+<h2>SN voucher</h2>
+<input id="cariSn" class="cari" type="search" inputmode="numeric" placeholder="Cari SN (ketik sebagian angka)" oninput="tampilSn()">
+<div id="snList" class="sn-list"><div class="note">Memuat SN...</div></div>
+
+<h2>Paket</h2>
+<div id="paketList"><div class="note">Memuat paket...</div></div>
+
+<div id="hasil" class="hasil" role="status" aria-live="polite"></div>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="ringkas" id="ringkas">Belum ada pilihan</div>
+    <button class="go" id="btnAktivasi" disabled>Aktivasi</button>
+  </div>
+</div>
+
+<div class="konfirm" id="konfirm" role="dialog" aria-modal="true" aria-labelledby="kTitle">
+  <div class="box">
+    <p id="kTitle"><b>Aktifkan paket ini?</b></p>
+    <p id="kIsi"></p>
+    <div class="baris">
+      <button class="batal" id="kBatal">Batal</button>
+      <button class="lanjut" id="kLanjut">Ya, aktivasi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== KONFIGURASI ======
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCz8o5opNRSQs5qLgbA6ORyTMkCW3sp4zOF-da2RnSpSd85u2ZeffQ1L9qJvlWXeWh/exec';
+const RTDB_URL   = 'https://endata-nasuka-wireless-default-rtdb.asia-southeast1.firebasedatabase.app';
+const PATH_SN    = 'produk_agregator/vouchersn';
+const PATH_PAKET = 'produk_agregator/voucherpaketaxis';
+
+// Nomor HP user yang login (sama seperti dana.html)
+function getUserPhone() {
+  try { return localStorage.getItem('userPhone') || ''; } catch (e) { return ''; }
+}
+// =========================
+
+let snTerpilih = '';
+let paketTerpilih = null; // { kode, nama, harga }
+let sedangProses = false;
+
+const $ = id => document.getElementById(id);
+const rupiah = n => 'Rp ' + Number(n).toLocaleString('id-ID');
+
+async function rtdbGet(path) {
+  const res = await fetch(RTDB_URL + '/' + path + '.json');
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+// SN bisa berupa satu field "sn", banyak field, atau objek berisi field sn.
+function ekstrakSn(data) {
+  const hasil = [];
+  const tambah = v => {
+    if (v === null || v === undefined || typeof v === 'object') return;
+    const s = String(v).trim();
+    if (s && hasil.indexOf(s) === -1) hasil.push(s);
+  };
+  if (data === null || data === undefined) return hasil;
+  if (typeof data !== 'object') { tambah(data); return hasil; }
+  Object.keys(data).forEach(k => {
+    const v = data[k];
+    if (v && typeof v === 'object') tambah(v.sn); else tambah(v);
+  });
+  return hasil;
+}
+
+let semuaSn = [];
+function renderSn(list) { semuaSn = list; tampilSn(); }
+
+function tampilSn() {
+  const el = $('snList'), q = $('cariSn').value.trim();
+  if (!semuaSn.length) { el.innerHTML = '<div class="note">Belum ada SN tersimpan.</div>'; return; }
+  const f = semuaSn.filter(s => !q || s.indexOf(q) > -1);
+  if (!f.length) { el.innerHTML = '<div class="note">SN tidak ditemukan.</div>'; return; }
+  el.innerHTML = '';
+  f.slice(0, 50).forEach(sn => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'sn' + (sn === snTerpilih ? ' on' : '');
+    b.textContent = sn;
+    b.onclick = () => {
+      snTerpilih = sn;
+      el.querySelectorAll('.sn').forEach(x => x.classList.toggle('on', x === b));
+      updateBar();
+    };
+    el.appendChild(b);
+  });
+  if (f.length > 50) {
+    const n = document.createElement('div');
+    n.className = 'note';
+    n.textContent = 'Menampilkan 50 dari ' + f.length + ' SN. Ketik angka untuk mempersempit.';
+    el.appendChild(n);
+  }
+  if (f.length === 1 && snTerpilih !== f[0]) { snTerpilih = f[0]; el.firstChild.classList.add('on'); updateBar(); }
+}
+
+// SN yang sudah dipakai dibuang dari daftar, SN berikutnya otomatis terpilih (paket tetap)
+function pakaiSn(sn) {
+  semuaSn = semuaSn.filter(s => s !== sn);
+  snTerpilih = semuaSn[0] || '';
+  $('cariSn').value = '';
+  tampilSn();
+  updateBar();
+}
+
+function renderPaket(data) {
+  const el = $('paketList');
+  const items = Object.keys(data || {})
+    .map(k => ({ id: k, ...data[k] }))
+    .filter(p => p && typeof p === 'object' && p.val && String(p.status) === '1')
+    .sort((a, b) => Number(a.harga) - Number(b.harga));
+
+  if (!items.length) {
+    el.innerHTML = '<div class="note">Belum ada paket aktif. Pastikan status paket di RTDB bernilai 1.</div>';
+    return;
+  }
+  el.innerHTML = '';
+  items.forEach(p => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'paket';
+    b.innerHTML = '<div><div class="nm"></div><div class="kd"></div></div><span class="hg"></span>';
+    b.querySelector('.nm').textContent = p.nama || p.val;
+    b.querySelector('.kd').textContent = p.val;
+    b.querySelector('.hg').textContent = rupiah(p.harga);
+    b.onclick = () => {
+      paketTerpilih = { kode: p.val, nama: p.nama || p.val, harga: Number(p.harga) };
+      el.querySelectorAll('.paket').forEach(x => x.classList.toggle('on', x === b));
+      updateBar();
+    };
+    el.appendChild(b);
+  });
+}
+
+function updateBar() {
+  const siap = snTerpilih && paketTerpilih && !sedangProses;
+  $('btnAktivasi').disabled = !siap;
+  if (snTerpilih && paketTerpilih) {
+    $('ringkas').innerHTML = 'SN <b>' + snTerpilih + '</b> · <b>' + paketTerpilih.nama + '</b> · ' + rupiah(paketTerpilih.harga);
+  } else if (snTerpilih) {
+    $('ringkas').textContent = 'Pilih paket dulu';
+  } else if (paketTerpilih) {
+    $('ringkas').textContent = 'Pilih SN dulu';
+  } else {
+    $('ringkas').textContent = 'Belum ada pilihan';
+  }
+}
+
+function tampilHasil(jenis, judul, isi) {
+  const h = $('hasil');
+  h.className = 'hasil show ' + jenis;
+  h.innerHTML = '<strong></strong><span></span>';
+  h.querySelector('strong').textContent = judul;
+  h.querySelector('span').textContent = isi || '';
+  h.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+async function kirim(body) {
+  // text/plain agar tidak memicu preflight CORS di Apps Script
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+// Status dibaca langsung dari RTDB (riwayat diupdate GAS/webhook), tidak lewat GAS supaya hemat kuota urlfetch
+async function pantauStatus(phone, refId) {
+  for (let i = 0; i < 20; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    try {
+      const s = await rtdbGet('users/' + encodeURIComponent(phone) + '/riwayat/' + encodeURIComponent(refId));
+      if (s && (s.status === 'sukses' || s.status === 'gagal')) return s;
+    } catch (e) { /* coba lagi */ }
+  }
+  return null;
+}
+
+async function jalankanAktivasi() {
+  const phone = getUserPhone();
+  if (!phone) { tampilHasil('bad', 'Belum login', 'Masuk ke akun dulu, lalu buka halaman ini lagi.'); return; }
+
+  const snPakai = snTerpilih;
+  sedangProses = true;
+  $('btnAktivasi').disabled = true;
+  $('btnAktivasi').textContent = 'Memproses...';
+  $('hasil').className = 'hasil';
+
+  try {
+    const r = await kirim({
+      action: 'orderAktivasi',
+      userPhone: phone,
+      dest: snTerpilih,
+      product: paketTerpilih.kode
+    });
+
+    if (r.status === 'sukses') {
+      pakaiSn(snPakai);
+      tampilHasil('ok', 'Sudah Aktif', 'SN ' + snPakai);
+    } else if (r.status === 'pending') {
+      pakaiSn(snPakai);
+      tampilHasil('wait', 'Sedang diproses', 'Menunggu konfirmasi dari server, jangan tutup halaman ini.');
+      const akhir = await pantauStatus(phone, r.ref_id);
+      if (akhir && akhir.status === 'sukses') tampilHasil('ok', 'Sudah Aktif', 'SN ' + snPakai);
+      else if (akhir && akhir.status === 'gagal') tampilHasil('bad', 'Gagal', 'Saldo dikembalikan otomatis.');
+      else tampilHasil('wait', 'Masih diproses', 'Hasil akan muncul di riwayat transaksi. Jika gagal, saldo dikembalikan otomatis.');
+    } else {
+      tampilHasil('bad', 'Gagal', 'Coba lagi beberapa saat.');
+    }
+  } catch (e) {
+    tampilHasil('wait', 'Koneksi terputus', 'Cek riwayat transaksi sebelum mencoba lagi agar tidak terpotong dua kali.');
+  } finally {
+    sedangProses = false;
+    $('btnAktivasi').textContent = 'Aktivasi';
+    updateBar();
+  }
+}
+
+$('btnAktivasi').onclick = () => {
+  $('kIsi').textContent = 'SN ' + snTerpilih + ' akan diaktifkan dengan ' + paketTerpilih.nama + ' seharga ' + rupiah(paketTerpilih.harga) + '.';
+  $('konfirm').classList.add('show');
+};
+$('kBatal').onclick = () => $('konfirm').classList.remove('show');
+$('kLanjut').onclick = () => { $('konfirm').classList.remove('show'); jalankanAktivasi(); };
+
+(async function init() {
+  try {
+    renderSn(ekstrakSn(await rtdbGet(PATH_SN)));
+  } catch (e) {
+    $('snList').innerHTML = '<div class="note err">Gagal memuat SN. Periksa koneksi.</div>';
+  }
+  try {
+    renderPaket(await rtdbGet(PATH_PAKET));
+  } catch (e) {
+    $('paketList').innerHTML = '<div class="note err">Gagal memuat paket. Periksa koneksi.</div>';
+  }
+})();
+</script>
+</body>
+</html>
