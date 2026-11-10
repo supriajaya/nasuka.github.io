@@ -18,12 +18,22 @@
     
     <div class="cctv-container">
         <div class="live-indicator">🔴 LIVE</div>
-        <video id="remote-video" autoplay playsinline controls></video>
+        <!-- Menambahkan atribut 'muted' agar diizinkan Autoplay oleh browser -->
+        <video id="remote-video" autoplay playsinline muted controls></video>
     </div>
 
     <script>
         const remoteVideo = document.getElementById('remote-video');
-        const peer = new Peer();
+        
+        // Menambahkan konfigurasi STUN Server untuk menembus batasan jaringan/firewall
+        const peer = new Peer({
+            config: {
+                'iceServers': [
+                    { urls: 'stun:://google.com' },
+                    { urls: 'stun:://google.com' }
+                ]
+            }
+        });
 
         // Harus SAMA EXACT dengan ID yang Anda tulis di halaman penyiar tadi
         const streamerId = 'nasukawireless12345'; 
