@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCTV Source Stream</title>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #222; color: #fff; padding: 20px; }
+        video { width: 100%; max-width: 400px; background: #000; border: 2px solid green; }
+        .status { color: #00ff00; font-weight: bold; margin: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>Kamera CCTV Aktif</h1>
+    <div class="status" id="status">Menghubungkan server...</div>
+    <video id="local-video" autoplay muted playsinline></video>
+
+    <script>
+        const videoElement = document.getElementById('local-video');
+        const statusDisplay = document.getElementById('status');
+        let localStream;
+
+        // Kunci ID penyiar di sini agar tidak berubah-ubah
+        // Ganti 'cctv-rahasia-anda-123' dengan nama unik buatan Anda sendiri
+        const peer = new Peer('cctv-rahasia-anda-123'); 
+
+        navigator.mediaDevices.getUserMedia({ 
+            video: { width: 1280, height: 720, frameRate: { ideal: 15, max: 24 } },
+            audio: false 
+        })
+        .then(stream => {
+            localStream = stream;
+            videoElement.srcObject = stream;
+
+            peer.on('open', (id) => {
+                statusDisplay.innerText = "CCTV Siap Disiarkan secara Live!";
+            });
+        })
+        .catch(err => {
+            statusDisplay.innerText = "Gagal mengakses kamera.";
+            console.error(err);
+        });
+
+        peer.on('call', (call) => {
+            call.answer(localStream);
+        });
+
+        peer.on('disconnected', () => {
+            setTimeout(() => { location.reload(); }, 5000);
+        });
+    </script>
+</body>
+</html>
