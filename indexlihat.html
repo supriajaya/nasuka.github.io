@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live CCTV Viewer</title>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #111; color: #fff; padding: 20px; }
+        .cctv-container { max-width: 800px; margin: auto; background: #000; border: 3px solid #333; position: relative; }
+        video { width: 100%; display: block; }
+        .live-indicator { position: absolute; top: 10px; left: 10px; background: red; color: white; padding: 5px 10px; font-weight: bold; border-radius: 4px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <h1>Live Streaming CCTV</h1>
+    
+    <div class="cctv-container">
+        <div class="live-indicator">🔴 LIVE</div>
+        <video id="remote-video" autoplay playsinline controls></video>
+    </div>
+
+    <script>
+        const remoteVideo = document.getElementById('remote-video');
+        const peer = new Peer();
+
+        // Harus SAMA EXACT dengan ID yang Anda tulis di halaman penyiar tadi
+        const streamerId = 'cctv-rahasia-anda-123'; 
+
+        peer.on('open', () => {
+            hubungkanKeCCTV();
+        });
+
+        function hubungkanKeCCTV() {
+            const call = peer.call(streamerId, new MediaStream());
+
+            call.on('stream', (remoteStream) => {
+                remoteVideo.srcObject = remoteStream;
+            });
+
+            call.on('close', () => {
+                setTimeout(hubungkanKeCCTV, 10000);
+            });
+        }
+    </script>
+</body>
+</html>
