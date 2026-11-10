@@ -22,10 +22,15 @@
         const statusDisplay = document.getElementById('status');
         let localStream;
 
-        // Kunci ID penyiar di sini agar tidak berubah-ubah
-        // Ganti 'cctv-rahasia-anda-123' dengan nama unik buatan Anda sendiri
-        const peer = new Peer('nasukawireless12345'); 
-
+        // Mengunci ID 'nasukawireless12345' lengkap dengan konfigurasi STUN Server Google
+        const peer = new Peer('nasukawireless12345', {
+            config: {
+                'iceServers': [
+                    { urls: 'stun:://google.com' },
+                    { urls: 'stun:://google.com' }
+                ]
+            }
+        }); 
 
         navigator.mediaDevices.getUserMedia({ 
             video: { width: 1280, height: 720, frameRate: { ideal: 15, max: 24 } },
